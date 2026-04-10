@@ -1,0 +1,6 @@
+@InsureTrust.CalculatorService_HostAddress = http://localhost:5265
+
+GET {{InsureTrust.CalculatorService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

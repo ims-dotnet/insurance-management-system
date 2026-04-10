@@ -1,0 +1,6 @@
+@InsureTrust.AdminService_HostAddress = http://localhost:5067
+
+GET {{InsureTrust.AdminService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

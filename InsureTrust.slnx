@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/frontend/">
+    <Project Path="frontend/InsureTrust.Web/InsureTrust.Web.csproj" />
+  </Folder>
+  <Folder Name="/gateways/">
+    <Project Path="gateways/InsureTrust.Gateway/InsureTrust.Gateway.csproj" />
+  </Folder>
+  <Folder Name="/services/">
+    <Project Path="services/InsureTrust.AdminService/InsureTrust.AdminService.csproj" Id="7b24c9b4-3a84-41da-8314-85209f50f987" />
+    <Project Path="services/InsureTrust.NotificationService/InsureTrust.NotificationService.csproj" Id="95fee58e-a951-48d7-9b13-32dcb6be82bd" />
+    <Project Path="services/InsureTrust.QueryService/InsureTrust.SupportService.csproj" Id="4283b353-4f58-4958-b7d5-17d6b4a80559" />
+    <Project Path="services/InsureTrust.CalculatorService/InsureTrust.CalculatorService.csproj" />
+    <Project Path="services/InsureTrust.ClaimService/InsureTrust.ClaimService.csproj" />
+    <Project Path="services/InsureTrust.IdentityService/InsureTrust.IdentityService.csproj" />
+    <Project Path="services/InsureTrust.PaymentService/InsureTrust.PaymentService.csproj" />
+    <Project Path="services/InsureTrust.ProductService/InsureTrust.ProductService.csproj" />
+  </Folder>
+  <Folder Name="/shared/">
+    <Project Path="shared/InsureTrust.Shared/InsureTrust.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/InsureTrust.ClaimService.Tests/InsureTrust.ClaimService.Tests.csproj" />
+    <Project Path="tests/InsureTrust.IdentityService.Tests/InsureTrust.IdentityService.Tests.csproj" />
+    <Project Path="tests/InsureTrust.Integration.Tests/InsureTrust.Integration.Tests.csproj" />
+    <Project Path="tests/InsureTrust.PaymentService.Tests/InsureTrust.PaymentService.Tests.csproj" />
+    <Project Path="tests/InsureTrust.ProductService.Tests/InsureTrust.ProductService.Tests.csproj" />
+  </Folder>
+</Solution>
