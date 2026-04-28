@@ -1,0 +1,156 @@
+@model InsureTrust.Web.Models.AdminPolicyTypeFormViewModel
+
+@{
+    ViewData["Title"] = Model.Id.HasValue ? "Edit Policy Type" : "Create New Policy Type";
+    var pageTitle = Model.Id.HasValue ? "Edit Policy Type" : "Create New Policy Type";
+}
+
+<section class="admin-policy-editor-page">
+    <a href="/Admin/Dashboard" class="admin-policy-editor-back">&larr; Back to Dashboard</a>
+    <h1>@pageTitle</h1>
+    <p class="admin-policy-editor-subtitle">Once created, this policy will immediately appear for all customers to purchase.</p>
+
+    @if (TempData["PolicyTypeError"] is string errorMessage)
+    {
+        <div class="admin-policy-alert admin-policy-alert-error">@errorMessage</div>
+    }
+
+    <div class="admin-policy-editor-note">
+        <strong>Real-time visibility:</strong> The new policy type will be visible immediately on the customer dashboard after saving.
+    </div>
+
+    <div class="admin-policy-editor-grid">
+        <form asp-controller="Admin" asp-action="CreatePolicyType" method="post" class="admin-policy-editor-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <h3>Basic Information</h3>
+
+            <label asp-for="Name">Policy Type Name <span>*</span></label>
+            <input asp-for="Name" class="form-control-box" placeholder="e.g. Cyber Insurance, Travel Insurance" />
+            <small>This name will appear on the customer buy page</small>
+
+            <label asp-for="Category">Category <span>*</span></label>
+            <select asp-for="Category" class="form-control-box">
+                <option>Personal</option>
+                <option>Business</option>
+                <option>Enterprise</option>
+            </select>
+            <small>Personal plans appear first; Business plans are shown as Enterprise</small>
+
+            <label asp-for="Description">Description <span>*</span></label>
+            <textarea asp-for="Description" rows="3" class="form-control-box" placeholder="Brief description shown to customers when browsing plans..."></textarea>
+
+            <label asp-for="CoverageDetails">Coverage Details</label>
+            <input asp-for="CoverageDetails" class="form-control-box" placeholder="e.g. Data breach, Ransomware, Business interruption" />
+            <small>Comma-separated list of coverage items shown on the plan card</small>
+
+            <hr class="admin-policy-editor-divider" />
+
+            <h3>Icon</h3>
+            <small>Select an icon to represent this policy type</small>
+            <input type="hidden" asp-for="Icon" id="policyTypeIcon" />
+            <div class="admin-policy-icon-grid" id="policyIconGrid">
+                @foreach (var icon in new[] { "🛡️", "❤️", "🚗", "🏠", "🏢", "👥", "⚙️", "✈️", "☂️", "📱", "💻", "💰", "🔥", "💧" })
+                {
+                    <button type="button" class="admin-policy-icon-btn" data-icon="@icon">@icon</button>
+                }
+            </div>
+
+            <hr class="admin-policy-editor-divider" />
+
+            <h3>Pricing &amp; Tenure</h3>
+
+            <label asp-for="BaseMonthlyPremium">Base Monthly Premium (₹) <span>*</span></label>
+            <input asp-for="BaseMonthlyPremium" type="number" min="1" step="1" class="form-control-box" />
+            <small>Customers can choose ₹5K, ₹10K, or ₹15K packages</small>
+
+            <div class="admin-policy-tenure-grid">
+                <div>
+                    <label asp-for="MinTenureMonths">Min Tenure (Months)</label>
+                    <input asp-for="MinTenureMonths" type="number" min="1" class="form-control-box" />
+                </div>
+                <div>
+                    <label asp-for="MaxTenureMonths">Max Tenure (Months)</label>
+                    <input asp-for="MaxTenureMonths" type="number" min="1" class="form-control-box" />
+                </div>
+            </div>
+
+            <hr class="admin-policy-editor-divider" />
+
+            <div class="admin-policy-editor-actions">
+                <button type="submit" name="submitAction" value="save" class="btn-inst admin-dashboard-create">
+                    @(Model.Id.HasValue ? "Save Policy Type" : "Create & Publish Policy Type")
+                </button>
+                <button type="submit" name="submitAction" value="cancel" class="btn-inst">Cancel</button>
+            </div>
+        </form>
+
+        <div class="admin-policy-live-preview">
+            <h3>Live Preview</h3>
+            <p>This is how customers will see this policy on the Buy Insurance page</p>
+
+            <div class="admin-policy-preview-card">
+                <div class="admin-policy-preview-icon" id="previewIcon">@Model.Icon</div>
+                <h4 id="previewName">@(string.IsNullOrWhiteSpace(Model.Name) ? "Policy Name" : Model.Name)</h4>
+                <p class="admin-policy-preview-category" id="previewCategory">@Model.Category.ToUpperInvariant() INSURANCE</p>
+                <p id="previewDescription">@(string.IsNullOrWhiteSpace(Model.Description) ? "Description will appear here..." : Model.Description)</p>
+                <p class="admin-policy-preview-price">From ₹<span id="previewPrice">@Model.BaseMonthlyPremium.ToString("N0")</span>/month</p>
+            </div>
+
+            <div class="admin-policy-editor-success-note">
+                <strong>Immediate Effect</strong>
+                <p>After you click "Create &amp; Publish", this policy type will instantly appear on every customer's "Buy Insurance" page. All registered users can immediately purchase it.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const iconInput = document.getElementById("policyTypeIcon");
+            const iconGrid = document.getElementById("policyIconGrid");
+            const previewIcon = document.getElementById("previewIcon");
+            const nameInput = document.getElementById("Name");
+            const categoryInput = document.getElementById("Category");
+            const descriptionInput = document.getElementById("Description");
+            const priceInput = document.getElementById("BaseMonthlyPremium");
++
+            function updatePreview() {
+                document.getElementById("previewName").textContent = nameInput.value.trim() || "Policy Name";
+                document.getElementById("previewCategory").textContent = (categoryInput.value || "Personal").toUpperCase() + " INSURANCE";
+                document.getElementById("previewDescription").textContent = descriptionInput.value.trim() || "Description will appear here...";
+                const price = Number(priceInput.value || 0);
+                document.getElementById("previewPrice").textContent = price > 0 ? price.toLocaleString("en-IN") : "0";
+                previewIcon.textContent = iconInput.value || "🛡️";
+            }
+
+            function markSelectedIcon() {
+                const selected = iconInput.value || "🛡️";
+                iconGrid.querySelectorAll(".admin-policy-icon-btn").forEach(btn => {
+                    btn.classList.toggle("is-selected", btn.dataset.icon === selected);
+                });
+            }
+
+            iconGrid.querySelectorAll(".admin-policy-icon-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    iconInput.value = btn.dataset.icon;
+                    markSelectedIcon();
+                    updatePreview();
+                });
+            });
+
+            [nameInput, categoryInput, descriptionInput, priceInput].forEach(el => {
+                el.addEventListener("input", updatePreview);
+            });
+
+            if (!iconInput.value) {
+                iconInput.value = "🛡️";
+            }
+
+            markSelectedIcon();
+            updatePreview();
+        })();
+    </script>
+}

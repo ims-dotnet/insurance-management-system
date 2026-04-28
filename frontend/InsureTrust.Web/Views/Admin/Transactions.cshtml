@@ -1,0 +1,123 @@
+@model List<InsureTrust.Web.Models.AdminTransactionViewModel>
+
+@{
+    ViewData["Title"] = "Transactions";
+    var pendingCount = Model.Count(t => string.Equals(t.Status, "Pending", StringComparison.OrdinalIgnoreCase));
+    var successCount = Model.Count(t => string.Equals(t.Status, "Success", StringComparison.OrdinalIgnoreCase));
+    var failedCount = Model.Count(t => string.Equals(t.Status, "Failed", StringComparison.OrdinalIgnoreCase));
+    var totalAmount = Model.Sum(t => t.Amount);
+}
+
+<section class="admin-transactions-page">
+    <div class="admin-ledger-head">
+        <div>
+            <p class="admin-ledger-index">Record Index 4.F</p>
+            <h1>Transaction History Ledger</h1>
+        </div>
+        <label class="admin-ledger-filter">
+            <i class="fas fa-receipt" aria-hidden="true"></i>
+            <input type="text" id="adminTransactionsFilter" placeholder="Filter transactions..." aria-label="Filter transactions" />
+        </label>
+    </div>
+
+    <div class="admin-ledger-divider"></div>
+
+    <div class="admin-transactions-kpis">
+        <article class="admin-transactions-kpi admin-transactions-kpi-warn">
+            <p>Pending</p>
+            <h2>@pendingCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-transactions-kpi admin-transactions-kpi-success">
+            <p>Success</p>
+            <h2>@successCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-transactions-kpi admin-transactions-kpi-danger">
+            <p>Failed</p>
+            <h2>@failedCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-transactions-kpi">
+            <p>Total Amount</p>
+            <h2>$@totalAmount.ToString("N2")</h2>
+        </article>
+    </div>
+
+    <div class="admin-panel admin-transactions-panel">
+        <div class="admin-panel-head">
+            <h3>Payment Register</h3>
+            <a href="/Admin/Dashboard" class="btn-inst">Back to Dashboard</a>
+        </div>
+
+        <div class="admin-transactions-table-wrap">
+            <table class="table-ledger admin-transactions-table" id="adminTransactionsTable">
+                <thead>
+                    <tr>
+                        <th>Payment Number</th>
+                        <th>User Name</th>
+                        <th>User Email</th>
+                        <th>Policy Number</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var transaction in Model)
+                        {
+                            var status = string.IsNullOrWhiteSpace(transaction.Status) ? "Pending" : transaction.Status;
+                            var chipClass = string.Equals(status, "Success", StringComparison.OrdinalIgnoreCase)
+                                ? "admin-chip admin-chip-success"
+                                : string.Equals(status, "Failed", StringComparison.OrdinalIgnoreCase)
+                                    ? "admin-chip admin-chip-danger"
+                                    : "admin-chip admin-chip-warn";
+
+                            <tr>
+                                <td>@transaction.PaymentNumber</td>
+                                <td>@transaction.UserName</td>
+                                <td>@transaction.UserEmail</td>
+                                <td>@transaction.PolicyNumber</td>
+                                <td>$@transaction.Amount.ToString("N2")</td>
+                                <td><span class="@chipClass">@status</span></td>
+                                <td>@transaction.PaymentDate.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="admin-transactions-empty">No transactions available right now.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById("adminTransactionsFilter");
+            const table = document.getElementById("adminTransactionsTable");
+
+            if (!input || !table) {
+                return;
+            }
+
+            input.addEventListener("input", function () {
+                const term = input.value.trim().toLowerCase();
+                const rows = table.querySelectorAll("tbody tr");
+
+                rows.forEach(function (row) {
+                    if (row.querySelector(".admin-transactions-empty")) {
+                        return;
+                    }
+
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? "" : "none";
+                });
+            });
+        })();
+    </script>
+}

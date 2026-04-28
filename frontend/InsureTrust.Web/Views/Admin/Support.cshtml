@@ -1,0 +1,177 @@
+@model List<InsureTrust.Web.Models.AdminSupportViewModel>
+
+@{
+    ViewData["Title"] = "Support Tickets";
+    var pendingCount = Model.Count(t => string.Equals(t.Status, "Pending", StringComparison.OrdinalIgnoreCase));
+    var inProgressCount = Model.Count(t => string.Equals(t.Status, "InProgress", StringComparison.OrdinalIgnoreCase));
+    var resolvedCount = Model.Count(t => string.Equals(t.Status, "Resolved", StringComparison.OrdinalIgnoreCase));
+}
+
+<section class="admin-support-page">
+    <div class="admin-ledger-head">
+        <div>
+            <p class="admin-ledger-index">Record Index 4.E</p>
+            <h1>Support Ticket Ledger</h1>
+        </div>
+        <label class="admin-ledger-filter">
+            <i class="fas fa-ticket-alt" aria-hidden="true"></i>
+            <input type="text" id="adminSupportFilter" placeholder="Filter tickets..." aria-label="Filter tickets" />
+        </label>
+    </div>
+
+    <div class="admin-ledger-divider"></div>
+
+    @if (TempData["SupportActionSuccess"] is string successMessage)
+    {
+        <div class="admin-support-alert admin-support-alert-success">@successMessage</div>
+    }
+
+    @if (TempData["SupportActionError"] is string errorMessage)
+    {
+        <div class="admin-support-alert admin-support-alert-error">@errorMessage</div>
+    }
+
+    <div class="admin-support-kpis">
+        <article class="admin-support-kpi admin-support-kpi-warn">
+            <p>Pending</p>
+            <h2>@pendingCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-support-kpi admin-support-kpi-info">
+            <p>In Progress</p>
+            <h2>@inProgressCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-support-kpi admin-support-kpi-success">
+            <p>Resolved</p>
+            <h2>@resolvedCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-support-kpi">
+            <p>Total Tickets</p>
+            <h2>@Model.Count.ToString("N0")</h2>
+        </article>
+    </div>
+
+    <div class="admin-panel admin-support-panel">
+        <div class="admin-panel-head">
+            <h3>Support Desk Queue</h3>
+            <a href="/Admin/Dashboard" class="btn-inst">Back to Dashboard</a>
+        </div>
+
+        <div class="admin-support-table-wrap">
+            <table class="table-ledger admin-support-table" id="adminSupportTable">
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Subject</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Attachment</th>
+                        <th>Created At</th>
+                        <th>Resolved At</th>
+                        <th>Admin Response + Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var ticket in Model)
+                        {
+                            var status = string.IsNullOrWhiteSpace(ticket.Status) ? "Pending" : ticket.Status;
+                            var normalized = status.Replace(" ", "", StringComparison.OrdinalIgnoreCase);
+                            var statusClass = string.Equals(normalized, "Resolved", StringComparison.OrdinalIgnoreCase)
+                                ? "admin-chip admin-chip-success"
+                                : string.Equals(normalized, "InProgress", StringComparison.OrdinalIgnoreCase)
+                                    ? "admin-chip admin-chip-info"
+                                    : "admin-chip admin-chip-warn";
+
+                            <tr>
+                                <td>@ticket.TicketNumber</td>
+                                <td>@ticket.Subject</td>
+                                <td class="admin-support-description">@ticket.Description</td>
+                                <td><span class="@statusClass">@status</span></td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(ticket.AttachmentUrl))
+                                    {
+                                        <a href="@ticket.AttachmentUrl" target="_blank" rel="noopener noreferrer">View File</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="admin-support-empty-cell">No Attachment</span>
+                                    }
+                                </td>
+                                <td>@ticket.CreatedAt.ToString("dd MMM yyyy")</td>
+                                <td>@(ticket.ResolvedAt.HasValue ? ticket.ResolvedAt.Value.ToString("dd MMM yyyy") : "-")</td>
+                                <td>
+                                    <form asp-controller="Admin" asp-action="UpdateSupportStatus" method="post" class="admin-support-action-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@ticket.Id" />
+                                        <select name="status" class="form-control-box admin-support-status-select" aria-label="Support status">
+                                            @if (string.Equals(normalized, "Pending", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <option value="Pending" selected>Pending</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="Pending">Pending</option>
+                                            }
+                                            @if (string.Equals(normalized, "InProgress", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <option value="InProgress" selected>InProgress</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="InProgress">InProgress</option>
+                                            }
+                                            @if (string.Equals(normalized, "Resolved", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <option value="Resolved" selected>Resolved</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="Resolved">Resolved</option>
+                                            }
+                                        </select>
+                                        <textarea name="adminResponse" rows="2" class="form-control-box admin-support-response" placeholder="Add response for customer">@ticket.AdminResponse</textarea>
+                                        <button type="submit" class="btn-inst">Update Ticket</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="admin-support-empty">No support tickets available right now.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById("adminSupportFilter");
+            const table = document.getElementById("adminSupportTable");
+
+            if (!input || !table) {
+                return;
+            }
+
+            input.addEventListener("input", function () {
+                const term = input.value.trim().toLowerCase();
+                const rows = table.querySelectorAll("tbody tr");
+
+                rows.forEach(function (row) {
+                    if (row.querySelector(".admin-support-empty")) {
+                        return;
+                    }
+
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? "" : "none";
+                });
+            });
+        })();
+    </script>
+}

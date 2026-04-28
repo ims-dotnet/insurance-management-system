@@ -1,0 +1,37 @@
+<aside class="sidebar">
+    <!-- User Profile Section -->
+    <div class="sidebar-profile">
+        <div class="sidebar-avatar">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=random" alt="Admin" />
+        </div>
+        <div class="sidebar-info">
+            <p class="sidebar-name">Admin Account</p>
+            <p class="sidebar-role">Super Administrator</p>
+        </div>
+    </div>
+
+    <a href="/Admin/Dashboard" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")" style="color: var(--text-ink); font-weight: bold;">
+        <i class="fas fa-chart-line" style="margin-right: 8px;"></i> Dashboard
+    </a>
+    <a href="/Admin/Policies" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Policies" ? "active" : "")" style="color: var(--text-ink); margin-top: 0.25rem;">
+        <i class="fas fa-file-contract" style="margin-right: 8px;"></i> Policies Management
+    </a>
+    <a href="/Admin/Claims" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Claims" ? "active" : "")" style="color: var(--text-ink); margin-top: 0.25rem;">
+        <i class="fas fa-hand-holding-medical" style="margin-right: 8px;"></i> Claims Management
+    </a>
+    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+        <i class="fas fa-sync-alt" style="margin-right: 8px;"></i> Renewals Management
+    </a>
+    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+        <i class="fas fa-receipt" style="margin-right: 8px;"></i> Transaction Logs
+    </a>
+    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+        <i class="fas fa-users" style="margin-right: 8px;"></i> User Management
+    </a>
+    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+        <i class="fas fa-headset" style="margin-right: 8px;"></i> Support
+    </a>
+    <a href="/Account/Logout" style="color: var(--accent-red); margin-top: auto; border-top: 1px solid var(--border-dark); padding-top: 1.5rem; font-size: 0.85rem; font-weight: bold;">
+        <i class="fas fa-sign-out-alt" style="margin-right: 10px; font-size: 1.1rem;"></i> Logout
+    </a>
+</aside>

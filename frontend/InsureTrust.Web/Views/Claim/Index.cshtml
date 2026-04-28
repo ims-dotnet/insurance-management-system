@@ -1,0 +1,115 @@
+@model IEnumerable<InsureTrust.Web.Models.ClaimViewModel>
+
+@{
+    ViewData["Title"] = "Your Claims Ledger";
+    var claims = Model.ToList();
+    var total = claims.Sum(c => c.MaturityAmount);
+}
+
+<div style="margin-bottom: 2rem;">
+    <div style="font-family: var(--font-heading); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-ink); margin-bottom: 0.25rem;">RECORD INDEX 4.A</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; font-weight: bold; text-transform: none; margin: 0;">Your Claims Ledger</h1>
+        <div style="display: flex; align-items: center; gap: 1rem; flex: 0 0 auto; margin-left: 2rem;">
+            <input type="text" id="ledger-filter" placeholder="FILTER LEDGER..." onkeyup="filterLedger(this.value)"
+                style="background: transparent; border: none; border-bottom: 1px solid var(--accent-red); padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem; color: var(--accent-red); width: 200px; outline: none;" />
+            <span style="color: var(--text-ink); font-size: 1rem;">&#9776;</span>
+        </div>
+    </div>
+</div>
+
+<hr class="divider-thick" style="border-top-color: var(--accent-green); margin-bottom: 0;" />
+
+<table class="table-ledger" id="claims-table" style="margin-bottom: 0;">
+    <thead>
+        <tr>
+            <th>CLAIM ID</th>
+            <th>DATE FILED</th>
+            <th>POLICY REF</th>
+            <th style="text-align: right;">CLAIM AMOUNT</th>
+            <th>STATUS</th>
+            <th style="text-align: right;">ACTION</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!claims.Any())
+        {
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 3rem; font-family: var(--font-heading); opacity: 0.5;">
+                    No claims on record. File a new claim to begin.
+                </td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var claim in claims)
+            {
+                <tr>
+                    <td style="font-family: var(--font-heading); font-weight: bold;">@claim.ClaimNumber</td>
+                    <td>@claim.SubmittedAt.ToString("MMM dd, yyyy")</td>
+                    <td>@claim.PolicyNumber</td>
+                    <td style="text-align: right; font-family: var(--font-heading);">$@claim.MaturityAmount.ToString("N2")</td>
+                    <td>
+                        @{
+                            var statusLower = claim.ClaimStatus.ToLower();
+                            string badgeStyle;
+                            if (statusLower == "pending")
+                                badgeStyle = "background-color: #4a4a2a; color: #fff; border: none;";
+                            else if (statusLower == "verification" || statusLower == "under review")
+                                badgeStyle = "background-color: var(--accent-red); color: #fff; border: none;";
+                            else if (statusLower == "approved" || statusLower == "paid" || statusLower == "cleared")
+                                badgeStyle = "background-color: var(--accent-green); color: #fff; border: none;";
+                            else if (statusLower == "denied" || statusLower == "rejected")
+                                badgeStyle = "background-color: #c0392b; color: #fff; border: none;";
+                            else
+                                badgeStyle = "background-color: var(--border-light); color: var(--text-ink); border: 1px solid var(--border-dark);";
+                        }
+                        <span class="status-badge" style="@badgeStyle padding: 0.3rem 0.75rem; font-size: 0.65rem; letter-spacing: 1px;">
+                            @claim.ClaimStatus.ToUpper()
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <button class="btn-inst" style="font-size: 0.65rem; line-height: 1.4; padding: 0.3rem 0.6rem; text-align: center;">
+                            VIEW<br/>DETAILS
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" style="font-family: var(--font-heading); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; padding-top: 1.25rem; border-top: 2px solid var(--accent-green); color: var(--text-ink);">
+                TOTAL ACTIVE EXPOSURE
+            </td>
+            <td style="text-align: right; font-family: var(--font-heading); font-size: 1.1rem; font-weight: bold; padding-top: 1.25rem; border-top: 2px solid var(--accent-green);">
+                $@total.ToString("N2")
+            </td>
+            <td colspan="2" style="border-top: 2px solid var(--accent-green);"></td>
+        </tr>
+    </tfoot>
+</table>
+
+<hr style="border: none; border-top: 1px solid var(--border-light); margin: 2rem 0;" />
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-family: var(--font-sans); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-ink); opacity: 0.7;">
+        PAGE 1 OF 42 &bull; SORTED BY DATE FILED (DESC)
+    </span>
+    <div style="display: flex; gap: 0.25rem;">
+        <button class="btn-inst" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;">&lt;</button>
+        <button class="btn-inst" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;">&gt;</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterLedger(val) {
+            var rows = document.querySelectorAll('#claims-table tbody tr');
+            rows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.includes(val.toLowerCase()) ? '' : 'none';
+            });
+        }
+    </script>
+}
