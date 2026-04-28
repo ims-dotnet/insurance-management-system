@@ -1,0 +1,261 @@
+@* @model InsureTrust.Web.Models.RenewalHistoryViewModel
+
+@{
+    ViewData["Title"] = "Renewal Audit Ledger";
+}
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem; display: flex; flex-direction: column;">
+    
+    <div style="border-bottom: 2px solid var(--border-dark); padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; text-transform: none; font-family: var(--font-heading);">Renewal Audit Ledger</h1>
+            <p style="color: var(--text-ink); font-family: var(--font-sans); margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                OFFICIAL RECORD OF FINANCIAL MOVEMENTS &mdash; UTC TIME STANDARD
+            </p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn-inst btn-inst-primary" style="padding: 0.6rem 1rem;">
+                &#x1F4E5; FOLIO EXPORT
+            </button>
+            <button class="btn-inst btn-inst-primary" style="padding: 0.6rem 1rem; background-color: #2b3a2f; color: #fff; border-color: #2b3a2f;">
+                &#x1F4E5; LEDGER DOWNLOAD
+            </button>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div style="padding: 2rem; border: 1px solid var(--border-dark); text-align: center; font-family: var(--font-sans); background: rgba(255,255,255,0.2);">
+            @ViewBag.Error
+        </div>
+    }
+    else
+    {
+        <!-- Summary Boxes -->
+        <div style="display: flex; border: 2px solid var(--border-dark); margin-bottom: 2rem; background: transparent;">
+            <div style="flex: 1; padding: 1.5rem; border-right: 1px solid var(--border-dark);">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Total Renewals Processed</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading);">
+                    @Model.TotalRenewals
+                </div>
+            </div>
+            <div style="flex: 1; padding: 1.5rem; border-right: 1px solid var(--border-dark);">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Cleared & Verified</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading); color: var(--accent-green);">
+                    @Model.SuccessfulRenewals
+                </div>
+            </div>
+            <div style="flex: 1; padding: 1.5rem; border-right: 1px solid var(--border-dark);">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Failed / Flagged</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading); color: var(--accent-red);">
+                    @Model.FailedRenewals
+                </div>
+            </div>
+            <div style="flex: 1; padding: 1.5rem;">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Last Audit Cycle</div>
+                <div style="font-size: 1rem; font-weight: bold; font-family: var(--font-sans); text-transform: uppercase; margin-top: 0.8rem;">
+                    @DateTime.UtcNow.ToString("MMM dd, yyyy - HH:mm EST")
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; font-family: var(--font-sans);">
+            <div style="flex: 1; max-width: 400px;">
+                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.3rem;">SEARCH LEDGER</label>
+                <div style="display: flex; border-bottom: 1px solid var(--border-dark); padding-bottom: 0.3rem;">
+                    <input type="text" placeholder="Enter Transaction ID or Reference..." style="border: none; background: transparent; outline: none; flex: 1; font-family: var(--font-sans);" />
+                    <span>&#x1F50D;</span>
+                </div>
+            </div>
+            <div style="width: 200px;">
+                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.3rem;">FILTER METHOD</label>
+                <select style="width: 100%; border: 1px solid var(--border-dark); background: transparent; padding: 0.4rem; font-family: var(--font-sans); outline: none;">
+                    <option>ALL METHODS</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div style="border: 1px solid var(--border-dark); padding: 0.5rem; background: rgba(232, 228, 217, 0.5);">
+            <table class="table-ledger" style="margin-bottom: 0;">
+                <thead>
+                    <tr>
+                        <th style="background-color: transparent;">TRANSACTION ID</th>
+                        <th style="background-color: transparent;">TIMESTAMP (UTC)</th>
+                        <th style="background-color: transparent;">USER ENTITY</th>
+                        <th style="background-color: transparent;">POLICY REF</th>
+                        <th style="background-color: transparent;">METHOD</th>
+                        <th style="background-color: transparent; text-align: right;">AMOUNT ($)</th>
+                        <th style="background-color: transparent; text-align: center;">STATUS</th>
+                    </tr>
+                </thead>
+                <tbody style="background-color: #fcfbfa;">
+                    @if (Model.Renewals == null || !Model.Renewals.Any())
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">No records found in institutional ledger.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Renewals)
+                        {
+                            <tr>
+                                <td style="font-weight: bold; font-family: var(--font-sans);">@item.PaymentNumber</td>
+                                <td>@item.PaymentDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@((item.Remarks != null && item.Remarks.Length > 20) ? item.Remarks.Substring(0, 20) + "..." : item.Remarks ?? "N/A")</td>
+                                <td>POL-@item.UserPolicyId</td>
+                                <td>@item.PaymentMethod.ToUpper()</td>
+                                <td style="text-align: right; font-weight: bold;">@item.Amount.ToString("N2")</td>
+                                <td style="text-align: center;">
+                                    @{
+                                        string statusClass = "status-pending";
+                                        string statusText = item.Status?.ToUpper() ?? "PENDING";
+                                        if (item.Status == "Success")
+                                        {
+                                            statusClass = "status-cleared";
+                                            statusText = "CLEARED";
+                                        }
+                                        else if (item.Status == "Failed")
+                                        {
+                                            statusClass = "status-void";
+                                            statusText = "FLAGGED";
+                                        }
+                                    }
+                                    <span class="status-badge @statusClass" style="width: 70px; text-align: center; color: #fff; background-color: @(statusText == "CLEARED" ? "#4b6b55" : (statusText == "FLAGGED" ? "#8b2626" : "#4a4636")); border: none; padding: 0.4rem;">
+                                        @statusText
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0.5rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                <div>SHOWING ROWS 1-@(Model.Renewals?.Count ?? 0) OF @(Model.TotalRenewals)</div>
+                <div style="display: flex; gap: 0.3rem;">
+                    <button class="btn-inst" style="padding: 0.3rem 0.6rem; border-color: var(--border-light); color: var(--border-light);">PREV</button>
+                    <button class="btn-inst" style="padding: 0.3rem 0.6rem; border-color: var(--border-dark);">NEXT</button>
+                </div>
+            </div>
+        </div>
+    }
+</div> *@
+@model InsureTrust.Web.Models.RenewalHistoryViewModel
+
+@{
+    ViewData["Title"] = "Renewal Audit Ledger";
+}
+
+<style>
+    @@media (max-width: 900px) {
+        .renewal-summary-row {
+            flex-direction: column !important;
+        }
+
+        .ledger-scroll {
+            overflow-x: auto;
+        }
+
+            .ledger-scroll table {
+                min-width: 900px;
+            }
+    }
+</style>
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem; display: flex; flex-direction: column;">
+
+    <div style="border-bottom: 2px solid var(--border-dark); padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+        <div>
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; text-transform: none; font-family: var(--font-heading);">Renewal Audit Ledger</h1>
+            <p style="color: var(--text-ink); font-family: var(--font-sans); margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                Official record of policy renewal transactions
+            </p>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div style="padding: 2rem; border: 1px solid var(--border-dark); text-align: center; font-family: var(--font-sans); background: rgba(255,255,255,0.2);">
+            @ViewBag.Error
+        </div>
+    }
+    else
+    {
+        <div class="renewal-summary-row" style="display: flex; border: 2px solid var(--border-dark); margin-bottom: 2rem; background: transparent;">
+            <div style="flex: 1; padding: 1.5rem; border-right: 1px solid var(--border-dark);">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase;">Total Renewals</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading);">@Model.TotalRenewals</div>
+            </div>
+
+            <div style="flex: 1; padding: 1.5rem; border-right: 1px solid var(--border-dark);">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase;">Successful</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading); color: var(--accent-green);">@Model.SuccessfulRenewals</div>
+            </div>
+
+            <div style="flex: 1; padding: 1.5rem;">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase;">Failed</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading); color: var(--accent-red);">@Model.FailedRenewals</div>
+            </div>
+        </div>
+
+        <div class="ledger-scroll" style="border: 1px solid var(--border-dark); padding: 0.5rem; background: rgba(232, 228, 217, 0.5);">
+            <table class="table-ledger" style="margin-bottom: 0; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>PAYMENT NUMBER</th>
+                        <th>TIMESTAMP</th>
+                        <th>USER POLICY ID</th>
+                        <th>POLICY NUMBER</th>
+                        <th>METHOD</th>
+                        <th style="text-align: right;">AMOUNT</th>
+                        <th style="text-align: center;">STATUS</th>
+                    </tr>
+                </thead>
+
+                <tbody style="background-color: #fcfbfa;">
+                    @if (Model.Renewals == null || !Model.Renewals.Any())
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">No renewal records found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Renewals)
+                        {
+                            var policyRef = !string.IsNullOrWhiteSpace(item.PolicyNumber)
+                                ? item.PolicyNumber
+                                : $"POL-{item.UserPolicyId}";
+
+                            string statusText = item.Status == "Success" ? "CLEARED" :
+                                                item.Status == "Failed" ? "FLAGGED" : "PENDING";
+
+                            string bg = statusText == "CLEARED" ? "#4b6b55" :
+                                        statusText == "FLAGGED" ? "#8b2626" : "#4a4636";
+
+                            <tr>
+                                <td style="font-weight: bold;">@item.PaymentNumber</td>
+                                <td>@item.PaymentDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@item.UserPolicyId</td>
+                                <td>@policyRef</td>
+                                <td>@item.PaymentMethod.ToUpper()</td>
+                                <td style="text-align: right; font-weight: bold;">₹@item.Amount.ToString("N2")</td>
+                                <td style="text-align: center;">
+                                    <span class="status-badge" style="width: 80px; text-align: center; color: #fff; background-color: @bg; border: none; padding: 0.4rem;">
+                                        @statusText
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0.5rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                <div>SHOWING @(Model.Renewals?.Count ?? 0) OF @(Model.TotalRenewals) RECORDS</div>
+            </div>
+        </div>
+    }
+</div>

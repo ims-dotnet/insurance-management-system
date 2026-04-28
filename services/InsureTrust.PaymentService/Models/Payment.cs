@@ -1,39 +1,38 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
-namespace InsureTrust.PaymentService.Models;
-
-public class Payment
+namespace InsureTrust.PaymentService.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class Payment
+    {
+        [Key]
+        public int Id { get; set; }
 
-    [Required]
-    [MaxLength(20)]
-    public string PaymentNumber { get; set; } = string.Empty;  // PAY5001
+       
+        public string PaymentNumber { get; set; } = string.Empty;
 
-    [Required]
-    public int UserId { get; set; }
+        
+        public int UserId { get; set; }
 
-    [Required]
-    public int UserPolicyId { get; set; }
+        // First purchase ke liye
+        public int? PolicyId { get; set; }
 
-    [Required]
-    [Precision(18, 2)]
-    public decimal Amount { get; set; }
+        // Renewal ke liye
+        public int? UserPolicyId { get; set; }
 
-    [Required]
-    [MaxLength(20)]
-    public string Status { get; set; } = "Pending";  // Pending, Success, Failed
+        public decimal Amount { get; set; }
 
-    [MaxLength(50)]
-    public string PaymentMethod { get; set; } = string.Empty;  // Card, UPI, NetBanking
+       
+        public string Status { get; set; } = "Pending";
 
-    [MaxLength(100)]
-    public string TransactionId { get; set; } = string.Empty;  // From gateway
+        public string PaymentMethod { get; set; } = string.Empty;
 
-    public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
+        
+        public string TransactionId { get; set; } = string.Empty;
 
-    [MaxLength(500)]
-    public string? Remarks { get; set; }
+        public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
+
+        
+        public string? Remarks { get; set; }
+    }
 }
-

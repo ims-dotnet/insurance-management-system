@@ -1,13 +1,12 @@
-using InsureTrust.ClaimService.DTOs;
+using InsureTrust.SupportService.DTOs;
 
-namespace InsureTrust.QueryService.Services;
-
-
-public interface ISupportService
+namespace InsureTrust.SupportService.Services
 {
-    Task<IEnumerable<SupportQueryDto>> GetMyQueriesAsync(int userId);
-    Task<IEnumerable<SupportQueryDto>> GetAllQueriesAsync();
-    Task<SupportQueryDto> SubmitQueryAsync(CreateSupportQueryDto dto, int userId, string uploadPath);
-    Task<SupportQueryDto> UpdateStatusAsync(int ticketId, UpdateSupportStatusDto dto);
+    public interface ISupportService
+    {
+        Task<IEnumerable<SupportQueryDto>> GetMyQueriesAsync(int userId);
+        Task<IEnumerable<SupportQueryDto>> GetAllQueriesAsync();
+        Task<SupportQueryDto> SubmitQueryAsync(CreateSupportQueryDto dto, int userId, string webRootPath);
+        Task<SupportQueryDto> UpdateStatusAsync(int ticketId, UpdateSupportStatusDto dto);
+    }
 }
-

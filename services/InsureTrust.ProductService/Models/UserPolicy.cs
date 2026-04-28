@@ -28,7 +28,7 @@ public class UserPolicy
 
     public int Tenure { get; set; }  // in months
 
-    [Precision(18, 2)]
+    //[Precision(18, 2)]
     public decimal PackageAmount { get; set; }  // 5000, 10000, 15000
 
     public string? DynamicFieldsJson { get; set; }  // JSON of dynamic form data

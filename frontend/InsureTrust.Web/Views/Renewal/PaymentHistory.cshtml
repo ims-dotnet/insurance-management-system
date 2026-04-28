@@ -1,0 +1,146 @@
+@model InsureTrust.Web.Models.PaymentHistoryViewModel
+
+@{
+    ViewData["Title"] = "Payment Audit Ledger";
+}
+
+<style>
+    @@media (max-width: 900px) {
+        .payment-summary-row {
+            flex-direction: column !important;
+        }
+
+        .ledger-scroll {
+            overflow-x: auto;
+        }
+
+            .ledger-scroll table {
+                min-width: 900px;
+            }
+    }
+</style>
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem; display: flex; flex-direction: column;">
+
+    <div style="border-bottom: 2px solid var(--border-dark); padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+        <div>
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; text-transform: none; font-family: var(--font-heading);">Payment History Ledger</h1>
+            <p style="color: var(--text-ink); font-family: var(--font-sans); margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                Official record of first-time policy payments
+            </p>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div style="padding: 2rem; border: 1px solid var(--border-dark); text-align: center; font-family: var(--font-sans); background: rgba(255,255,255,0.2);">
+            @ViewBag.Error
+        </div>
+    }
+    else
+    {
+        <div class="payment-summary-row" style="display: flex; border: 2px solid var(--border-dark); margin-bottom: 2rem; background: transparent;">
+            <div style="flex: 1; padding: 1.5rem; border-right: 1px solid var(--border-dark);">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase;">Total Payments</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading);">@Model.TotalPayments</div>
+            </div>
+
+            <div style="flex: 1; padding: 1.5rem; border-right: 1px solid var(--border-dark);">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase;">Successful</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading); color: var(--accent-green);">@Model.SuccessfulPayments</div>
+            </div>
+
+            <div style="flex: 1; padding: 1.5rem;">
+                <div style="font-size: 0.8rem; font-family: var(--font-sans); text-transform: uppercase;">Failed</div>
+                <div style="font-size: 2rem; font-weight: bold; font-family: var(--font-heading); color: var(--accent-red);">@Model.FailedPayments</div>
+            </div>
+        </div>
+
+        <div class="ledger-scroll" style="border: 1px solid var(--border-dark); padding: 0.5rem; background: rgba(232, 228, 217, 0.5);">
+            <table class="table-ledger" style="margin-bottom: 0; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>PAYMENT NUMBER</th>
+                        <th>TIMESTAMP</th>
+                        <th>USER ID</th>
+                        <th>USER POLICY ID</th>
+                        <th>POLICY NUMBER</th>
+                        <th>METHOD</th>
+                        <th style="text-align: right;">AMOUNT</th>
+                        <th style="text-align: center;">STATUS</th>
+                    </tr>
+                </thead>
+
+                <tbody style="background-color: #fcfbfa;">
+                    @if (Model.Payments == null || !Model.Payments.Any())
+                    {
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 2rem;">No payment records found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Payments)
+                        {
+                            var policyRef = !string.IsNullOrWhiteSpace(item.PolicyNumber)
+                                ? item.PolicyNumber
+                                : (item.UserPolicyId > 0 ? $"POL-{item.UserPolicyId}" : $"ID-{item.PolicyId}");
+
+                            bool isPendingAdmin = item.Remarks?.Contains("Pending Admin Approval", StringComparison.OrdinalIgnoreCase) ?? false;
+                            bool isRejected = item.Remarks?.Contains("Admin Rejected", StringComparison.OrdinalIgnoreCase) ?? false;
+                            string? reason = isRejected ? item.Remarks?.Replace("Admin Rejected: ", "", StringComparison.OrdinalIgnoreCase) : null;
+
+                            string statusText;
+                            string bg;
+
+                            if (isRejected)
+                            {
+                                statusText = "REJECTED";
+                                bg = "#d41717"; // Red for "REJECTED"
+                            }
+                            else if (isPendingAdmin)
+                            {
+                                statusText = "Pending";
+                                bg = "#8b4513"; // Burnt Orange for "Pending"
+                            }
+                            else if (item.Status == "Success")
+                            {
+                                statusText = "DONE";
+                                bg = "#4b6b55"; // Green for "DONE" (CLEARED)
+                            }
+                            else if (item.Status == "Failed")
+                            {
+                                statusText = "FLAGGED";
+                                bg = "#8b2626"; // Red for "FLAGGED"
+                            }
+                            else
+                            {
+                                statusText = "PENDING";
+                                bg = "#4a4636"; // Neutral
+                            }
+
+                            <tr>
+                                <td style="font-weight: bold;">@item.PaymentNumber</td>
+                                <td>@item.PaymentDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@item.UserId</td>
+                                <td>@(item.UserPolicyId > 0 ? item.UserPolicyId.ToString() : "N/A")</td>
+                                <td>@policyRef</td>
+                                <td>@item.PaymentMethod.ToUpper()</td>
+                                <td style="text-align: right; font-weight: bold;">₹@item.Amount.ToString("N2")</td>
+                                <td style="text-align: center;">
+                                    <span class="status-badge" title="@reason" style="width: 80px; text-align: center; color: #fff; background-color: @bg; border: none; padding: 0.4rem; font-weight: bold; display: inline-block;">
+                                        @statusText
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0.5rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                <div>SHOWING @(Model.Payments?.Count ?? 0) OF @(Model.TotalPayments) RECORDS</div>
+            </div>
+        </div>
+    }
+</div>

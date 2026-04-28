@@ -1,0 +1,215 @@
+@* @model InsureTrust.Web.Models.PaymentResultViewModel
+
+@{
+    ViewData["Title"] = "Payment Success";
+}
+
+<style>
+    .result-container {
+        max-width: 800px;
+        margin: 50px auto;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+        border: 1px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .icon {
+        font-size: 48px;
+        color: #16a34a;
+        margin-bottom: 12px;
+    }
+
+    .title {
+        font-size: 30px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .subtitle {
+        color: #6b7280;
+        margin-bottom: 24px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+    .actions {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        text-decoration: none;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #111827;
+    }
+</style>
+
+<div class="result-container">
+    <div class="card">
+        <div class="icon">✓</div>
+        <div class="title">Payment Successful</div>
+        <div class="subtitle">
+            Your @(Model.IsRenewal ? "renewal payment" : "policy payment") has been completed successfully.
+        </div>
+
+        <div class="row"><span>Policy ID</span><span>@Model.UserPolicyId</span></div>
+        <div class="row"><span>Payment Number</span><span>@Model.PaymentNumber</span></div>
+        <div class="row"><span>Amount</span><span>₹@Model.Amount</span></div>
+        <div class="row"><span>Status</span><span>@Model.Status</span></div>
+        <div class="row"><span>Payment Method</span><span>@Model.PaymentMethod</span></div>
+        <div class="row"><span>Transaction ID</span><span>@Model.TransactionId</span></div>
+
+        <div class="actions">
+            <a asp-controller="Renewal" asp-action="History" class="btn btn-primary">View Payment History</a>
+            <a asp-controller="Renewal" asp-action="RenewalHistory" class="btn btn-secondary">View Renewal History</a>
+        </div>
+    </div>
+</div> *@
+@model InsureTrust.Web.Models.PaymentResultViewModel
+
+@{
+    ViewData["Title"] = "Payment Success";
+}
+
+<style>
+    .result-container {
+        max-width: 800px;
+        margin: 50px auto;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        padding: 0 1rem;
+    }
+
+    .result-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+        border: 1px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .result-icon {
+        font-size: 48px;
+        color: #16a34a;
+        margin-bottom: 12px;
+    }
+
+    .result-title {
+        font-size: 30px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .result-subtitle {
+        color: #6b7280;
+        margin-bottom: 24px;
+    }
+
+    .result-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+    .actions {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-local {
+        text-decoration: none;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .btn-primary-local {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-secondary-local {
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+    @@media (max-width: 600px) {
+        .result-row {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="result-container">
+    <div class="result-card">
+        <div class="result-icon">✓</div>
+        <div class="result-title">Payment Successful</div>
+        <div class="result-subtitle">
+            Your @(Model.IsRenewal ? "renewal payment" : "first policy payment") has been completed successfully.
+        </div>
+
+        <div class="result-row"><span>Transaction Type</span><span>@(Model.IsRenewal ? "Renewal Payment" : "First Policy Payment")</span></div>
+        <div class="result-row"><span>User Policy ID</span><span>@Model.UserPolicyId</span></div>
+        <div class="result-row"><span>Payment Number</span><span>@(string.IsNullOrWhiteSpace(Model.PaymentNumber) ? "N/A" : Model.PaymentNumber)</span></div>
+        <div class="result-row"><span>Amount</span><span>₹@Model.Amount.ToString("N2")</span></div>
+        <div class="result-row"><span>Status</span><span>@(string.IsNullOrWhiteSpace(Model.Status) ? "Success" : Model.Status)</span></div>
+        <div class="result-row"><span>Payment Method</span><span>@Model.PaymentMethod</span></div>
+        <div class="result-row"><span>Transaction ID</span><span>@(string.IsNullOrWhiteSpace(Model.TransactionId) ? "N/A" : Model.TransactionId)</span></div>
+
+        @if (!Model.IsRenewal)
+        {
+            <div class="result-row">
+                <span>Policy Approval</span>
+                <span>Pending Admin Approval</span>
+            </div>
+        }
+
+        <div class="actions">
+            <a asp-controller="Renewal" asp-action="History" class="btn-local btn-primary-local">View Payment History</a>
+            <a asp-controller="Renewal" asp-action="RenewalHistory" class="btn-local btn-secondary-local">View Renewal History</a>
+        </div>
+    </div>
+</div>

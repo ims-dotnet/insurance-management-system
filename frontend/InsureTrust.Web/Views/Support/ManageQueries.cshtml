@@ -1,0 +1,314 @@
+@model InsureTrust.Web.Models.SupportQueryListViewModel
+
+@{
+    ViewData["Title"] = "Manage Support Queries";
+}
+
+<style>
+    .admin-queries-page {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+    }
+
+    .admin-header h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: #111827;
+        margin: 0;
+    }
+
+    .stats-container {
+        display: flex;
+        gap: 16px;
+    }
+
+    .stat-badge {
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .query-card {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 28px;
+        margin-bottom: 24px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .query-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .query-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .ticket-badge {
+        font-family: monospace;
+        background: #f8fafc;
+        color: #64748b;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+    }
+
+    .subject {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 8px 0;
+    }
+
+    .description {
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 24px;
+        background: #f8fafc;
+        padding: 16px;
+        border-radius: 12px;
+        border-left: 4px solid #e2e8f0;
+    }
+
+    .admin-form {
+        background: #fcfcfd;
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid #f1f5f9;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 200px 1fr auto;
+        gap: 16px;
+        align-items: flex-end;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .form-select, .form-textarea {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+    .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 44px;
+    }
+
+    .btn-update {
+        background: #1e293b;
+        color: #ffffff;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+        height: 44px;
+    }
+
+    .btn-update:hover {
+        background: #0f172a;
+    }
+
+    .status-pill {
+        padding: 6px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-inprogress { background: #dbeafe; color: #1e40af; }
+    .status-resolved { background: #dcfce7; color: #166534; }
+
+    .attachment-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 12px;
+    }
+
+    .attachment-link:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        font-weight: 500;
+    }
+
+    .alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
+    .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+
+    @@media (max-width: 900px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .btn-update {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="admin-queries-page">
+    <div class="admin-header">
+        <div>
+            <h1>Master Support Center</h1>
+            <p style="color: #64748b; margin-top: 4px;">Review and respond to all customer support queries.</p>
+        </div>
+        <div class="stats-container">
+            <div class="stat-badge">Total: @(Model.Queries?.Count ?? 0)</div>
+            <div class="stat-badge" style="background: #fef3c7; color: #92400e;">Pending: @(Model.Queries?.Count(q => q.Status == "Pending") ?? 0)</div>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (TempData["Error"] != null || !string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-error">@(TempData["Error"] ?? Model.ErrorMessage)</div>
+    }
+
+    @if (Model.Queries == null || !Model.Queries.Any())
+    {
+        <div style="text-align: center; padding: 60px; background: #f8fafc; border-radius: 24px; border: 2px dashed #e2e8f0;">
+            <p style="color: #64748b; font-size: 18px; font-weight: 500;">No support queries found in the system.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model.Queries.OrderByDescending(q => q.CreatedAt))
+        {
+            var statusClass = item.Status?.ToLower() switch
+            {
+                "pending" => "status-pending",
+                "inprogress" => "status-inprogress",
+                "resolved" => "status-resolved",
+                _ => ""
+            };
+
+            <div class="query-card">
+                <div class="query-header">
+                    <div>
+                        <div class="user-info">
+                            <div class="user-avatar">U</div>
+                            <div>
+                                <div style="font-weight: 700; color: #1e293b;">User ID: @item.UserId</div>
+                                <div style="font-size: 12px; color: #64748b;">Submitted on @item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                        <div class="ticket-badge">#@item.TicketNumber</div>
+                    </div>
+                    <span class="status-pill @statusClass">@item.Status</span>
+                </div>
+
+                <div class="subject">@item.Subject</div>
+                <div class="description">@item.Description</div>
+ 
+                @if (!string.IsNullOrWhiteSpace(item.AttachmentUrl))
+                {
+                    <a href="http://localhost:5135@(item.AttachmentUrl)" target="_blank" class="attachment-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                        View Attachment
+                    </a>
+                }
+
+                <div style="margin-top: 24px;">
+                    <form asp-action="UpdateStatus" method="post" class="admin-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Id" value="@item.Id" />
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Update Status</label>
+                                <select name="Status" class="form-select">
+                                    <option value="Pending" selected="@(item.Status == "Pending")">Pending</option>
+                                    <option value="InProgress" selected="@(item.Status == "InProgress")">In Progress</option>
+                                    <option value="Resolved" selected="@(item.Status == "Resolved")">Resolved</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Admin Response / Suggestions</label>
+                                <textarea name="AdminResponse" class="form-textarea" placeholder="Provide suggestion or feedback...">@item.AdminResponse</textarea>
+                            </div>
+                            <button type="submit" class="btn-update">Update Ticket</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+    }
+</div>

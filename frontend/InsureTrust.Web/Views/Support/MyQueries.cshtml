@@ -1,0 +1,217 @@
+@model InsureTrust.Web.Models.SupportQueryListViewModel
+
+@{
+    ViewData["Title"] = "My Support Queries";
+}
+
+<style>
+    .queries-page {
+        max-width: 1150px;
+        margin: 40px auto;
+        padding: 0 16px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .queries-header {
+        margin-bottom: 24px;
+    }
+
+        .queries-header h1 {
+            margin: 0 0 8px 0;
+            font-size: 32px;
+            color: #111827;
+        }
+
+        .queries-header p {
+            margin: 0;
+            color: #6b7280;
+        }
+
+    .queries-grid {
+        display: grid;
+        gap: 18px;
+    }
+
+    .query-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 22px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    }
+
+    .query-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+
+    .ticket-no {
+        font-weight: 700;
+        color: #1d4ed8;
+        font-size: 14px;
+    }
+
+    .subject {
+        font-size: 22px;
+        font-weight: 700;
+        color: #111827;
+        margin-top: 6px;
+    }
+
+    .status-badge {
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-inprogress {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-resolved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .meta-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    .meta-box {
+        background: #f9fafb;
+        border-radius: 14px;
+        padding: 14px;
+        border: 1px solid #eef2f7;
+    }
+
+    .meta-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .meta-value {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .error-box {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .empty-box {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px dashed #cbd5e1;
+        padding: 40px 24px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    @@media (max-width: 768px) {
+        .meta-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="queries-page">
+    <div class="queries-header">
+        <h1>My Support Queries</h1>
+        <p>Track all your submitted support tickets and admin responses.</p>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="error-box">
+            <strong>Error:</strong> @Model.ErrorMessage
+        </div>
+    }
+
+    @if (Model.Queries == null || !Model.Queries.Any())
+    {
+        <div class="empty-box">
+            <h3>No support queries found</h3>
+            <p>You have not submitted any support ticket yet.</p>
+            <a asp-controller="Support" asp-action="CreateQuery" class="btn btn-primary">Create Support Query</a>
+        </div>
+    }
+    else
+    {
+        <div class="queries-grid">
+            @foreach (var item in Model.Queries)
+            {
+                var statusClass = item.Status?.ToLower() switch
+                {
+                    "pending" => "status-pending",
+                    "inprogress" => "status-inprogress",
+                    "resolved" => "status-resolved",
+                    _ => "status-inprogress"
+                };
+
+                <div class="query-card">
+                    <div class="query-top">
+                        <div>
+                            <div class="ticket-no">@item.TicketNumber</div>
+                            <div class="subject">@item.Subject</div>
+                        </div>
+
+                        <span class="status-badge @statusClass">@item.Status</span>
+                    </div>
+
+                    <p style="color:#4b5563; margin-bottom:16px;">@item.Description</p>
+
+                    <div class="meta-row">
+                        <div class="meta-box">
+                            <div class="meta-label">Created At</div>
+                            <div class="meta-value">@item.CreatedAt</div>
+                        </div>
+
+                        <div class="meta-box">
+                            <div class="meta-label">Resolved At</div>
+                            <div class="meta-value">@(item.ResolvedAt?.ToString() ?? "Not resolved yet")</div>
+                        </div>
+
+                        <div class="meta-box">
+                            <div class="meta-label">Attachment</div>
+                            <div class="meta-value">
+                                @if (!string.IsNullOrWhiteSpace(item.AttachmentUrl))
+                                {
+                                    <a href="http://localhost:5135@(item.AttachmentUrl)" target="_blank">Open attachment</a>
+                                }
+                                else
+                                {
+                                    <span>No attachment</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="meta-box">
+                            <div class="meta-label">Admin Response</div>
+                            <div class="meta-value">@(item.AdminResponse ?? "No response yet")</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
