@@ -2,7 +2,21 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="profile-shell">
+    <div class="page-heading">
+        <p class="meta-line">Insure Trust Entry Console</p>
+        <h1>Dashboard</h1>
+    </div>
+
+    <div class="panel-card mt-3">
+        <p class="meta-note mb-2">
+            Calculator access is public. You can estimate premium before or after login.
+        </p>
+        @await Html.PartialAsync("_Calculator")
+    </div>
+</section>
+
+<div id="notificationPreview" class="panel-card mt-3 d-none">
+    <div class="panel-title">Recent Notifications</div>
+    <ul id="notificationList" class="list-group list-group-flush"></ul>
 </div>
