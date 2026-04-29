@@ -1,0 +1,214 @@
+@using InsureTrust.Productweb.DTOs
+@model IEnumerable<PolicyDto>
+
+@{
+    ViewData["Title"] = "Policy Registry & Clearance";
+}
+
+<style>
+    /* Scoped minimalist styles matching the reference image */
+    .registry-header {
+        margin-bottom: 40px;
+    }
+    .registry-title {
+        font-family: var(--font-b);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+    .registry-subtitle {
+        font-family: var(--font-b);
+        font-size: 12px;
+        color: var(--text2);
+    }
+    
+    .registry-controls {
+        display: flex;
+        justify-content: flex-end;
+        gap: 24px;
+        margin-top: -30px; /* Align with title */
+        margin-bottom: 30px;
+    }
+    .control-btn {
+        background: transparent;
+        border: none;
+        font-family: var(--font-b);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .minimal-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--font-b);
+    }
+    .minimal-table thead th {
+        text-align: left;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: var(--text);
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+    .minimal-table tbody tr {
+        border-bottom: 1px solid transparent; /* invisible by default */
+        transition: background 0.2s;
+    }
+    .minimal-table tbody tr:hover {
+        background: rgba(0,0,0,0.03);
+    }
+    .minimal-table tbody td {
+        padding: 14px 16px;
+        font-size: 12px;
+        color: var(--text);
+        vertical-align: middle;
+    }
+    
+    /* Specific Column Styles */
+    .col-id {
+        font-weight: 600;
+    }
+    .col-name {
+        color: var(--text2);
+    }
+    .col-level {
+        color: var(--text2);
+    }
+    .col-status {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text3); /* Faded look like the image */
+        text-align: center;
+    }
+    .col-action {
+        text-align: right;
+    }
+    .action-link {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text);
+        text-decoration: none;
+        border-bottom: 1px solid var(--text);
+        padding-bottom: 1px;
+    }
+    .action-link:hover {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+    }
+
+    .registry-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+        font-family: var(--font-b);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text3);
+    }
+    .pagination-arrows {
+        display: flex;
+        gap: 16px;
+    }
+    .pagination-arrows span {
+        cursor: pointer;
+    }
+    .pagination-arrows span:hover {
+        color: var(--text);
+    }
+</style>
+
+<div class="registry-header">
+    <div class="registry-title">Policy Registry & Clearance</div>
+    <div class="registry-subtitle">Master Directory of Active and Archived Insurance Policies</div>
+    
+</div>
+
+<table class="minimal-table">
+    <thead>
+        <tr>
+            <th>Ref ID</th>
+            <th>Classification Name</th>
+            <th>Coverage Category</th>
+            <th style="text-align:center;">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <!-- Dummy data to match the image structure when DB is empty -->
+            <tr>
+                <td class="col-id">POL-7492</td>
+                <td class="col-name">Comprehensive Auto, Standard</td>
+                <td class="col-level">Tier 4 - Gamma</td>
+                <td class="col-status">ACTIVE</td>
+                <td class="col-action"><a href="#" class="action-link">VIEW</a></td>
+            </tr>
+            <tr>
+                <td class="col-id">POL-3811</td>
+                <td class="col-name">Term Life, 20 Year</td>
+                <td class="col-level">Tier 2 - Beta</td>
+                <td class="col-status">ACTIVE</td>
+                <td class="col-action"><a href="#" class="action-link">VIEW</a></td>
+            </tr>
+            <tr>
+                <td class="col-id">POL-9044</td>
+                <td class="col-name">Property Liability, Commercial</td>
+                <td class="col-level">Tier 5 - Omega</td>
+                <td class="col-status" style="color:var(--accent);">SUSPENDED</td>
+                <td class="col-action"><a href="#" class="action-link">VIEW</a></td>
+            </tr>
+            <tr>
+                <td class="col-id">POL-1158</td>
+                <td class="col-name">Health PPO, Family Plan</td>
+                <td class="col-level">Tier 3 - Alpha</td>
+                <td class="col-status">ON HOLD</td>
+                <td class="col-action"><a href="#" class="action-link">VIEW</a></td>
+            </tr>
+            <tr>
+                <td class="col-id">POL-6620</td>
+                <td class="col-name">Cyber Security, Enterprise</td>
+                <td class="col-level">Tier 1 - Provisional</td>
+                <td class="col-status" style="color:#d4a017;">PENDING</td>
+                <td class="col-action"><a href="#" class="action-link">VIEW</a></td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="col-id">@item.PolicyNumber</td>
+                    <td class="col-name">@item.PolicyTypeName</td>
+                    <td class="col-level">@item.Category</td>
+                    <td class="col-status" style="@(item.Status == "Pending" ? "color:#d4a017;" : item.Status != "Active" && item.Status != "Approved" ? "color:var(--accent);" : "")">
+                        @item.Status.ToUpper()
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div class="registry-footer">
+    <div>SHOWING 1-@(Model.Any() ? Model.Count() : 5) OF @(Model.Any() ? Model.Count() : 248) RECORDS</div>
+    <div class="pagination-arrows">
+        <span>&lt;</span>
+        <span>&gt;</span>
+    </div>
+</div>

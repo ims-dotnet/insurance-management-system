@@ -1,0 +1,286 @@
+@using InsureTrust.Productweb.DTOs
+@model IEnumerable<PolicyDto>
+
+@{
+    ViewData["Title"] = "My Policies";
+}
+
+@functions {
+    string StatusClass(string s) => (s ?? "").ToLower() switch {
+        "active"   => "myp-status-active",
+        "approved" => "myp-status-active",
+        "expired"  => "myp-status-expired",
+        "pending"  => "myp-status-pending",
+        "canceled" => "myp-status-canceled",
+        _          => "myp-status-canceled"
+    };
+
+    string PolicyIcon(string name) => (name ?? "").ToLower() switch {
+        var n when n.Contains("vehicle")  => "🚗",
+        var n when n.Contains("auto")     => "🚗",
+        var n when n.Contains("health")   => "🏥",
+        var n when n.Contains("life")     => "🛡️",
+        var n when n.Contains("home")     => "🏠",
+        var n when n.Contains("travel")   => "✈️",
+        var n when n.Contains("cyber")    => "💻",
+        var n when n.Contains("property") => "🏢",
+        _ => "📋"
+    };
+}
+
+<style>
+    /* ── MY POLICIES — Bureau of Risk Card List ────── */
+
+    .myp-header { margin-bottom: 36px; }
+    .myp-eyebrow {
+        font-size: 9px; font-weight: 700; letter-spacing: 2.5px;
+        text-transform: uppercase; color: var(--text3); margin-bottom: 6px;
+    }
+    .myp-heading {
+        font-family: var(--font-h); font-size: 30px; font-weight: 900;
+        color: var(--text); line-height: 1.1; margin-bottom: 6px;
+    }
+    .myp-sub { font-size: 12px; color: var(--text2); }
+
+    /* ── CARD LIST ─── */
+    .myp-list { display: flex; flex-direction: column; gap: 12px; max-width: 860px; }
+
+    .myp-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 24px;
+        transition: box-shadow .2s, border-color .2s;
+        position: relative;
+    }
+    .myp-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,.07);
+        border-color: var(--border-dark);
+    }
+
+    /* left accent bar on hover */
+    .myp-card::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 3px;
+        background: var(--accent);
+        opacity: 0;
+        transition: opacity .2s;
+    }
+    .myp-card:hover::before { opacity: 1; }
+
+    /* ── ICON BOX ─── */
+    .myp-icon {
+        width: 48px; height: 48px; flex-shrink: 0;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px;
+    }
+
+    /* ── BODY ─── */
+    .myp-body { flex: 1; min-width: 0; }
+
+    .myp-top {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 5px; flex-wrap: wrap;
+    }
+    .myp-polnum {
+        font-family: var(--font-h); font-size: 16px; font-weight: 700;
+        color: var(--text); letter-spacing: .5px;
+    }
+
+    /* status pill */
+    .myp-status {
+        font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+        text-transform: uppercase; padding: 3px 10px;
+        border-radius: 20px; border: 1px solid;
+    }
+    .myp-status-active   { background: #e6f4e6; color: #2d6a2d; border-color: #b5d9b5; }
+    .myp-status-expired  { background: #fdecea; color: var(--accent); border-color: #f5c2be; }
+    .myp-status-pending  { background: #fdf6e3; color: #8a6200; border-color: #e6d18a; }
+    .myp-status-canceled { background: #f0f0f0; color: var(--text3); border-color: var(--border-dark); }
+
+    /* details line */
+    .myp-details {
+        font-size: 13px; color: var(--text2);
+        display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+        margin-bottom: 4px;
+    }
+    .myp-sep { margin: 0 7px; color: var(--border-dark); font-size: 10px; }
+
+    /* dates line */
+    .myp-dates {
+        font-size: 11px; color: var(--text3);
+        display: flex; align-items: center; flex-wrap: wrap;
+    }
+
+    /* ── ACTIONS ─── */
+    .myp-actions {
+        display: flex; flex-direction: column; align-items: flex-end;
+        gap: 8px; flex-shrink: 0;
+    }
+    .myp-btn {
+        font-family: var(--font-b); font-size: 9px; font-weight: 700;
+        letter-spacing: 1px; text-transform: uppercase;
+        padding: 6px 14px; text-decoration: none;
+        border: 1px solid; cursor: pointer; white-space: nowrap;
+        transition: all .2s; display: inline-block;
+    }
+    .myp-btn-outline { border-color: var(--border-dark); color: var(--text); background: transparent; }
+    .myp-btn-outline:hover { background: var(--bg2); color: var(--text); }
+    .myp-btn-primary { border-color: var(--text); background: var(--text); color: var(--bg); }
+    .myp-btn-primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* ── DIVIDER SEPARATOR ─── */
+    .myp-divider {
+        font-size: 9px; font-weight: 700; letter-spacing: 2px;
+        text-transform: uppercase; color: var(--text3);
+        padding-bottom: 8px; border-bottom: 1px solid var(--border);
+        margin: 8px 0 12px 0; max-width: 860px;
+    }
+
+    /* ── EMPTY STATE ─── */
+    .myp-empty {
+        text-align: center; padding: 80px 20px;
+        border: 1px dashed var(--border-dark); background: #fff;
+        max-width: 860px;
+    }
+    .myp-empty-icon { font-size: 36px; margin-bottom: 12px; color: var(--border-dark); }
+    .myp-empty-msg { font-family: var(--font-h); font-size: 20px; font-weight: 700; color: var(--text2); }
+    .myp-empty-sub { font-size: 11px; color: var(--text3); margin-top: 6px; }
+    .myp-empty-action { margin-top: 20px; }
+
+    /* ── FOOTER COUNT ─── */
+    .myp-footer {
+        font-size: 9px; font-weight: 700; letter-spacing: 2px;
+        text-transform: uppercase; color: var(--text3);
+        margin-top: 20px; max-width: 860px;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="myp-header">
+    <div class="myp-eyebrow">Policy Archive</div>
+    <div class="myp-heading">My Policies</div>
+    <div class="myp-sub">Manage all your insurance policies in one place</div>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="myp-empty">
+        <div class="myp-empty-icon">📋</div>
+        <div class="myp-empty-msg">No Policies Filed</div>
+        <div class="myp-empty-sub">You have no active insurance policies. Browse available plans to get started.</div>
+        <div class="myp-empty-action">
+            <a asp-action="Index" class="myp-btn myp-btn-primary">Browse Plans</a>
+        </div>
+    </div>
+}
+else
+{
+    var activeList = Model.Where(p => p.Status?.ToLower() == "active" || p.Status?.ToLower() == "approved").ToList();
+    var otherList  = Model.Where(p => p.Status?.ToLower() != "active" && p.Status?.ToLower() != "approved").ToList();
+
+    if (activeList.Any())
+    {
+        <div class="myp-divider">Active Policies</div>
+        <div class="myp-list">
+            @foreach (var item in activeList)
+            {
+                var purchaseDate = item.PurchaseDate.ToString("dd MMM yyyy");
+                var expiryDate   = item.ExpiryDate.ToString("dd MMM yyyy");
+                var daysLeft     = item.DaysLeft > 0 ? $"{item.DaysLeft} days remaining" : "Expired";
+                var duration     = $"{(int)((item.ExpiryDate - item.PurchaseDate).TotalDays / 30)} months";
+                var amount       = item.PackageAmount > 0 ? $"₹{item.PackageAmount:N0}/mo" : "—";
+
+                <div class="myp-card">
+                    <div class="myp-icon">@PolicyIcon(item.PolicyTypeName)</div>
+
+                    <div class="myp-body">
+                        <div class="myp-top">
+                            <span class="myp-polnum">@item.PolicyNumber</span>
+                            <span class="myp-status @StatusClass(item.Status)">@item.Status</span>
+                        </div>
+                        <div class="myp-details">
+                            <span>@(item.PolicyTypeName ?? "—")</span>
+                            <span class="myp-sep">·</span>
+                            <span>@(item.Category ?? "Personal")</span>
+                            <span class="myp-sep">·</span>
+                            <span>@amount</span>
+                            <span class="myp-sep">·</span>
+                            <span>@duration</span>
+                        </div>
+                        <div class="myp-dates">
+                            Purchased: @purchaseDate
+                            <span class="myp-sep">·</span>
+                            Expires: @expiryDate
+                            <span class="myp-sep">·</span>
+                            @daysLeft
+                        </div>
+                    </div>
+
+                    <div class="myp-actions">
+                        <a asp-action="Renew"   asp-route-id="@item.Id" class="myp-btn myp-btn-primary">Renew</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    if (otherList.Any())
+    {
+        <div class="myp-divider" style="margin-top:28px;">Other Policies</div>
+        <div class="myp-list">
+            @foreach (var item in otherList)
+            {
+                var purchaseDate = item.PurchaseDate.ToString("dd MMM yyyy");
+                var expiryDate   = item.ExpiryDate.ToString("dd MMM yyyy");
+                var daysLeft     = item.DaysLeft > 0 ? $"{item.DaysLeft} days remaining" : "Expired";
+                var duration     = $"{(int)((item.ExpiryDate - item.PurchaseDate).TotalDays / 30)} months";
+                var amount       = item.PackageAmount > 0 ? $"₹{item.PackageAmount:N0}/mo" : "—";
+
+                <div class="myp-card">
+                    <div class="myp-icon">@PolicyIcon(item.PolicyTypeName)</div>
+
+                    <div class="myp-body">
+                        <div class="myp-top">
+                            <span class="myp-polnum">@item.PolicyNumber</span>
+                            <span class="myp-status @StatusClass(item.Status)">@item.Status</span>
+                        </div>
+                        <div class="myp-details">
+                            <span>@(item.PolicyTypeName ?? "—")</span>
+                            <span class="myp-sep">·</span>
+                            <span>@(item.Category ?? "Personal")</span>
+                            <span class="myp-sep">·</span>
+                            <span>@amount</span>
+                            <span class="myp-sep">·</span>
+                            <span>@duration</span>
+                        </div>
+                        <div class="myp-dates">
+                            Purchased: @purchaseDate
+                            <span class="myp-sep">·</span>
+                            Expires: @expiryDate
+                            <span class="myp-sep">·</span>
+                            @daysLeft
+                        </div>
+                    </div>
+
+                    <div class="myp-actions">
+                        @if (item.Status?.ToLower() == "expired")
+                        {
+                            <a asp-action="Renew" asp-route-id="@item.Id" class="myp-btn myp-btn-primary">Renew</a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="myp-footer">
+        Showing @Model.Count() record@(Model.Count() == 1 ? "" : "s")
+    </div>
+}

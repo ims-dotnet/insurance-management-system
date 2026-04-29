@@ -1,0 +1,43 @@
+@model IEnumerable<InsureTrust.Web.Services.NotificationDto>
+@{
+    ViewData["Title"] = "Notification History";
+}
+
+<section class="profile-shell">
+    <div class="page-heading">
+        <p class="meta-line">Alerts and Updates</p>
+        <h1>Notification History</h1>
+    </div>
+
+    <article class="panel-card">
+        <h2 class="section-title">Recent Dispatches</h2>
+        <table class="table-ledger">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="notificationLedgerBody">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                            <td>@item.Title</td>
+                            <td>@(item.IsRead ? "Read" : "Unread")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3">No notifications found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </article>
+</section>

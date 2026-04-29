@@ -1,30 +1,24 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace InsureTrust.ClaimService.DTOs
 {
     public class SubmitClaimDto
     {
-        [Required]
-        [MaxLength(500)]
         public string Description { get; set; } = string.Empty;
-
-        [Required]
-        [Range(0.01, double.MaxValue)]
+        
         public decimal MaturityAmount { get; set; }
-
-        public List<IFormFile> Documents { get; set; } = new();  // Up to 12 files
+        
+        public List<IFormFile> Documents { get; set; } = new();
     }
 
     public class UpdateClaimDto
     {
-        [Required]
         public string Action { get; set; } = string.Empty;  // Approve, Deny
-
-        [MaxLength(500)]
+        
         public string? AdminRemarks { get; set; }
     }
 
-    // Response DTOs
     public class ClaimDto
     {
         public int Id { get; set; }
@@ -38,5 +32,4 @@ namespace InsureTrust.ClaimService.DTOs
         public DateTime SubmittedAt { get; set; }
         public List<string> DocumentUrls { get; set; } = new();
     }
-
 }

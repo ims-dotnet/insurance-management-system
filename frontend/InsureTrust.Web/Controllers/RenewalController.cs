@@ -1,4 +1,3 @@
-
 using InsureTrust.Web.Models;
 using InsureTrust.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +24,10 @@ namespace InsureTrust.Web.Controllers
 
             if (response == null || !response.Success || response.Data == null)
             {
-                return View(new PolicyPaymentViewModel 
-                { 
+                return View(new PolicyPaymentViewModel
+                {
                     PolicyId = policyId.Value,
-                    ErrorMessage = response?.Message ?? "Could not fetch policy details." 
+                    ErrorMessage = response?.Message ?? "Could not fetch policy details."
                 });
             }
 
@@ -76,10 +75,10 @@ namespace InsureTrust.Web.Controllers
 
             if (response == null || !response.Success || response.Data == null)
             {
-                return View(new PolicyPaymentViewModel 
-                { 
+                return View(new PolicyPaymentViewModel
+                {
                     PolicyNumber = policyNumber,
-                    ErrorMessage = response?.Message ?? "Policy not found in Product Service." 
+                    ErrorMessage = response?.Message ?? "Policy not found in Product Service."
                 });
             }
 
@@ -323,7 +322,7 @@ namespace InsureTrust.Web.Controllers
                 if (!string.IsNullOrWhiteSpace(searchQuery))
                 {
                     allPayments = allPayments
-                        .Where(p => 
+                        .Where(p =>
                             (!string.IsNullOrEmpty(p.TransactionId) && p.TransactionId.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
                             (p.UserPolicyId.HasValue && p.UserPolicyId.Value.ToString() == searchQuery)
                         )
@@ -445,3 +444,4 @@ namespace InsureTrust.Web.Controllers
 
     }
 }
+

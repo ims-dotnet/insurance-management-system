@@ -1,0 +1,40 @@
+@{
+    var suffix = ViewData["CalculatorIdSuffix"]?.ToString() ?? string.Empty;
+    var sectionId = string.IsNullOrWhiteSpace(suffix) ? "calculatorPanel" : $"calculatorPanel{suffix}";
+}
+
+<section id="@sectionId" class="panel-card calculator-panel js-calculator">
+    <div class="panel-title">Estimator Console</div>
+    <div class="calc-grid">
+        <div>
+            <label class="form-label">Age</label>
+            <input class="form-control-inst js-calc-age" type="number" min="18" max="70" placeholder="18-70" />
+        </div>
+        <div>
+            <label class="form-label">Package Amount</label>
+            <input class="form-control-inst js-calc-amount" type="number" min="5000" max="15000" placeholder="5000-15000" />
+        </div>
+        <div>
+            <label class="form-label">Tenure (Months)</label>
+            <input class="form-control-inst js-calc-tenure" type="number" min="12" max="36" placeholder="12-36" />
+        </div>
+        <div>
+            <label class="form-label">Policy Category</label>
+            <select class="form-control-inst js-calc-category">
+                <option value="">Select category</option>
+                <option value="Personal">Personal</option>
+                <option value="Business">Business</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Policy Type</label>
+            <select class="form-control-inst js-calc-policy-type" disabled>
+                <option value="">Select policy type</option>
+            </select>
+        </div>
+    </div>
+    <div class="panel-actions">
+        <button type="button" class="btn-inst btn-inst-success js-calc-run">Run Estimate</button>
+    </div>
+    <p class="meta-note js-calc-result"></p>
+</section>

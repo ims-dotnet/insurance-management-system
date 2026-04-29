@@ -7,11 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+<<<<<<< HEAD
     
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
 	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	  <PackageReference Include="Yarp.ReverseProxy" Version="2.2.0" />
+=======
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.2.0" />
+>>>>>>> main
   </ItemGroup>
 
 </Project>

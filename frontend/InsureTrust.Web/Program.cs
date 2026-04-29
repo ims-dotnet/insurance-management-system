@@ -1,72 +1,78 @@
 using InsureTrust.Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// ✅ Needed for ApiClient to access session/JWT later
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
 
-// ✅ Session support
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
+builder.Services.AddHttpClient();
+
+// ── HTTP Clients — all traffic flows through the YARP Gateway ─────────────────
+var gatewayUrl = builder.Configuration["ApiBaseUrls:Gateway"]
+    ?? throw new InvalidOperationException("ApiBaseUrls:Gateway is not configured.");
+
+builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
+    client.BaseAddress = new Uri(gatewayUrl);
 });
 
-// ✅ Authentication support for the frontend UI
-builder.Services.AddAuthentication("Cookies")
-    .AddCookie("Cookies", options =>
+builder.Services.AddHttpClient<ICalculatorService, CalculatorService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+builder.Services.AddHttpClient<INotificationService, NotificationService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
+        };
     });
 
-// ✅ Typed HttpClients for specific services
-builder.Services.AddHttpClient<IRenewalService, RenewalService>();
-builder.Services.AddHttpClient<ISupportService, SupportService>();
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpClient<IPolicyService, PolicyService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7296/");
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
-// ✅ Session middleware must come before authentication/authorization
+
 app.UseSession();
-
-// ✅ Auth Mock — LOCAL DEV ONLY. Removed in staging/production.
-// The Auth team's AccountController login will populate "JWToken" in other environments.
-if (app.Environment.IsDevelopment())
-{
-    app.Use(async (context, next) =>
-    {
-        const string SessionKey = "JWToken";
-        if (string.IsNullOrEmpty(context.Session.GetString(SessionKey)))
-        {
-            context.Session.SetString(SessionKey, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiTWlua2kiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJtYXlhbmtAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQ3VzdG9tZXIiLCJqdGkiOiI1ZjA1ZDk5YS04Y2ViLTQ2NjktOTA0NS1kYjFiM2VkNTJjNDIiLCJleHAiOjE3NzczNjk5MzEsImlzcyI6Ikluc3VyZVRydXN0LklkZW50aXR5U2VydmljZSIsImF1ZCI6Ikluc3VyZVRydXN0LkNsaWVudCJ9.ypkInz8FotpPTAZN4AzBvKsZWAwpkPmO0RTYqDm2glg");
-        }
-        await next();
-    });
-}
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+
+app.UseStaticFiles();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

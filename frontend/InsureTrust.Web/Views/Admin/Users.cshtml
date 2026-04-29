@@ -1,0 +1,127 @@
+@model List<InsureTrust.Web.Models.AdminUserViewModel>
+
+@{
+    ViewData["Title"] = "User Management";
+    var totalUsers = Model.Count;
+    var adminUsers = Model.Count(u => string.Equals(u.Role, "Admin", StringComparison.OrdinalIgnoreCase));
+    var verifiedUsers = Model.Count(u => u.ActivePolicyCount > 0);
+    var pendingUsers = Math.Max(0, totalUsers - verifiedUsers);
+}
+
+<section class="admin-users-page">
+    <div class="admin-ledger-head">
+        <div>
+            <p class="admin-ledger-index">Record Index 4.B</p>
+            <h1>User Management Ledger</h1>
+        </div>
+        <label class="admin-ledger-filter">
+            <i class="fas fa-user-shield" aria-hidden="true"></i>
+            <input type="text" id="adminUsersFilter" placeholder="Filter users..." aria-label="Filter users" />
+        </label>
+    </div>
+
+    <div class="admin-ledger-divider"></div>
+
+    <div class="admin-users-kpis">
+        <article class="admin-users-kpi">
+            <p>Total Users</p>
+            <h2>@totalUsers.ToString("N0")</h2>
+        </article>
+        <article class="admin-users-kpi">
+            <p>Verified Profiles</p>
+            <h2>@verifiedUsers.ToString("N0")</h2>
+        </article>
+        <article class="admin-users-kpi admin-users-kpi-warn">
+            <p>Pending KYC</p>
+            <h2>@pendingUsers.ToString("N0")</h2>
+        </article>
+        <article class="admin-users-kpi">
+            <p>Admin Accounts</p>
+            <h2>@adminUsers.ToString("N0")</h2>
+        </article>
+    </div>
+
+    <div class="admin-panel admin-users-panel">
+        <div class="admin-panel-head">
+            <h3>Account Register</h3>
+            <a href="/Admin/Dashboard" class="btn-inst">Back to Dashboard</a>
+        </div>
+
+        <div class="admin-users-table-wrap">
+            <table class="table-ledger admin-users-table" id="adminUsersTable">
+                <thead>
+                    <tr>
+                        <th>User Number</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Active Policies</th>
+                        <th>Total Spent</th>
+                        <th>Registered At</th>
+                        <th>KYC</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var user in Model)
+                        {
+                            var isKycVerified = user.ActivePolicyCount > 0;
+                            var kycChipClass = isKycVerified ? "admin-chip admin-chip-success" : "admin-chip admin-chip-warn";
+                            var kycLabel = isKycVerified ? "Verified" : "Pending";
+                            <tr>
+                                <td>@user.UserNumber</td>
+                                <td>@user.Name</td>
+                                <td>@user.Email</td>
+                                <td>@user.Role</td>
+                                <td>@user.ActivePolicyCount</td>
+                                <td>$@user.TotalSpent.ToString("N2")</td>
+                                <td>@user.RegisteredAt.ToString("dd MMM yyyy")</td>
+                                <td><span class="@kycChipClass">@kycLabel</span></td>
+                                <td>
+                                    <button type="button" class="btn-inst admin-users-verify-btn" @(isKycVerified ? "disabled" : null)>
+                                        @(isKycVerified ? "Verified" : "Verify KYC")
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="admin-users-empty">No users available right now.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById("adminUsersFilter");
+            const table = document.getElementById("adminUsersTable");
+
+            if (!input || !table) {
+                return;
+            }
+
+            input.addEventListener("input", function () {
+                const term = input.value.trim().toLowerCase();
+                const rows = table.querySelectorAll("tbody tr");
+
+                rows.forEach(function (row) {
+                    if (row.querySelector(".admin-users-empty")) {
+                        return;
+                    }
+
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? "" : "none";
+                });
+            });
+        })();
+    </script>
+}

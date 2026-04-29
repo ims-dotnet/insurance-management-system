@@ -7,6 +7,9 @@ using InsureTrust.SupportService.Repositories;
 using InsureTrust.SupportService.Services;
 using InsureTrust.SupportService.Validators;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+
 
 using Serilog;
 
@@ -38,7 +41,9 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
+
             new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+
             {
                 Reference = new Microsoft.OpenApi.Models.OpenApiReference
                 {
