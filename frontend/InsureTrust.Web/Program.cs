@@ -29,7 +29,7 @@ builder.Services.AddHttpClient<INotificationService, NotificationService>(client
 {
     client.BaseAddress = new Uri(gatewayUrl);
 });
->>>>>>> main
+
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -55,14 +55,14 @@ builder.Services.AddHttpClient<IPolicyService, PolicyService>(client =>
     client.BaseAddress = new Uri("https://localhost:7296/");
 });
 
-// 🔥 BUILD
 var app = builder.Build();
 
-// 🔥 MIDDLEWARE
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
 
 app.UseSession();
 app.UseAuthentication();
@@ -74,7 +74,5 @@ app.UseStaticFiles();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-
 
 app.Run();

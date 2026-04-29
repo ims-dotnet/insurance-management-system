@@ -1,0 +1,591 @@
+@model InsureTrust.Web.Models.MasterPaymentLedgerViewModel
+
+@{
+    ViewData["Title"] = "Master Payment Ledger";
+}
+
+<style>
+    .mpl-wrapper {
+        background-color: var(--bg-paper);
+        padding: 2rem 2.5rem 3rem;
+        min-height: 100vh;
+        font-family: var(--font-sans);
+    }
+
+    .mpl-header {
+        border-bottom: 3px solid var(--border-dark);
+        padding-bottom: 1.25rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .mpl-title {
+        font-family: var(--font-heading);
+        font-size: 2.4rem;
+        font-weight: bold;
+        margin: 0 0 0.3rem;
+        text-transform: none;
+        letter-spacing: -0.5px;
+    }
+
+    .mpl-subtitle {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #5a5348;
+        margin: 0;
+    }
+
+    .mpl-admin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.9rem;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border-radius: 2px;
+    }
+
+    .mpl-stats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0;
+        border: 2px solid var(--border-dark);
+        margin-bottom: 2rem;
+    }
+
+    .mpl-stat-cell {
+        padding: 1.2rem 1.5rem;
+        border-right: 1px solid var(--border-dark);
+        background: transparent;
+        transition: background 0.2s;
+    }
+
+    .mpl-stat-cell:last-child { border-right: none; }
+    .mpl-stat-cell:hover { background: rgba(0,0,0,0.04); }
+
+    .mpl-stat-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #5a5348;
+        margin-bottom: 0.5rem;
+    }
+
+    .mpl-stat-value {
+        font-family: var(--font-heading);
+        font-size: 1.8rem;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .mpl-stat-value.pending  { color: #8b4513; }
+    .mpl-stat-value.approved { color: #2b5a3a; }
+    .mpl-stat-value.renewal  { color: #1a3a6b; }
+    .mpl-stat-value.amount   { color: #1a1a1a; font-size: 1.4rem; }
+
+    .mpl-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .mpl-search-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .mpl-control-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 0.3rem;
+        color: #5a5348;
+    }
+
+    .mpl-input {
+        width: 100%;
+        padding: 0.5rem 0.6rem;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid var(--border-dark);
+        font-family: var(--font-sans);
+        font-size: 0.85rem;
+        color: var(--text-ink);
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .mpl-input:focus {
+        outline: none;
+        border-bottom-color: #1a1a1a;
+        background: rgba(255,255,255,0.4);
+    }
+
+    .mpl-input::placeholder { color: #aaa; font-style: italic; }
+
+    .mpl-select {
+        padding: 0.5rem 0.6rem;
+        background: var(--bg-paper);
+        border: 1px solid var(--border-dark);
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        color: var(--text-ink);
+        cursor: pointer;
+        min-width: 140px;
+    }
+
+    .mpl-select:focus { outline: none; }
+
+    .mpl-btn-search {
+        padding: 0.5rem 1.6rem;
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: background 0.2s;
+        white-space: nowrap;
+        align-self: flex-end;
+    }
+
+    .mpl-btn-search:hover { background: #333; }
+
+    .mpl-btn-clear {
+        padding: 0.5rem 1rem;
+        background: transparent;
+        color: var(--text-ink);
+        border: 1px solid var(--border-dark);
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        align-self: flex-end;
+    }
+
+    .mpl-btn-clear:hover { background: #1a1a1a; color: #fff; }
+
+    .mpl-table-wrap {
+        border: 2px solid var(--border-dark);
+        background: rgba(232, 228, 217, 0.35);
+        overflow: hidden;
+    }
+
+    .mpl-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--font-sans);
+    }
+
+    .mpl-table thead tr {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .mpl-table th {
+        padding: 0.7rem 0.75rem;
+        font-size: 0.65rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        white-space: nowrap;
+    }
+
+    .mpl-table th.check-col { width: 44px; text-align: center; }
+    .mpl-table th.right     { text-align: right; }
+    .mpl-table th.center    { text-align: center; }
+
+    .mpl-table tbody tr {
+        border-bottom: 1px solid var(--border-light);
+        transition: background 0.15s;
+    }
+
+    .mpl-table tbody tr:last-child { border-bottom: none; }
+    .mpl-table tbody tr:hover { background: rgba(0,0,0,0.04); }
+
+    .mpl-table td {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.82rem;
+        color: var(--text-ink);
+        vertical-align: middle;
+    }
+
+    .mpl-table td.right  { text-align: right; font-weight: bold; }
+    .mpl-table td.center { text-align: center; }
+    .mpl-table td.mono   { font-family: "Courier New", monospace; font-size: 0.78rem; color: #333; }
+
+    .type-badge {
+        display: inline-block;
+        padding: 0.15rem 0.5rem;
+        font-size: 0.6rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 2px;
+    }
+
+    .type-first   { background: #dceeff; border: 1px solid #5588bb; color: #1a3a6b; }
+    .type-renewal { background: #e4f4e8; border: 1px solid #4a8a5c; color: #1a4a2a; }
+
+    .status-badge-mpl {
+        display: inline-block;
+        padding: 0.2rem 0.55rem;
+        font-size: 0.62rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 2px;
+        white-space: nowrap;
+    }
+
+    .s-approved { background: #2b5a3a; color: #fff; }
+    .s-pending  { background: #8b4513; color: #fff; }
+    .s-rejected { background: #d41717; color: #fff; }
+    .s-failed   { background: #8b2626; color: #fff; }
+    .s-done     { background: #4b6b55; color: #fff; }
+    .s-other    { background: #4a4636; color: #fff; }
+
+    .btn-reject-flag {
+        background: transparent;
+        border: none;
+        color: #8b2626;
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 0;
+        margin-left: 5px;
+        transition: transform 0.2s;
+    }
+    .btn-reject-flag:hover { transform: scale(1.2); color: #d41717; }
+
+    .approve-form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .approve-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #2b5a3a;
+    }
+
+    .approve-checkbox:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+        accent-color: #2b5a3a;
+    }
+
+    .mpl-footer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.9rem 0.75rem;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .mpl-error {
+        padding: 2rem;
+        border: 2px solid var(--border-dark);
+        text-align: center;
+        font-family: var(--font-sans);
+        background: rgba(255,255,255,0.2);
+        color: var(--accent-red);
+    }
+
+    @@media (max-width: 1100px) {
+        .mpl-stats { grid-template-columns: repeat(3, 1fr); }
+    }
+    @@media (max-width: 768px) {
+        .mpl-stats { grid-template-columns: repeat(2, 1fr); }
+        .mpl-title { font-size: 1.8rem; }
+        .mpl-table-wrap { overflow-x: auto; }
+        .mpl-table { min-width: 950px; }
+        .mpl-controls { flex-direction: column; }
+    }
+</style>
+
+<div class="mpl-wrapper">
+
+    @* ─── HEADER ─────────────────────────────────────────── *@
+    <div class="mpl-header">
+        <div>
+            <h1 class="mpl-title">Master Payment Ledger</h1>
+            <p class="mpl-subtitle">Official record of all financial movements &mdash; first-time &amp; renewals</p>
+        </div>
+        <span class="mpl-admin-badge">&#11042; Admin View</span>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="mpl-error">
+            <strong>Error loading payments:</strong> @ViewBag.Error
+        </div>
+    }
+    else
+    {
+        @* ─── STATS STRIP ─────────────────────────────────────── *@
+        <div class="mpl-stats">
+            <div class="mpl-stat-cell">
+                <div class="mpl-stat-label">Total Payments</div>
+                <div class="mpl-stat-value">@Model.TotalPayments</div>
+            </div>
+            <div class="mpl-stat-cell">
+                <div class="mpl-stat-label">Pending Approval</div>
+                <div class="mpl-stat-value pending">@Model.PendingApprovals</div>
+            </div>
+            <div class="mpl-stat-cell">
+                <div class="mpl-stat-label">Approved</div>
+                <div class="mpl-stat-value approved">@Model.ApprovedPayments</div>
+            </div>
+            <div class="mpl-stat-cell">
+                <div class="mpl-stat-label">First-Time / Renewal</div>
+                <div class="mpl-stat-value renewal">@Model.FirstTimePayments / @Model.RenewalPayments</div>
+            </div>
+            <div class="mpl-stat-cell">
+                <div class="mpl-stat-label">Total Volume</div>
+                <div class="mpl-stat-value amount">&#8377;@Model.TotalAmount.ToString("N2")</div>
+            </div>
+        </div>
+
+        @* ─── SEARCH & FILTER BAR ─────────────────────────────── *@
+        <form method="get" asp-controller="Renewal" asp-action="MasterPaymentLedger" id="searchForm">
+            <div class="mpl-controls">
+                <div class="mpl-search-group">
+                    <label class="mpl-control-label" for="searchQuery">Search Transaction ID or Policy User ID</label>
+                    <input id="searchQuery"
+                           name="searchQuery"
+                           class="mpl-input"
+                           type="text"
+                           placeholder="Enter Transaction ID or Policy User ID..."
+                           value="@Model.SearchQuery"
+                           autocomplete="off" />
+                </div>
+
+                <div>
+                    <label class="mpl-control-label" for="filterType">Payment Type</label>
+                    <select id="filterType" name="filterType" class="mpl-select">
+                        <option value="all"        selected="@(Model.FilterType == "all"        ? "selected" : null)">All Types</option>
+                        <option value="first-time" selected="@(Model.FilterType == "first-time" ? "selected" : null)">First-Time</option>
+                        <option value="renewal"    selected="@(Model.FilterType == "renewal"    ? "selected" : null)">Renewal</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="mpl-control-label" for="filterStatus">Approval Status</label>
+                    <select id="filterStatus" name="filterStatus" class="mpl-select">
+                        <option value="all"      selected="@(Model.FilterStatus == "all"      ? "selected" : null)">All Statuses</option>
+                        <option value="pending"  selected="@(Model.FilterStatus == "pending"  ? "selected" : null)">Pending Approval</option>
+                        <option value="approved" selected="@(Model.FilterStatus == "approved" ? "selected" : null)">Approved</option>
+                        <option value="rejected" selected="@(Model.FilterStatus == "rejected" ? "selected" : null)">Rejected</option>
+                        <option value="failed"   selected="@(Model.FilterStatus == "failed"   ? "selected" : null)">Failed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="mpl-btn-search">&#128269; Search</button>
+                <a href="@Url.Action("MasterPaymentLedger", "Renewal")" class="mpl-btn-clear">&#10005; Clear</a>
+            </div>
+        </form>
+
+        @* ─── TABLE ───────────────────────────────────────────── *@
+        <div class="mpl-table-wrap">
+            <table class="mpl-table" id="masterLedgerTable">
+                <thead>
+                    <tr>
+                        <th class="check-col" title="Approve payment">&#10003;</th>
+                        <th>Transaction ID</th>
+                        <th>Timestamp (UTC)</th>
+                        <th>User ID</th>
+                        <th>Policy User ID</th>
+                        <th>Policy Number</th>
+                        <th>Type</th>
+                        <th>Method</th>
+                        <th class="right">Amount (&#8377;)</th>
+                        <th class="center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Payments == null || !Model.Payments.Any())
+                    {
+                        <tr>
+                            <td colspan="10" style="text-align:center; padding:3rem; color:#888; font-style:italic;">
+                                No payment records found for the current filters.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Payments)
+                        {
+                            var policyRef = !string.IsNullOrWhiteSpace(item.PolicyNumber)
+                                ? item.PolicyNumber
+                                : (item.UserPolicyId.HasValue && item.UserPolicyId > 0
+                                    ? $"POL-{item.UserPolicyId}"
+                                    : (item.PolicyId.HasValue ? $"ID-{item.PolicyId}" : "—"));
+
+                            string badgeCss;
+                            string badgeText;
+
+                            if (item.IsAdminApproved)
+                            {
+                                badgeCss  = "s-approved";
+                                badgeText = "APPROVED";
+                            }
+                            else if (item.IsRejected)
+                            {
+                                badgeCss  = "s-rejected";
+                                badgeText = "REJECTED";
+                            }
+                            else if (item.IsPendingAdminApproval)
+                            {
+                                badgeCss  = "s-pending";
+                                badgeText = "PENDING";
+                            }
+                            else if (string.Equals(item.Status, "Failed", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeCss  = "s-failed";
+                                badgeText = "FAILED";
+                            }
+                            else if (string.Equals(item.Status, "Success", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeCss  = "s-done";
+                                badgeText = "CLEARED";
+                            }
+                            else
+                            {
+                                badgeCss  = "s-other";
+                                badgeText = item.Status?.ToUpper() ?? "UNKNOWN";
+                            }
+
+                            <tr>
+                                @* Approve checkbox *@
+                                <td class="center">
+                                    @if (item.IsAdminApproved)
+                                    {
+                                        <input type="checkbox"
+                                               class="approve-checkbox"
+                                               checked
+                                               disabled
+                                               title="Already approved" />
+                                    }
+                                    else if (item.IsRejected)
+                                    {
+                                        <span style="color:#d41717; font-size:1.1rem;" title="Rejected: @item.RejectionReason">&#10008;</span>
+                                    }
+                                    else if (item.IsPendingAdminApproval)
+                                    {
+                                        <div style="display: flex; align-items: center; justify-content: center;">
+                                            <form method="post"
+                                                  asp-controller="Renewal"
+                                                  asp-action="ApprovePayment"
+                                                  class="approve-form"
+                                                  id="approveForm_@item.Id">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="paymentId" value="@item.Id" />
+                                                <input type="checkbox"
+                                                       class="approve-checkbox"
+                                                       title="Click to approve"
+                                                       onchange="if(confirm('Approve payment @item.PaymentNumber?')) { this.form.submit(); } else { this.checked=false; }" />
+                                            </form>
+
+                                            <button type="button"
+                                                    class="btn-reject-flag"
+                                                    title="Reject with reason"
+                                                    onclick="const r = prompt('Reason for rejection:'); if(r) { document.getElementById('rjReason_@item.Id').value = r; document.getElementById('rjForm_@item.Id').submit(); }">
+                                                &#128681;
+                                            </button>
+
+                                            <form method="post" asp-controller="Renewal" asp-action="RejectPayment" id="rjForm_@item.Id" style="display:none;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="paymentId" value="@item.Id" />
+                                                <input type="hidden" name="reason" id="rjReason_@item.Id" />
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#ccc; font-size:0.75rem;">&#8212;</span>
+                                    }
+                                </td>
+
+                                @* Transaction ID *@
+                                <td class="mono">@(string.IsNullOrWhiteSpace(item.TransactionId) ? "—" : item.TransactionId)</td>
+
+                                @* Timestamp *@
+                                <td>@item.PaymentDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+
+                                @* User ID *@
+                                <td>@item.UserId</td>
+
+                                @* Policy User ID *@
+                                <td>@(item.UserPolicyId.HasValue && item.UserPolicyId > 0 ? item.UserPolicyId.ToString() : "—")</td>
+
+                                @* Policy Ref *@
+                                <td style="color:#1a3a6b; font-weight:600;">@policyRef</td>
+
+                                @* Type badge *@
+                                <td>
+                                    @if (item.PaymentType == "Renewal")
+                                    {
+                                        <span class="type-badge type-renewal">Renewal</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="type-badge type-first">First-Time</span>
+                                    }
+                                </td>
+
+                                @* Method *@
+                                <td>@item.PaymentMethod.ToUpper()</td>
+
+                                @* Amount *@
+                                <td class="right">@item.Amount.ToString("N2")</td>
+
+                                @* Status badge *@
+                                <td class="center">
+                                    <span class="status-badge-mpl @badgeCss">@badgeText</span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            @* Footer summary bar *@
+            <div class="mpl-footer-row">
+                <span>Showing @(Model.Payments?.Count ?? 0) of @Model.TotalPayments records</span>
+                @if (Model.Payments != null && Model.Payments.Any())
+                {
+                    <span>Page Total &nbsp;&nbsp; &#8377;@(Model.Payments.Sum(p => p.Amount).ToString("N2"))</span>
+                }
+            </div>
+        </div>
+    }
+</div>

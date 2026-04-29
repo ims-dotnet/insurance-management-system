@@ -55,9 +55,14 @@ builder.Services.AddScoped<IClaimService, ClaimService>();
 
 var app = builder.Build();
 
+<<<<<<< HEAD
+//change
+// Configure the HTTP request pipeline.
+=======
 // ================= MIDDLEWARE PIPELINE =================
 app.UseMiddleware<InsureTrust.ClaimService.Middleware.ExceptionMiddleware>();
 
+>>>>>>> main
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -1,0 +1,126 @@
+@model InsureTrust.Web.Models.PolicyPaymentViewModel
+
+@{
+    ViewData["Title"] = "Finalize Underwriting";
+}
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem;">
+    <div style="max-width: 1000px; margin: 0 auto; width: 100%;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--border-dark); padding-bottom: 0.5rem; margin-bottom: 2rem;">
+            <h4 style="color: var(--accent-red); margin: 0;">Secure Payment</h4>
+            <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-sans); letter-spacing: 1px;">Complete Your Policy Purchase</span>
+        </div>
+
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Review & Confirm Your Payment Details</h1>
+        <p style="color: var(--text-ink); font-family: var(--font-sans); margin-bottom: 3rem;">Please review policy particulars and authorize the final transaction.</p>
+
+        <form asp-action="Checkout" asp-controller="Renewal" method="post" style="display: flex; gap: 4rem;">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="IsRenewal" value="false" />
+            <input type="hidden" asp-for="PolicyId" />
+            <input type="hidden" asp-for="Amount" />
+            <input type="hidden" asp-for="UserPolicyId" />
+            
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.1rem; letter-spacing: 1px;">POLICY DETAILS</h3>
+                <hr class="divider-thick" style="margin-top: 0.5rem;" />
+                
+                <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+                    <div style="flex: 1;">
+                        <span class="form-label">POLICY ID</span>
+                        <div class="form-control-inst" style="background: transparent;">@Model.PolicyId</div>
+                    </div>
+                    <div style="flex: 1;">
+                        <span class="form-label">TRANSACTION TYPE</span>
+                        <div style="padding: 0.5rem; font-family: var(--font-body); font-size: 0.9rem; border-bottom: 1px solid var(--border-dark);">New Policy Purchase</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <span class="form-label">CHOOSE PAYMENT METHOD</span>
+                    <select asp-for="PaymentCategory" class="form-control-inst" style="background: transparent; appearance: none; border-radius: 0;">
+                        <option value="UPI">UPI Transfer</option>
+                        <option value="Card">Institutional Credit/Debit</option>
+                        <option value="NetBanking">Corporate Wire Transfer</option>
+                    </select>
+                </div>
+
+                <h3 style="font-size: 1.1rem; letter-spacing: 1px;">SELECT PAYMENT OPTION</h3>
+                <hr class="divider-thick" style="margin-top: 0.5rem;" />
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="border: 1px solid var(--border-dark); padding: 1rem; margin-bottom: 1rem; background-color: rgba(200, 195, 181, 0.2);">
+                        <strong style="display: block; font-family: var(--font-heading); text-transform: uppercase; margin-bottom: 0.5rem;">Payment Option Details</strong>
+                        <select asp-for="PaymentMethod" class="form-control-inst" style="background-color: var(--bg-paper); border-bottom: 1px solid var(--border-dark); padding: 0.4rem 0.5rem; width: 100%;">
+                            <option value="GPay">GPay</option>
+                            <option value="PhonePe">PhonePe</option>
+                            <option value="Paytm">Paytm</option>
+                            <option value="DebitCard">Debit Card</option>
+                            <option value="CreditCard">Credit Card</option>
+                            <option value="NetBanking">Net Banking</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar / Ledger -->
+            <div style="width: 350px; border: 1px solid var(--border-dark); padding: 1.5rem; background-color: rgba(255,255,255,0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">PAYMENT SUMMARY</h3>
+                    <span style="font-size: 1.2rem;">&#128196;</span>
+                </div>
+                
+                <table style="width: 100%; margin-bottom: 1.5rem; font-family: var(--font-sans); font-size: 0.85rem;">
+                    <tbody>
+                        <tr>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-transform: uppercase;">POLICY ID</td>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right; font-weight: bold;">@Model.PolicyId</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-transform: uppercase;">APPROVAL STATUS</td>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right; font-weight: bold;">Pending after payment</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-transform: uppercase;">RENEWAL</td>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right; font-weight: bold;">No</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table style="width: 100%; margin-bottom: 1rem; font-family: var(--font-sans); font-size: 0.85rem;">
+                    <tbody>
+                        <tr>
+                            <td style="padding: 0.25rem 0;">Base Amount</td>
+                            <td style="padding: 0.25rem 0; text-align: right;">₹@Model.Amount.ToString("N2")</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <hr class="divider-thick" />
+                
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0; font-size: 1.5rem; line-height: 1;">TOTAL<br/><span style="font-size: 1.2rem;">PAYABLE</span></h2>
+                    <h2 style="margin: 0; font-size: 1.5rem;">₹@Model.Amount.ToString("N2")</h2>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 1.5rem; font-family: var(--font-sans); font-size: 0.75rem;">
+                    <input type="checkbox" required id="authorize" style="margin-top: 0.2rem; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer;" />
+                    <label for="authorize" style="cursor: pointer;">I confirm the selected policy and authorize this transaction.</label>
+                </div>
+
+                <button type="submit" class="btn-inst btn-inst-primary" style="width: 100%; background-color: var(--accent-green); color: #fff; padding: 1rem; border: none;">
+                    &#x270E; PROCEED TO PAY
+                </button>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div style="margin-top: 2rem; border: 1px solid var(--accent-red); padding: 1rem; background-color: rgba(139, 38, 38, 0.1); color: var(--accent-red); font-family: var(--font-sans);">
+                <strong>Error:</strong> @Model.ErrorMessage
+            </div>
+        }
+    </div>
+</div>
+

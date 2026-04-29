@@ -45,10 +45,10 @@ public class AccountController : Controller
             }
 
             Response.Cookies.Append("authToken", response.Token, cookieOptions);
-            
+
             // NOTE: Currently JS handles userProfile, but we can set it in cookie or let JS fetch it.
             // Let's set it in a cookie that JS can read, or redirect and let JS loadProfile().
-            
+
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             {
                 return Redirect(model.ReturnUrl);
@@ -63,7 +63,7 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Register()
     {
-        return View( new RegisterRequestDto());
+        return View(new RegisterRequestDto());
     }
 
     [HttpPost]

@@ -1,0 +1,288 @@
+﻿@model InsureTrust.Web.Models.CreateSupportQueryViewModel
+
+@{
+    ViewData["Title"] = "Create Support Query";
+}
+
+<style>
+    .support-page {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 0 16px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .support-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 24px;
+    }
+
+    .support-card {
+        background: #fff;
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e5e7eb;
+    }
+
+    .support-title {
+        margin-bottom: 24px;
+    }
+
+        .support-title h1 {
+            margin: 0 0 8px 0;
+            color: #111827;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .support-title p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+    .badge-soft {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 14px;
+        padding: 12px 14px;
+        font-size: 15px;
+        transition: 0.2s ease;
+        box-sizing: border-box;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+    textarea.form-control {
+        min-height: 160px;
+        resize: vertical;
+    }
+
+    .btn-submit {
+        width: 100%;
+        border: none;
+        border-radius: 14px;
+        padding: 14px 18px;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+        }
+
+    .info-box {
+        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 16px;
+    }
+
+        .info-box h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #111827;
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 18px;
+            color: #4b5563;
+        }
+
+    .alert-success-custom {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .alert-danger-custom {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .ticket-box {
+        margin-top: 18px;
+        border-radius: 16px;
+        border: 1px solid #dbeafe;
+        background: #eff6ff;
+        padding: 18px;
+    }
+
+    .ticket-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+        .ticket-row:last-child {
+            border-bottom: none;
+        }
+
+    .ticket-label {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    @@media (max-width: 900px) {
+        .support-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="support-page">
+    <div class="support-title">
+        <span class="badge-soft">Customer Support</span>
+        <h1>Create Support Query</h1>
+        <p>Raise a ticket for payment, renewal, claim, document, or account related issues.</p>
+    </div>
+
+    <div class="support-grid">
+        <div class="support-card">
+            @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+            {
+                <div class="alert-success-custom">
+                    <strong>@Model.SuccessMessage</strong>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+            {
+                <div class="alert-danger-custom">
+                    <strong>Error:</strong> @Model.ErrorMessage
+                </div>
+            }
+
+            <form asp-action="CreateQuery" asp-controller="Support" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label asp-for="Subject" class="form-label"></label>
+                    <input asp-for="Subject" class="form-control" placeholder="Example: Payment not updated" />
+                    <span asp-validation-for="Subject" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" placeholder="Describe your issue clearly so support can resolve it faster."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Attachment" class="form-label"></label>
+                    <input asp-for="Attachment" class="form-control" type="file" />
+                    <span asp-validation-for="Attachment" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn-submit">Submit Support Ticket</button>
+            </form>
+
+            @if (Model.CreatedTicket != null)
+            {
+                <div class="ticket-box">
+                    <h4 style="margin-top:0;">Created Ticket Details</h4>
+
+                    <div class="ticket-row">
+                        <span class="ticket-label">Ticket Number</span>
+                        <span>@Model.CreatedTicket.TicketNumber</span>
+                    </div>
+
+                    <div class="ticket-row">
+                        <span class="ticket-label">Subject</span>
+                        <span>@Model.CreatedTicket.Subject</span>
+                    </div>
+
+                    <div class="ticket-row">
+                        <span class="ticket-label">Status</span>
+                        <span>@Model.CreatedTicket.Status</span>
+                    </div>
+
+                    <div class="ticket-row">
+                        <span class="ticket-label">Created At</span>
+                        <span>@Model.CreatedTicket.CreatedAt</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="support-card">
+            <div class="info-box">
+                <h3>When to create a support query</h3>
+                <ul>
+                    <li>Payment completed but policy not updated</li>
+                    <li>Renewal issue or wrong calculation</li>
+                    <li>Claim upload or document issue</li>
+                    <li>Policy details mismatch</li>
+                    <li>General account or support request</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>Attachment guidance</h3>
+                <ul>
+                    <li>Upload payment screenshot or error screenshot if available</li>
+                    <li>Prefer PDF, JPG, JPEG, or PNG</li>
+                    
+                </ul>
+            </div>
+
+
+            <div class="info-box">
+                <h3>Quick access</h3>
+                <a asp-controller="Support" asp-action="MyQueries" class="btn btn-outline-primary w-100">
+                    View My Support Queries
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,107 @@
+@* @model InsureTrust.Web.Models.PaymentResultViewModel
+
+@{
+    ViewData["Title"] = "Transaction Voided";
+}
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
+    <div style="background-color: #fff; width: 100%; max-width: 600px; padding: 3rem; border: 1px solid var(--border-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center;">
+        
+        <div style="color: var(--accent-red); font-size: 3rem; margin-bottom: 1rem;">&#x26A0;</div>
+        
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem; text-transform: uppercase; font-family: var(--font-heading); color: var(--accent-red);">Transaction Voided</h1>
+        <p style="font-family: var(--font-sans); color: var(--text-ink); margin-bottom: 2rem;">
+            The requested @(Model.IsRenewal ? "renewal" : "policy") transaction could not be completed.
+        </p>
+
+        <table style="width: 100%; text-align: left; margin-bottom: 2rem; font-family: var(--font-sans); font-size: 0.9rem; border-collapse: collapse;">
+            <tbody>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-weight: bold;">POLICY ID</td>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right;">@Model.UserPolicyId</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-weight: bold;">PAYMENT METHOD</td>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right;">@Model.PaymentMethod</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-weight: bold;">REASON</td>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right; color: var(--accent-red);">
+                        @(string.IsNullOrWhiteSpace(Model.ErrorMessage) ? "Verification Failed" : Model.ErrorMessage)
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a asp-controller="Renewal" asp-action="History" class="btn-inst btn-inst-primary" style="padding: 0.8rem 1.5rem;">
+                VIEW LEDGER
+            </a>
+            <a asp-controller="Renewal" asp-action="@(Model.IsRenewal ? "RenewPolicy" : "Checkout")" asp-route-userPolicyId="@Model.UserPolicyId" class="btn-inst" style="padding: 0.8rem 1.5rem; border-color: var(--accent-red); color: var(--accent-red);">
+                RETRY TRANSACTION
+            </a>
+        </div>
+    </div>
+</div> *@
+@model InsureTrust.Web.Models.PaymentResultViewModel
+
+@{
+    ViewData["Title"] = "Transaction Failed";
+}
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
+    <div style="background-color: #fff; width: 100%; max-width: 600px; padding: 3rem; border: 1px solid var(--border-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center;">
+
+        <div style="color: var(--accent-red); font-size: 3rem; margin-bottom: 1rem;">&#x26A0;</div>
+
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem; text-transform: uppercase; font-family: var(--font-heading); color: var(--accent-red);">
+            Transaction Failed
+        </h1>
+
+        <p style="font-family: var(--font-sans); color: var(--text-ink); margin-bottom: 2rem;">
+            The requested @(Model.IsRenewal ? "renewal" : "policy purchase") transaction could not be completed.
+        </p>
+
+        <table style="width: 100%; text-align: left; margin-bottom: 2rem; font-family: var(--font-sans); font-size: 0.9rem; border-collapse: collapse;">
+            <tbody>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-weight: bold;">TRANSACTION TYPE</td>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right;">@(Model.IsRenewal ? "Renewal" : "First Payment")</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-weight: bold;">USER POLICY ID</td>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right;">@Model.UserPolicyId</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-weight: bold;">PAYMENT METHOD</td>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right;">@Model.PaymentMethod</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); font-weight: bold;">REASON</td>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right; color: var(--accent-red);">
+                        @(string.IsNullOrWhiteSpace(Model.ErrorMessage) ? "Verification failed or payment was declined." : Model.ErrorMessage)
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a asp-controller="Renewal" asp-action="History" class="btn-inst btn-inst-primary" style="padding: 0.8rem 1.5rem;">
+                VIEW HISTORY
+            </a>
+
+            @if (Model.IsRenewal)
+            {
+                <a asp-controller="Renewal" asp-action="RenewPolicy" asp-route-userPolicyId="@Model.UserPolicyId" class="btn-inst" style="padding: 0.8rem 1.5rem; border-color: var(--accent-red); color: var(--accent-red);">
+                    RETRY RENEWAL
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Renewal" asp-action="Checkout" class="btn-inst" style="padding: 0.8rem 1.5rem; border-color: var(--accent-red); color: var(--accent-red);">
+                    RETRY PAYMENT
+                </a>
+            }
+        </div>
+    </div>
+</div>

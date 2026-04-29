@@ -1,15 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
-namespace InsureTrust.ClaimService.DTOs
+namespace InsureTrust.SupportService.DTOs
 {
     public class CreateSupportQueryDto
     {
-        [Required]
-        [MaxLength(200)]
         public string Subject { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(2000)]
         public string Description { get; set; } = string.Empty;
 
         public IFormFile? Attachment { get; set; }
@@ -17,18 +13,16 @@ namespace InsureTrust.ClaimService.DTOs
 
     public class UpdateSupportStatusDto
     {
-        [Required]
-        public string Status { get; set; } = string.Empty;  // Pending, InProgress, Resolved
+        public string Status { get; set; } = string.Empty;
 
-        [MaxLength(1000)]
         public string? AdminResponse { get; set; }
     }
 
-    // Response DTOs
     public class SupportQueryDto
     {
         public int Id { get; set; }
         public string TicketNumber { get; set; } = string.Empty;
+        public int UserId { get; set; }
         public string Subject { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
@@ -37,5 +31,4 @@ namespace InsureTrust.ClaimService.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? ResolvedAt { get; set; }
     }
-
 }

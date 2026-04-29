@@ -1,0 +1,272 @@
+@* @model InsureTrust.Web.Models.PolicyPaymentViewModel
+
+@{
+    ViewData["Title"] = "Payment Verification";
+}
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem; display: flex; flex-direction: column; align-items: center;">
+    <div style="width: 100%; border-bottom: 2px solid var(--border-dark); padding-bottom: 0.5rem; margin-bottom: 3rem;">
+        <h4 style="margin: 0; font-family: var(--font-heading); letter-spacing: 2px;">INSTITUTIONAL LEDGER</h4>
+    </div>
+
+    <div style="background-color: #fff; width: 100%; max-width: 600px; padding: 3rem; border: 1px solid var(--border-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 1px solid var(--border-dark); padding-bottom: 1rem;">
+            <div>
+                <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem; line-height: 1.1;">FINANCIAL INSTRUMENT<br/>FILING</h1>
+                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-sans);">FORM 882-C / PAYMENT AUTHORIZATION</span>
+            </div>
+            <div style="border: 1px solid var(--border-dark); padding: 0.5rem; text-align: center; font-size: 0.65rem; text-transform: uppercase; width: 80px;">
+                OFFICIAL USE<br/>ONLY
+            </div>
+        </div>
+
+        <form asp-action="PaymentVerification" asp-controller="Renewal" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="UserPolicyId" type="hidden" />
+            <input asp-for="PaymentCategory" type="hidden" />
+            <input asp-for="PaymentMethod" type="hidden" />
+            <input asp-for="IsRenewal" type="hidden" />
+            <input asp-for="Amount" type="hidden" />
+
+            <!-- Read-only info -->
+            <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                <div style="flex: 1;">
+                    <span class="form-label" style="color: #999;">Policy ID</span>
+                    <div style="font-family: var(--font-heading); font-size: 1.1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">@Model.UserPolicyId</div>
+                </div>
+                <div style="flex: 1;">
+                    <span class="form-label" style="color: #999;">Method</span>
+                    <div style="font-family: var(--font-heading); font-size: 1.1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">@Model.PaymentMethod (@Model.PaymentCategory)</div>
+                </div>
+                <div style="flex: 1;">
+                    <span class="form-label" style="color: #999;">Amount</span>
+                    <div style="font-family: var(--font-heading); font-size: 1.1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">₹@Model.Amount</div>
+                </div>
+            </div>
+
+            @if (Model.PaymentCategory == "UPI")
+            {
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">UPI Application</h3>
+                    <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">AS REGISTERED ON DEVICE</span>
+                    <input asp-for="UpiApp" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="e.g. GPay / PhonePe" />
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Virtual Payment Address (VPA)</h3>
+                    <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">XXXX@XXXX</span>
+                    <input asp-for="UpiId" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="e.g. user@bank" />
+                </div>
+            }
+            else if (Model.PaymentCategory == "Card")
+            {
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Cardholder Name</h3>
+                    <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">AS IT APPEARS ON INSTRUMENT</span>
+                    <input asp-for="CardHolderName" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="Enter name" />
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Primary Account Number</h3>
+                    <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">XXXX XXXX XXXX XXXX</span>
+                    <input asp-for="CardNumber" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="16-digit card number" />
+                </div>
+
+                <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                    <div style="flex: 1;">
+                        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Expiration Date</h3>
+                        <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">MM/YY</span>
+                        <input asp-for="ExpiryMonthYear" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="MM/YY" />
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Security Code</h3>
+                        <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">CVV</span>
+                        <input asp-for="Cvv" type="password" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="***" />
+                    </div>
+                </div>
+            }
+            else if (Model.PaymentCategory == "NetBanking")
+            {
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Institution Name</h3>
+                    <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">REGISTERED BANK</span>
+                    <input asp-for="BankName" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="Bank Name" />
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Account Number</h3>
+                    <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">PRIMARY LEDGER</span>
+                    <input asp-for="AccountNumber" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="Account No" />
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none; margin-bottom: 0.5rem;">Routing / IFSC Code</h3>
+                    <span style="font-size: 0.75rem; color: #a9a9a9; text-transform: uppercase;">BRANCH IDENTIFIER</span>
+                    <input asp-for="IFSCCode" class="form-control-inst" style="margin-top: 0.5rem;" placeholder="IFSC Code" />
+                </div>
+            }
+
+            <hr style="border: none; border-top: 2px solid var(--border-dark); margin: 2rem 0;" />
+
+            <div style="text-align: center; margin-bottom: 2rem; font-size: 0.7rem; font-family: var(--font-sans); text-transform: uppercase; line-height: 1.5; font-weight: bold; max-width: 80%; margin-left: auto; margin-right: auto;">
+                BY AFFIXING AUTHORIZATION BELOW, THE SIGNATORY CONFIRMS THE VALIDITY OF THE PROVIDED INSTRUMENT AND CONSENTS TO THE IMMEDIATE DEDUCTION OF REQUISITE FUNDS AS LOGGED IN THE INSTITUTIONAL LEDGER.
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit" class="btn-inst btn-inst-primary" style="background-color: #4b6b55; color: #fff; padding: 0.8rem 2rem; border: none; font-size: 0.8rem; letter-spacing: 1px;">
+                    AUTHORIZE TRANSACTION
+                </button>
+            </div>
+            
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+            {
+                <div style="margin-top: 2rem; border: 1px solid var(--accent-red); padding: 1rem; background-color: rgba(139, 38, 38, 0.1); color: var(--accent-red); font-family: var(--font-sans); text-align: center;">
+                    <strong>Error:</strong> @Model.ErrorMessage
+                </div>
+            }
+        </form>
+    </div>
+
+</div> *@
+@model InsureTrust.Web.Models.PolicyPaymentViewModel
+
+@{
+    ViewData["Title"] = "Payment Verification";
+}
+
+<style>
+    @@media (max-width: 800px) {
+        .verification-summary {
+            flex-direction: column !important;
+            gap: 1rem !important;
+        }
+    }
+</style>
+
+<div class="institutional-wrapper" style="background-color: var(--bg-paper); padding: 2rem; display: flex; flex-direction: column; align-items: center;">
+    <div style="width: 100%; border-bottom: 2px solid var(--border-dark); padding-bottom: 0.5rem; margin-bottom: 3rem;">
+        <h4 style="margin: 0; font-family: var(--font-heading); letter-spacing: 2px;">SECURE PAYMENT VERIFICATION</h4>
+    </div>
+
+    <div style="background-color: #fff; width: 100%; max-width: 650px; padding: 3rem; border: 1px solid var(--border-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 1px solid var(--border-dark); padding-bottom: 1rem;">
+            <div>
+                <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem; line-height: 1.1;">PAYMENT<br />VERIFICATION</h1>
+                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-sans);">Demo verification before final payment</span>
+            </div>
+            <div style="border: 1px solid var(--border-dark); padding: 0.5rem; text-align: center; font-size: 0.65rem; text-transform: uppercase; width: 80px;">
+                SECURE<br />CHECK
+            </div>
+        </div>
+
+        <form asp-action="PaymentVerification" asp-controller="Renewal" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="PolicyId" type="hidden" />
+            <input asp-for="PolicyNumber" type="hidden" />
+            <input asp-for="UserPolicyId" type="hidden" />
+            <input asp-for="PaymentCategory" type="hidden" />
+            <input asp-for="PaymentMethod" type="hidden" />
+            <input asp-for="IsRenewal" type="hidden" />
+            <input asp-for="Amount" type="hidden" />
+
+            <div class="verification-summary" style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                <div style="flex: 1;">
+                    <span class="form-label" style="color: #999;">Policy Reference</span>
+                    <div style="font-family: var(--font-heading); font-size: 1.1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">
+                        @(Model.IsRenewal ? $"Policy #{Model.PolicyNumber}" : $"Policy ID #{Model.PolicyId}")
+                    </div>
+                </div>
+
+                <div style="flex: 1;">
+                    <span class="form-label" style="color: #999;">Payment Option</span>
+                    <div style="font-family: var(--font-heading); font-size: 1.1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">
+                        @Model.PaymentMethod (@Model.PaymentCategory)
+                    </div>
+                </div>
+
+                <div style="flex: 1;">
+                    <span class="form-label" style="color: #999;">Amount</span>
+                    <div style="font-family: var(--font-heading); font-size: 1.1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">
+                        ₹@Model.Amount.ToString("N2")
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.PaymentCategory == "UPI")
+            {
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">UPI Application</h3>
+                    <input asp-for="UpiApp" class="form-control-inst" placeholder="e.g. GPay / PhonePe / Paytm" />
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">Virtual Payment Address</h3>
+                    <input asp-for="UpiId" class="form-control-inst" placeholder="e.g. user@bank" />
+                </div>
+            }
+            else if (Model.PaymentCategory == "Card")
+            {
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">Cardholder Name</h3>
+                    <input asp-for="CardHolderName" class="form-control-inst" placeholder="Enter cardholder name" />
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">Card Number</h3>
+                    <input asp-for="CardNumber" class="form-control-inst" placeholder="16-digit card number" />
+                </div>
+
+                <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                    <div style="flex: 1;">
+                        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">Expiry</h3>
+                        <input asp-for="ExpiryMonthYear" class="form-control-inst" placeholder="MM/YY" />
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">CVV</h3>
+                        <input asp-for="Cvv" type="password" class="form-control-inst" placeholder="***" />
+                    </div>
+                </div>
+            }
+            else if (Model.PaymentCategory == "NetBanking")
+            {
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">Bank Name</h3>
+                    <input asp-for="BankName" class="form-control-inst" placeholder="Bank Name" />
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">Account Number</h3>
+                    <input asp-for="AccountNumber" class="form-control-inst" placeholder="Account Number" />
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; text-transform: none;">IFSC Code</h3>
+                    <input asp-for="IFSCCode" class="form-control-inst" placeholder="IFSC Code" />
+                </div>
+            }
+
+            <hr style="border: none; border-top: 2px solid var(--border-dark); margin: 2rem 0;" />
+
+            <div style="text-align: center; margin-bottom: 2rem; font-size: 0.7rem; font-family: var(--font-sans); text-transform: uppercase; line-height: 1.5; font-weight: bold;">
+                This verification is for demo authorization only. Payment success will be controlled by the Payment Service.
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit" class="btn-inst btn-inst-primary" style="background-color: #4b6b55; color: #fff; padding: 0.8rem 2rem; border: none; font-size: 0.8rem; letter-spacing: 1px;">
+                    CONFIRM PAYMENT
+                </button>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+            {
+                <div style="margin-top: 2rem; border: 1px solid var(--accent-red); padding: 1rem; background-color: rgba(139, 38, 38, 0.1); color: var(--accent-red); font-family: var(--font-sans); text-align: center;">
+                    <strong>Error:</strong> @Model.ErrorMessage
+                </div>
+            }
+        </form>
+    </div>
+</div>
