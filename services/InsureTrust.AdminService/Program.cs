@@ -1,36 +1,71 @@
+using InsureTrust.AdminService.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Serilog;
 
-namespace InsureTrust.AdminService
+var builder = WebApplication.CreateBuilder(args);
+
+// ================= SERILOG CONFIGURATION =================
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("logs/admin-service-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// ================= CONTROLLERS & VALIDATION =================
+builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// ================= SWAGGER =================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// ================= HTTP CLIENT ( IMPORTANT) =================
+builder.Services.AddHttpClient<IAdminService, AdminService>(client =>
 {
-    public class Program
+    client.BaseAddress = new Uri("http://localhost:5000/"); 
+});
+
+// ================= JWT AUTH =================
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        public static void Main(string[] args)
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            var builder = WebApplication.CreateBuilder(args);
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("THIS_IS_SECRET_KEY_CHANGE_IT") // same as Identity Service
+            )
+        };
+    });
 
-            // Add services to the container.
+var app = builder.Build();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+// ================= MIDDLEWARE PIPELINE =================
+app.UseMiddleware<InsureTrust.AdminService.Middleware.ExceptionMiddleware>();
 
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
+
+// 🔥 IMPORTANT ORDER
+app.UseAuthentication();   // MUST BEFORE Authorization
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();

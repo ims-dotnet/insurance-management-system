@@ -1,30 +1,29 @@
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
-namespace InsureTrust.ClaimService.DTOs
+namespace InsureTrust.Web.Models
 {
-    public class SubmitClaimDto
+    public class SubmitClaimViewModel
     {
+        [Required]
+        public int PolicyId { get; set; }
+
+        [Required]
+        [MaxLength(500)]
         public string Description { get; set; } = string.Empty;
         
+        [Required]
+        [Range(0.01, double.MaxValue)]
         public decimal MaturityAmount { get; set; }
         
         public List<IFormFile> Documents { get; set; } = new();
     }
 
-    public class UpdateClaimDto
-    {
-        public string Action { get; set; } = string.Empty;  // Approve, Deny
-        
-        public string? AdminRemarks { get; set; }
-    }
-
-    public class ClaimDto
+    public class ClaimViewModel
     {
         public int Id { get; set; }
         public string ClaimNumber { get; set; } = string.Empty;
         public string PolicyNumber { get; set; } = string.Empty;
-        public string PolicyTypeName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string ClaimStatus { get; set; } = string.Empty;
         public decimal MaturityAmount { get; set; }

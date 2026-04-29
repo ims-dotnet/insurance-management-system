@@ -1,18 +1,41 @@
+<<<<<<< HEAD
+=======
 @inject IConfiguration Configuration
 @{
     var gatewayBase = Configuration["ApiBaseUrls:Gateway"] ?? string.Empty;
 }
 
+>>>>>>> main
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Executive Ledger</title>
+<<<<<<< HEAD
+    <script type="importmap"></script>
+=======
+>>>>>>> main
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InsureTrust.Web.styles.css" asp-append-version="true" />
+    <style>
+        /* Base Layout Styles */
+    </style>
 </head>
+<<<<<<< HEAD
+<body style="background-color: var(--bg-paper);">
+    <div class="institutional-wrapper">
+        <partial name="_AdminSidebar" />
+
+        <div class="main-content" style="max-width: 1200px; margin: 0 auto; width: 100%;">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+=======
 <body
     data-gateway-base="@gatewayBase">
     <div class="institutional-wrapper">
@@ -70,9 +93,24 @@
         </div>
     </div>
 
+>>>>>>> main
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        function toggleDropdown(id, element) {
+            const submenu = document.getElementById(id);
+            const arrow = element.querySelector('.dropdown-arrow');
+            
+            if (submenu.style.display === "flex") {
+                submenu.style.display = "none";
+                arrow.classList.remove('rotated');
+            } else {
+                submenu.style.display = "flex";
+                arrow.classList.add('rotated');
+            }
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

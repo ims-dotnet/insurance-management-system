@@ -1,0 +1,122 @@
+@model InsureTrust.Web.Models.SubmitClaimViewModel
+
+@{
+    ViewData["Title"] = "Submit a Claim";
+}
+
+<div style="margin-bottom: 2rem; margin-top: 1rem;">
+    <h1 style="font-family: var(--font-heading); font-size: 3rem; margin-bottom: 1rem;">CLAIM SUBMISSION</h1>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <p style="font-family: var(--font-heading); color: var(--text-ink); margin: 0; max-width: 60%; font-size: 0.9rem;">
+            Complete all sections below with absolute precision. Omissions will result in immediate rejection of the claim artifact.
+        </p>
+        <div style="text-align: right;">
+            <div style="font-family: var(--font-heading); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.2rem;">FORM REF:</div>
+            <div style="border: 2px solid var(--border-dark); padding: 0.2rem 0.5rem; font-family: var(--font-heading); font-weight: bold; font-size: 1.1rem; display: inline-block;">
+                CLM-402-A
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="divider-thick" style="margin-top: 0; margin-bottom: 1.5rem;" />
+
+<form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="PolicyId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    
+    <div style="border: 2px solid var(--border-dark); background-color: var(--bg-paper);">
+        
+        <!-- Section I -->
+        <div style="border-bottom: 2px solid var(--border-dark); padding: 1rem; background-color: var(--bg-panel); font-family: var(--font-heading); font-size: 1.25rem; font-weight: bold;">
+            I. INCIDENT PARTICULARS
+        </div>
+        
+        <div style="display: flex; border-bottom: 1px solid var(--border-dark);">
+            <div style="flex: 1; border-right: 1px solid var(--border-dark); padding: 1.5rem;">
+                <label class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">POLICY IDENTIFICATION NUMBER</label>
+                <input type="text" class="form-control-inst" placeholder="e.g. POL-99-XXXX" style="border:none; padding-left:0;" />
+            </div>
+            <div style="flex: 1; border-right: 1px solid var(--border-dark); padding: 1.5rem;">
+                <label class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">DATE OF OCCURRENCE</label>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <input type="text" class="form-control-inst" placeholder="MM/DD/YYYY" style="border:none; padding-left:0; flex: 1;" />
+                    <i class="far fa-calendar" style="color: var(--text-ink); margin-left: 0.5rem;"></i>
+                </div>
+            </div>
+            <div style="flex: 1; padding: 1.5rem;">
+                <label class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">TIME OF OCCURRENCE</label>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <input type="text" class="form-control-inst" placeholder="--:--" style="border:none; padding-left:0; flex: 1;" />
+                    <i class="far fa-clock" style="color: var(--text-ink); margin-left: 0.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div style="border-bottom: 1px solid var(--border-dark); padding: 1.5rem;">
+            <label class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">GEOGRAPHIC LOCATION OF INCIDENT</label>
+            <input type="text" class="form-control-inst" placeholder="Full legal address or precise coordinates" style="border:none; padding-left:0;" />
+        </div>
+        
+        <div style="padding: 1.5rem; background-color: var(--bg-panel); border-bottom: 1px solid var(--border-dark);">
+            <label class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">COMPREHENSIVE NARRATIVE DESCRIPTION</label>
+        </div>
+        <div style="padding: 1.5rem;">
+            <textarea asp-for="Description" class="form-control-inst" rows="4" placeholder="Provide a detailed, chronological account of the events resulting in the claimed loss..." style="border:none; padding-left:0; resize: vertical;"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <!-- Section II -->
+        <div style="border-bottom: 2px solid var(--border-dark); border-top: 2px solid var(--border-dark); padding: 1rem; background-color: var(--bg-panel); font-family: var(--font-heading); font-size: 1.25rem; font-weight: bold;">
+            II. LOSS ASSESSMENT
+        </div>
+        
+        <div style="display: flex; border-bottom: 2px solid var(--border-dark); background-color: #e8e4d9;">
+            <div style="flex: 1; border-right: 1px solid var(--border-dark); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
+                <label asp-for="MaturityAmount" class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">CALCULATED MATURITY AMOUNT</label>
+                <div style="display: flex; align-items: center; margin-top: 1rem;">
+                    <span style="font-family: var(--font-heading); font-size: 2rem; font-weight: bold; margin-right: 0.5rem;">$</span>
+                    <input asp-for="MaturityAmount" type="number" step="0.01" class="form-control-box" placeholder="0.00" style="font-size: 2rem; text-align: right; font-family: var(--font-heading); background-color: transparent; border: 1px solid var(--border-dark);" />
+                </div>
+                <span asp-validation-for="MaturityAmount" class="text-danger"></span>
+            </div>
+            <div style="flex: 1; padding: 1.5rem;">
+                <div style="margin-bottom: 2rem;">
+                    <label class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">CURRENCY DENOMINATION</label>
+                    <select class="form-control-inst" style="border:none; border-bottom: 1px solid var(--border-dark); padding-left:0; font-weight: bold; font-size: 0.85rem;">
+                        <option>USD - UNITED STATES DOLLAR</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" style="font-family: var(--font-heading); letter-spacing: 1px;">LOSS CLASSIFICATION</label>
+                    <select class="form-control-inst" style="border:none; border-bottom: 1px solid var(--border-dark); padding-left:0; font-weight: bold; font-size: 0.85rem;">
+                        <option>PROPERTY DAMAGE (STRUCTURAL)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section III -->
+        <div style="border-bottom: 2px solid var(--border-dark); padding: 1rem; background-color: var(--bg-panel); font-family: var(--font-heading); font-size: 1.25rem; font-weight: bold;">
+            III. DOCUMENT SUBMISSION
+        </div>
+        
+        <div style="padding: 2rem; background-color: #e8e4d9;">
+            <div style="border: 2px dashed var(--border-dark); padding: 3rem; text-align: center; position: relative; cursor: pointer; transition: background-color 0.2s;">
+                <input asp-for="Documents" type="file" multiple class="file-upload-input" accept=".jpg,.jpeg,.png,.pdf" style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;" />
+                <i class="fas fa-file-upload fa-2x mb-3" style="color: var(--text-ink);"></i>
+                <div style="font-family: var(--font-heading); font-weight: bold; text-transform: uppercase; font-size: 0.9rem;">Upload Evidentiary Files</div>
+                <div style="font-family: var(--font-sans); font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.7;">DRAG & DROP OR CLICK TO BROWSE</div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div style="margin-top: 2rem; text-align: right;">
+        <button type="submit" class="btn-inst" style="background-color: var(--border-dark); color: var(--bg-paper); padding: 0.75rem 2.5rem; font-size: 1rem; border: 2px solid var(--border-dark); font-weight: bold; letter-spacing: 1px;">FILE CLAIM</button>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
