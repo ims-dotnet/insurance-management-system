@@ -147,7 +147,7 @@ namespace InsureTrust.Web.Controllers
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    
+
                     if (apiResponse.TryGetProperty("data", out var dataProperty))
                     {
                         claims = JsonSerializer.Deserialize<List<AdminClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminClaimViewModel>();

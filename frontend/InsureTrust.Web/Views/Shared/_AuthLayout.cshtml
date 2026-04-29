@@ -1,0 +1,42 @@
+@inject IConfiguration Configuration
+@{
+    var authApiBase = Configuration["ApiBaseUrls:Auth"] ?? string.Empty;
+    var notificationApiBase = Configuration["ApiBaseUrls:Notification"] ?? string.Empty;
+    var calculatorApiBase = Configuration["ApiBaseUrls:Calculator"] ?? string.Empty;
+    var productApiBase = Configuration["ApiBaseUrls:Product"] ?? string.Empty;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - InsureTrust</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/InsureTrust.Web.styles.css" asp-append-version="true" />
+</head>
+<body
+    class="auth-screen"
+    data-auth-api-base="@authApiBase"
+    data-notification-api-base="@notificationApiBase"
+    data-calculator-api-base="@calculatorApiBase"
+    data-product-api-base="@productApiBase">
+    <main role="main" class="auth-main">
+        @RenderBody()
+    </main>
+    <footer class="app-footer auth-footer">
+        <div>© 1954 Institutional Risk & Assurance. All rights reserved.</div>
+        <div class="footer-links">
+            <span>Privacy Ledger</span>
+            <span>Compliance Protocol</span>
+            <span>Regulatory Filings</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

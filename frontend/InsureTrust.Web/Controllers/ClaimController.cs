@@ -17,19 +17,19 @@ namespace InsureTrust.Web.Controllers
         {
             var client = _httpClientFactory.CreateClient();
             var response = await client.GetAsync("http://localhost:7004/api/claim/my-claims"); // API Gateway or Service URL
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                
+
                 if (apiResponse.TryGetProperty("data", out var dataProperty))
                 {
                     var claims = JsonSerializer.Deserialize<List<ClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     return View(claims);
                 }
             }
-            
+
             return View(new List<ClaimViewModel>());
         }
 

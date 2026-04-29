@@ -1,10 +1,21 @@
+<<<<<<< HEAD
+=======
+@inject IConfiguration Configuration
+@{
+    var gatewayBase = Configuration["ApiBaseUrls:Gateway"] ?? string.Empty;
+}
+
+>>>>>>> main
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Executive Ledger</title>
+<<<<<<< HEAD
     <script type="importmap"></script>
+=======
+>>>>>>> main
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -13,6 +24,7 @@
         /* Base Layout Styles */
     </style>
 </head>
+<<<<<<< HEAD
 <body style="background-color: var(--bg-paper);">
     <div class="institutional-wrapper">
         <partial name="_AdminSidebar" />
@@ -23,6 +35,65 @@
             </main>
         </div>
     </div>
+=======
+<body
+    data-gateway-base="@gatewayBase">
+    <div class="institutional-wrapper">
+        <aside class="sidebar-left">
+            <div class="sidebar-header">
+                <img id="sidebarUserAvatar" class="user-avatar" src="~/images/avatars/avatar-1.svg" alt="User avatar" />
+                <div class="user-details">
+                    <p id="sidebarUserName" class="sidebar-title">Guest User</p>
+                    <p id="sidebarUserEmail" class="sidebar-subtitle">guest@insuretrust</p>
+                </div>
+                <div class="user-actions">
+                    @await Html.PartialAsync("_NotificationBell")
+                </div>
+            </div>
+            <a asp-controller="Account" asp-action="Register" class="btn-inst w-100 text-center mb-3">Create Account</a>
+
+            <nav class="nav-ledger">
+                <a asp-controller="Home" asp-action="Index">Dashboard</a>
+                <a asp-controller="Policy" asp-action="Index" data-auth-required="true">Policy Desk</a>
+                <a asp-controller="Claim" asp-action="Index" data-auth-required="true">Claim Desk</a>
+                <a asp-controller="Notification" asp-action="Index" data-auth-required="true">Notification History</a>
+                <a asp-controller="Account" asp-action="Profile" data-auth-required="true">Profile</a>
+                <button type="button" id="openCalculatorPanel" class="btn-link-ledger">Calculator</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a asp-controller="Support" asp-action="Index" data-auth-required="true">Support</a>
+                <a asp-controller="Account" asp-action="Logout">Logout</a>
+            </div>
+        </aside>
+
+        <div class="main-stage">
+            <main role="main" class="main-content pb-3">
+                @RenderBody()
+            </main>
+
+            <footer class="app-footer">
+                <div>© 1954 Institutional Risk & Assurance. All rights reserved.</div>
+                <div class="footer-links">
+                    <span>Privacy Ledger</span>
+                    <span>Compliance Protocol</span>
+                    <span>Regulatory Filings</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <div id="calculatorPopup" class="calculator-popup" aria-hidden="true">
+        <div class="calculator-popup-panel" role="dialog" aria-modal="true" aria-label="Calculator">
+            <div class="calculator-popup-header">
+                <span>Quick Calculator</span>
+                <button type="button" id="closeCalculatorPopup" class="btn-close-ledger" aria-label="Close calculator">×</button>
+            </div>
+            @await Html.PartialAsync("_Calculator")
+        </div>
+    </div>
+
+>>>>>>> main
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
