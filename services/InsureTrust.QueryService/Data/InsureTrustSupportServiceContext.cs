@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using InsureTrust.QueryService.Models;
 
-namespace InsureTrust.SupportService.Data
+   namespace InsureTrust.QueryService.Data
 {
-    public class InsureTrustSupportServiceContext : DbContext
+    public class InsureTrustQueryServiceContext : DbContext
     {
-        public InsureTrustSupportServiceContext (DbContextOptions<InsureTrustSupportServiceContext> options)
+        public InsureTrustQueryServiceContext (DbContextOptions<InsureTrustQueryServiceContext> options)
             : base(options)
         {
         }
