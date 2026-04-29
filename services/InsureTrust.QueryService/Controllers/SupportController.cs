@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using InsureTrust.SupportService.DTOs;
 using InsureTrust.SupportService.Services;
 using InsureTrust.SupportService.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InsureTrust.SupportService.Controllers
 {
@@ -25,7 +25,9 @@ namespace InsureTrust.SupportService.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Submit([FromForm] CreateSupportQueryDto dto)
         {
-            int userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            if (!TryGetUserId(out int userId))
+                return Unauthorized(new { message = "User identity could not be determined from the token." });
+
             var result = await _supportService.SubmitQueryAsync(dto, userId, _environment.WebRootPath);
             return Ok(ApiResponse<SupportQueryDto>.SuccessResponse(result, "Support query submitted successfully."));
         }
@@ -34,7 +36,9 @@ namespace InsureTrust.SupportService.Controllers
         [HttpGet("my-queries")]
         public async Task<IActionResult> GetMyQueries()
         {
-            int userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            if (!TryGetUserId(out int userId))
+                return Unauthorized(new { message = "User identity could not be determined from the token." });
+
             var result = await _supportService.GetMyQueriesAsync(userId);
             return Ok(ApiResponse<IEnumerable<SupportQueryDto>>.SuccessResponse(result));
         }
@@ -53,6 +57,19 @@ namespace InsureTrust.SupportService.Controllers
         {
             var result = await _supportService.UpdateStatusAsync(ticketId, dto);
             return Ok(ApiResponse<SupportQueryDto>.SuccessResponse(result, "Status updated successfully."));
+        }
+
+        // ─── Helpers ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Safely extracts the integer UserId from the JWT NameIdentifier claim.
+        /// Returns false and outputs 0 if the claim is missing or not a valid integer,
+        /// making the service resilient to whatever token format the Auth team issues.
+        /// </summary>
+        private bool TryGetUserId(out int userId)
+        {
+            var claimValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(claimValue, out userId);
         }
     }
 }

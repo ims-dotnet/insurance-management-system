@@ -166,6 +166,7 @@
             @Html.AntiForgeryToken()
 
             <input asp-for="PolicyId" type="hidden" />
+            <input asp-for="PolicyNumber" type="hidden" />
             <input asp-for="UserPolicyId" type="hidden" />
             <input asp-for="PaymentCategory" type="hidden" />
             <input asp-for="PaymentMethod" type="hidden" />
@@ -174,9 +175,9 @@
 
             <div class="verification-summary" style="display: flex; gap: 2rem; margin-bottom: 2rem;">
                 <div style="flex: 1;">
-                    <span class="form-label" style="color: #999;">Policy User ID</span>
+                    <span class="form-label" style="color: #999;">Policy Reference</span>
                     <div style="font-family: var(--font-heading); font-size: 1.1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">
-                        @(Model.IsRenewal ? $"User Policy #{Model.UserPolicyId}" : $"Policy #{Model.PolicyId}")
+                        @(Model.IsRenewal ? $"Policy #{Model.PolicyNumber}" : $"Policy ID #{Model.PolicyId}")
                     </div>
                 </div>
 

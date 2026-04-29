@@ -10,5 +10,7 @@ namespace InsureTrust.PaymentService.Services
         Task<IEnumerable<PaymentDto>> GetAllPaymentsAsync();
         Task<bool> ApprovePaymentAsync(int paymentId);
         Task<bool> RejectPaymentAsync(int paymentId, string reason);
+        Task<ProductPolicyDto?> GetPolicyDetailsByNumberAsync(string policyNumber);
+        Task<ProductPolicyDto?> GetPolicyDetailsByIdAsync(int policyId);
     }
-}
+}

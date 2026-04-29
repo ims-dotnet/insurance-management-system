@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using InsureTrust.PaymentService.DTOs;
 using InsureTrust.PaymentService.Models;
 
@@ -8,9 +8,7 @@ namespace InsureTrust.PaymentService.Mappings
     {
         public PaymentMappingProfile()
         {
-            CreateMap<Payment, PaymentDto>()
-                .ForMember(dest => dest.PolicyNumber,
-                    opt => opt.MapFrom(src => string.Empty));
+            CreateMap<Payment, PaymentDto>();
 
             CreateMap<Payment, InitiatePaymentResponseDto>()
                 .ForMember(dest => dest.RedirectUrl,

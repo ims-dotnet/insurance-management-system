@@ -32,29 +32,27 @@ namespace InsureTrust.PaymentService.Services
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            // Temporary demo amount.
-            // Later fetch from Product Service using PolicyId.
-            decimal amount = 5000m;
-            // Real integration later
-            // var policy = await _productClient.GetPolicyByPolicyIdAsync(dto.PolicyId);
-            //
-            // if (policy == null)
-            //     throw new NotFoundException("Policy not found.");
-            //
-            // decimal amount = policy.PremiumAmount;
+            // Fetch real amount from Product Service
+            var initialPolicy = await _productClient.GetPolicyByPolicyIdAsync(dto.PolicyId);
+            if (initialPolicy == null)
+                throw new NotFoundException("Policy product not found.");
+
+            decimal amount = initialPolicy.PackageAmount;
 
             var gatewayResult = await _gateway.ProcessAsync(amount, dto.PaymentMethod);
 
             int? generatedUserPolicyId = null;
             if (gatewayResult.Success)
             {
-                generatedUserPolicyId = PaymentHelper.GenerateUserPolicyId();
+                // Register the policy in ProductService and get real ID/Number
+                var productResponse = await _productClient.RegisterNewPolicyAsync(userId, dto.PolicyId, amount);
+                generatedUserPolicyId = productResponse?.UserPolicyId;
             }
 
             var payment = new Payment
             {
                 UserId = userId,
-                PolicyId = null,
+                PolicyId = dto.PolicyId,
                 UserPolicyId = generatedUserPolicyId,
                 Amount = amount,
                 PaymentMethod = dto.PaymentMethod,
@@ -80,12 +78,13 @@ namespace InsureTrust.PaymentService.Services
             InitiateRenewalPaymentDto dto,
             int userId)
         {
-            var policy = await _productClient.GetPolicyAsync(dto.UserPolicyId);
+            var policy = await _productClient.GetPolicyByNumberAsync(dto.PolicyNumber);
 
             if (policy == null)
                 throw new NotFoundException("Policy not found for renewal.");
 
-            decimal baseAmount = 5000m; // Temporary demo amount
+            // Use the real amount from Product Service instead of hardcoded value
+            decimal baseAmount = policy.PackageAmount;
             decimal finalAmount = CalculateRenewalAmount(policy, baseAmount);
 
             var gatewayResult = await _gateway.ProcessAsync(finalAmount, dto.PaymentMethod);
@@ -94,7 +93,7 @@ namespace InsureTrust.PaymentService.Services
             {
                 UserId = userId,
                 PolicyId = policy.PolicyId,
-                UserPolicyId = dto.UserPolicyId,
+                UserPolicyId = policy.UserPolicyId, // Saving the real ID from lookup
                 Amount = finalAmount,
                 PaymentMethod = dto.PaymentMethod,
                 PaymentNumber = PaymentHelper.GeneratePaymentNumber(),
@@ -110,7 +109,7 @@ namespace InsureTrust.PaymentService.Services
             {
                 try
                 {
-                    var isRenewed = await _productClient.RenewPolicyAsync(dto.UserPolicyId);
+                    var isRenewed = await _productClient.RenewPolicyByNumberAsync(dto.PolicyNumber);
 
                     payment.Remarks = isRenewed
                         ? "Policy Renewed Successfully"
@@ -242,6 +241,16 @@ namespace InsureTrust.PaymentService.Services
             };
 
             return baseAmount + (baseAmount * penaltyPercent);
+        }
+
+        public async Task<ProductPolicyDto?> GetPolicyDetailsByNumberAsync(string policyNumber)
+        {
+            return await _productClient.GetPolicyByNumberAsync(policyNumber);
+        }
+
+        public async Task<ProductPolicyDto?> GetPolicyDetailsByIdAsync(int policyId)
+        {
+            return await _productClient.GetPolicyByPolicyIdAsync(policyId);
         }
     }
 }

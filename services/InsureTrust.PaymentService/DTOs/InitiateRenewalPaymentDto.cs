@@ -2,9 +2,8 @@ namespace InsureTrust.PaymentService.DTOs
 {
     public class InitiateRenewalPaymentDto
     {
-        public int UserPolicyId { get; set; }
+        public string PolicyNumber { get; set; } = string.Empty;
 
-       
         public string PaymentMethod { get; set; } = string.Empty;
     }
 }

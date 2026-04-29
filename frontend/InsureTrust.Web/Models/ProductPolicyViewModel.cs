@@ -1,9 +1,8 @@
-namespace InsureTrust.PaymentService.DTOs
+namespace InsureTrust.Web.Models
 {
-    public class ProductPolicyDto
+    public class ProductPolicyViewModel
     {
         public int PolicyId { get; set; }
-        public int UserPolicyId { get; set; }
         public string PolicyNumber { get; set; } = string.Empty;
         public string PolicyType { get; set; } = string.Empty;
         public DateTime ExpiryDate { get; set; }

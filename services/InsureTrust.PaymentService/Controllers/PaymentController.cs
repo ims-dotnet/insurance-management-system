@@ -85,6 +85,20 @@ namespace InsureTrust.PaymentService.Controllers
             await _service.RejectPaymentAsync(id, request.Reason);
             return Ok(ApiResponse<object?>.SuccessResponse(null, "Payment rejected successfully"));
         }
+        
+        [HttpGet("policy-details/number/{policyNumber}")]
+        public async Task<IActionResult> GetPolicyDetailsByNumber(string policyNumber)
+        {
+            var result = await _service.GetPolicyDetailsByNumberAsync(policyNumber);
+            return Ok(ApiResponse<ProductPolicyDto?>.SuccessResponse(result, "Policy details fetched successfully"));
+        }
+
+        [HttpGet("policy-details/{policyId:int}")]
+        public async Task<IActionResult> GetPolicyDetailsById(int policyId)
+        {
+            var result = await _service.GetPolicyDetailsByIdAsync(policyId);
+            return Ok(ApiResponse<ProductPolicyDto?>.SuccessResponse(result, "Policy details fetched successfully"));
+        }
 
 
 
@@ -97,4 +111,4 @@ namespace InsureTrust.PaymentService.Controllers
                 : 1;
         }
     }
-}
+}

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using InsureTrust.PaymentService.DTOs;
 
 namespace InsureTrust.PaymentService.Validators
@@ -7,9 +7,10 @@ namespace InsureTrust.PaymentService.Validators
     {
         public InitiateRenewalPaymentDtoValidator()
         {
-            RuleFor(x => x.UserPolicyId)
-                .GreaterThan(0)
-                .WithMessage("Valid UserPolicyId is required.");
+            RuleFor(x => x.PolicyNumber)
+                .NotEmpty()
+                .Matches(@"^POL-\d+$|POL[0-9]{4}|POL-DEMO") // Allowing current mock formats
+                .WithMessage("Valid PolicyNumber is required.");
 
             RuleFor(x => x.PaymentMethod)
                 .NotEmpty()

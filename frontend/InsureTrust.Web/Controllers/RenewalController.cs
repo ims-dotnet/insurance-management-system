@@ -7,23 +7,38 @@ namespace InsureTrust.Web.Controllers
 {
     public class RenewalController : Controller
     {
-        private readonly ApiClient _apiClient;
+        private readonly IRenewalService _renewalService;
 
-        public RenewalController(ApiClient apiClient)
+        public RenewalController(IRenewalService renewalService)
         {
-            _apiClient = apiClient;
+            _renewalService = renewalService;
         }
 
         [HttpGet]
-        public IActionResult Checkout(int? policyId)
+        public async Task<IActionResult> Checkout(int? policyId)
         {
+            // Default to policy 1 if none provided (e.g. from navbar link)
+            policyId ??= 1;
+
+
+            var response = await _renewalService.GetPolicyDetailsByIdAsync(policyId.Value);
+
+            if (response == null || !response.Success || response.Data == null)
+            {
+                return View(new PolicyPaymentViewModel 
+                { 
+                    PolicyId = policyId.Value,
+                    ErrorMessage = response?.Message ?? "Could not fetch policy details." 
+                });
+            }
+
             var model = new PolicyPaymentViewModel
             {
-                PolicyId = policyId ?? 1,
+                PolicyId = response.Data.PolicyId,
                 PaymentCategory = "UPI",
                 PaymentMethod = "GPay",
                 IsRenewal = false,
-                Amount = 5000
+                Amount = response.Data.PackageAmount
             };
 
             return View(model);
@@ -51,15 +66,30 @@ namespace InsureTrust.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult RenewPolicy(int? userPolicyId)
+        public async Task<IActionResult> RenewPolicy(string? policyNumber)
         {
+            // Default to mock policy number for demo/testing
+            policyNumber ??= "POL-12345";
+
+
+            var response = await _renewalService.GetPolicyDetailsByNumberAsync(policyNumber);
+
+            if (response == null || !response.Success || response.Data == null)
+            {
+                return View(new PolicyPaymentViewModel 
+                { 
+                    PolicyNumber = policyNumber,
+                    ErrorMessage = response?.Message ?? "Policy not found in Product Service." 
+                });
+            }
+
             var model = new PolicyPaymentViewModel
             {
-                UserPolicyId = userPolicyId ?? 101,
+                PolicyNumber = response.Data.PolicyNumber,
                 PaymentCategory = "UPI",
                 PaymentMethod = "GPay",
                 IsRenewal = true,
-                Amount = 5000
+                Amount = response.Data.PackageAmount
             };
 
             return View(model);
@@ -78,7 +108,7 @@ namespace InsureTrust.Web.Controllers
             return RedirectToAction("PaymentVerification", new
             {
                 policyId = model.PolicyId,
-                userPolicyId = model.UserPolicyId,
+                policyNumber = model.PolicyNumber,
                 paymentCategory = model.PaymentCategory,
                 paymentMethod = model.PaymentMethod,
                 isRenewal = true,
@@ -89,7 +119,7 @@ namespace InsureTrust.Web.Controllers
         [HttpGet]
         public IActionResult PaymentVerification(
             int policyId,
-            int userPolicyId,
+            string policyNumber,
             string paymentCategory,
             string paymentMethod,
             bool isRenewal,
@@ -98,7 +128,7 @@ namespace InsureTrust.Web.Controllers
             var model = new PolicyPaymentViewModel
             {
                 PolicyId = policyId,
-                UserPolicyId = userPolicyId,
+                PolicyNumber = policyNumber,
                 PaymentCategory = paymentCategory,
                 PaymentMethod = paymentMethod,
                 IsRenewal = isRenewal,
@@ -126,13 +156,11 @@ namespace InsureTrust.Web.Controllers
                 {
                     var request = new
                     {
-                        userPolicyId = model.UserPolicyId,
+                        policyNumber = model.PolicyNumber,
                         paymentMethod = model.PaymentMethod
                     };
 
-                    apiResponse = await _apiClient.PostAsync<ApiResponse<PaymentResultViewModel>>(
-                        "https://localhost:7003/api/payment/initiate-renewal-payment",
-                        request);
+                    apiResponse = await _renewalService.InitiateRenewalPaymentAsync(request);
                 }
                 else
                 {
@@ -142,9 +170,7 @@ namespace InsureTrust.Web.Controllers
                         paymentMethod = model.PaymentMethod
                     };
 
-                    apiResponse = await _apiClient.PostAsync<ApiResponse<PaymentResultViewModel>>(
-                        "https://localhost:7003/api/payment/initiate-first-payment",
-                        request);
+                    apiResponse = await _renewalService.InitiateFirstPaymentAsync(request);
                 }
 
                 var result = apiResponse?.Data;
@@ -160,6 +186,8 @@ namespace InsureTrust.Web.Controllers
                     UserPolicyId = model.IsRenewal
                         ? model.UserPolicyId
                         : result.GeneratedUserPolicyId ?? result.UserPolicyId,
+
+                    PolicyNumber = model.PolicyNumber,
 
                     GeneratedUserPolicyId = result.GeneratedUserPolicyId,
                     PaymentNumber = result.PaymentNumber ?? string.Empty,
@@ -184,6 +212,7 @@ namespace InsureTrust.Web.Controllers
                 return RedirectToAction("Failed", new PaymentResultViewModel
                 {
                     UserPolicyId = model.UserPolicyId,
+                    PolicyNumber = model.PolicyNumber,
                     IsRenewal = model.IsRenewal,
                     PaymentMethod = model.PaymentMethod,
                     ErrorMessage = ex.Message
@@ -196,10 +225,15 @@ namespace InsureTrust.Web.Controllers
         {
             try
             {
-                var apiResponse = await _apiClient.GetAsync<ApiResponse<List<PaymentHistoryItemViewModel>>>(
-                    "https://localhost:7003/api/payment/history");
+                var apiResponse = await _renewalService.GetPaymentHistoryAsync();
 
-                var payments = apiResponse?.Data ?? new List<PaymentHistoryItemViewModel>();
+                if (apiResponse == null || !apiResponse.Success)
+                {
+                    ViewBag.Error = apiResponse?.Message ?? "Could not fetch payment history from the service.";
+                    return View(new RenewalHistoryViewModel());
+                }
+
+                var payments = apiResponse.Data ?? new List<PaymentHistoryItemViewModel>();
 
                 var renewalItems = payments
                     .Where(x => !string.IsNullOrWhiteSpace(x.Remarks) &&
@@ -232,12 +266,16 @@ namespace InsureTrust.Web.Controllers
         {
             try
             {
-                var apiResponse = await _apiClient.GetAsync<ApiResponse<List<PaymentHistoryItemViewModel>>>(
-                    "https://localhost:7003/api/payment/history");
+                var apiResponse = await _renewalService.GetPaymentHistoryAsync();
 
-                var payments = apiResponse?.Data ?? new List<PaymentHistoryItemViewModel>();
+                if (apiResponse == null || !apiResponse.Success)
+                {
+                    ViewBag.Error = apiResponse?.Message ?? "Could not fetch payment history from the service.";
+                    return View(new PaymentHistoryViewModel());
+                }
 
-                // Filter for first-time payments (those that don't contain 'Renew')
+                var payments = apiResponse.Data ?? new List<PaymentHistoryItemViewModel>();
+
                 var firstTimePayments = payments
                     .Where(x => string.IsNullOrWhiteSpace(x.Remarks) ||
                                (!x.Remarks.Contains("Renew", StringComparison.OrdinalIgnoreCase) &&
@@ -272,12 +310,16 @@ namespace InsureTrust.Web.Controllers
         {
             try
             {
-                var apiResponse = await _apiClient.GetAsync<ApiResponse<List<PaymentHistoryItemViewModel>>>(
-                    "https://localhost:7003/api/payment/all");
+                var apiResponse = await _renewalService.GetAllPaymentsAsync();
 
-                var allPayments = apiResponse?.Data ?? new List<PaymentHistoryItemViewModel>();
+                if (apiResponse == null || !apiResponse.Success)
+                {
+                    ViewBag.Error = apiResponse?.Message ?? "Could not fetch master ledger from the service.";
+                    return View(new MasterPaymentLedgerViewModel());
+                }
 
-                // ── Apply search (Transaction ID or Policy User ID) ───────────
+                var allPayments = apiResponse.Data ?? new List<PaymentHistoryItemViewModel>();
+
                 if (!string.IsNullOrWhiteSpace(searchQuery))
                 {
                     allPayments = allPayments
@@ -288,7 +330,6 @@ namespace InsureTrust.Web.Controllers
                         .ToList();
                 }
 
-                // ── Apply type filter ─────────────────────────────────────────
                 if (!string.IsNullOrWhiteSpace(filterType) && filterType != "all")
                 {
                     bool isRenewal = filterType == "renewal";
@@ -301,7 +342,6 @@ namespace InsureTrust.Web.Controllers
                     }).ToList();
                 }
 
-                // ── Apply status filter ───────────────────────────────────────
                 if (!string.IsNullOrWhiteSpace(filterStatus) && filterStatus != "all")
                 {
                     allPayments = filterStatus switch
@@ -321,7 +361,6 @@ namespace InsureTrust.Web.Controllers
                     };
                 }
 
-                // ── Build ViewModel ───────────────────────────────────────────
                 var ledgerItems = allPayments.Select(p => new MasterPaymentLedgerItemViewModel
                 {
                     Id = p.Id,
@@ -367,13 +406,10 @@ namespace InsureTrust.Web.Controllers
         {
             try
             {
-                await _apiClient.PostAsync<ApiResponse<object>>(
-                    $"https://localhost:7003/api/payment/{paymentId}/approve",
-                    new { });
+                await _renewalService.ApprovePaymentAsync(paymentId);
             }
             catch
             {
-                // log if needed
             }
 
             return RedirectToAction("MasterPaymentLedger");
@@ -385,13 +421,10 @@ namespace InsureTrust.Web.Controllers
         {
             try
             {
-                await _apiClient.PostAsync<ApiResponse<object>>(
-                    $"https://localhost:7003/api/payment/{paymentId}/reject",
-                    new { Reason = reason });
+                await _renewalService.RejectPaymentAsync(paymentId, reason);
             }
             catch
             {
-                // log if needed
             }
 
             return RedirectToAction("MasterPaymentLedger");
@@ -410,16 +443,5 @@ namespace InsureTrust.Web.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        public IActionResult SetMyToken(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return Content("Error: Token cannot be empty.");
-            }
-
-            HttpContext.Session.SetString("JWToken", token);
-            return Content("Success! Your token is now active on the website session. You can now go to the payment page.");
-        }
     }
 }

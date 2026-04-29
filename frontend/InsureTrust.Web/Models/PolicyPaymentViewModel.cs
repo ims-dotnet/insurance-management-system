@@ -6,6 +6,7 @@ namespace InsureTrust.Web.Models
     {
         // UserPolicyId is assigned by the payment service on success (not user-entered)
         public int? UserPolicyId { get; set; }
+        public string? PolicyNumber { get; set; }
 
         [Required(ErrorMessage = "Please select a payment category.")]
         public string PaymentCategory { get; set; } = "UPI";

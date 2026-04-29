@@ -7,11 +7,11 @@ namespace InsureTrust.Web.Controllers
 {
     public class SupportController : Controller
     {
-        private readonly ApiClient _apiClient;
+        private readonly ISupportService _supportService;
 
-        public SupportController(ApiClient apiClient)
+        public SupportController(ISupportService supportService)
         {
-            _apiClient = apiClient;
+            _supportService = supportService;
         }
 
         [HttpGet]
@@ -47,9 +47,7 @@ namespace InsureTrust.Web.Controllers
                     content.Add(streamContent, "Attachment", model.Attachment.FileName);
                 }
 
-                var response = await _apiClient.PostMultipartAsync<ApiResponse<SupportQueryViewModel>>(
-                    "http://localhost:5135/api/support/submit",
-                    content);
+                var response = await _supportService.SubmitSupportQueryAsync(content);
 
                 if (response == null || !response.Success)
                 {
@@ -80,10 +78,16 @@ namespace InsureTrust.Web.Controllers
 
             try
             {
-                var response = await _apiClient.GetAsync<ApiResponse<List<SupportQueryViewModel>>>(
-                    "http://localhost:5135/api/support/my-queries");
+                var response = await _supportService.GetMyQueriesAsync();
 
-                viewModel.Queries = response?.Data ?? new List<SupportQueryViewModel>();
+                if (response == null || !response.Success)
+                {
+                    viewModel.ErrorMessage = response?.Message ?? "Could not fetch queries from the service.";
+                }
+                else
+                {
+                    viewModel.Queries = response.Data ?? new List<SupportQueryViewModel>();
+                }
             }
             catch (Exception ex)
             {
@@ -100,10 +104,16 @@ namespace InsureTrust.Web.Controllers
 
             try
             {
-                var response = await _apiClient.GetAsync<ApiResponse<List<SupportQueryViewModel>>>(
-                    "http://localhost:5135/api/support/all");
+                var response = await _supportService.GetAllQueriesAsync();
 
-                viewModel.Queries = response?.Data ?? new List<SupportQueryViewModel>();
+                if (response == null || !response.Success)
+                {
+                    viewModel.ErrorMessage = response?.Message ?? "Could not fetch queries from the service.";
+                }
+                else
+                {
+                    viewModel.Queries = response.Data ?? new List<SupportQueryViewModel>();
+                }
             }
             catch (Exception ex)
             {
@@ -119,9 +129,7 @@ namespace InsureTrust.Web.Controllers
         {
             try
             {
-                var response = await _apiClient.PutAsync<ApiResponse<object>>(
-                    $"http://localhost:5135/api/support/update/{model.Id}",
-                    model);
+                var response = await _supportService.UpdateQueryStatusAsync(model.Id, model);
 
                 if (response == null || !response.Success)
                 {
