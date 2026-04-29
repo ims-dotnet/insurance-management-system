@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -26,18 +26,37 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Policy" asp-action="GetAllPolicybyid">GetPolicy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Policy" asp-action="GetAllPending">GetpendingPolicy</a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Policy" asp-action="GetAllPolicy">GetallPolicy</a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Policy" asp-action="ManageTypes">ManagePolicy</a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Policy" asp-action="CreatePolicy">createPolicy</a>
+
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container" style="position: relative; z-index: 1;">
+        <main role="main" class="pb-5" style="padding-bottom: 80px !important;">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted" style="position: relative; z-index: 0; clear: both;">
         <div class="container">
             &copy; 2026 - InsureTrust.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

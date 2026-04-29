@@ -1,0 +1,194 @@
+@using InsureTrust.Productweb.DTOs
+@model PolicyDto
+
+@{
+    ViewData["Title"] = "Policy Continuation";
+}
+
+<style>
+    /* ── POLICY CONTINUATION — Bureau of Risk ── */
+    .renewal-wrap {
+        background: #fff;
+        border: 1px solid var(--border);
+        padding: 48px;
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .renewal-header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--text);
+    }
+
+    .renewal-form-num {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+    }
+
+    .renewal-title {
+        font-family: var(--font-h);
+        font-size: 32px;
+        font-weight: 900;
+        color: var(--text);
+    }
+
+    .renewal-advisory {
+        padding: 24px;
+        margin-bottom: 32px;
+        border-left: 4px solid var(--text3);
+        background: var(--bg);
+        font-size: 13px;
+        color: var(--text2);
+        line-height: 1.6;
+    }
+
+    .renewal-advisory.urgent {
+        border-left-color: var(--accent);
+        background: rgba(139, 26, 26, 0.05);
+    }
+
+    .renewal-section {
+        margin-bottom: 32px;
+    }
+
+    .renewal-section-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .renewal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .renewal-label {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+    }
+
+    .renewal-value {
+        font-family: var(--font-doc);
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .renewal-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+    }
+
+    .renewal-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid var(--text);
+        cursor: pointer;
+    }
+
+    .renewal-btn-primary {
+        background: var(--text);
+        color: var(--bg);
+    }
+
+    .renewal-btn-primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+
+    .renewal-btn-outline {
+        background: transparent;
+        color: var(--text);
+    }
+
+    .renewal-btn-outline:hover {
+        background: var(--bg2);
+    }
+</style>
+
+<div class="renewal-wrap">
+    <div class="renewal-header">
+        <div class="renewal-form-num">FORM BOR-SRV-090 · CONTINUATION FILING</div>
+        <h1 class="renewal-title">Continuation Certificate Request</h1>
+    </div>
+
+    <div class="renewal-advisory @(Model.DaysLeft <= 0 ? "urgent" : "")">
+        <strong>CURRENT STATUS: @Model.Status.ToUpper()</strong><br />
+        @if (Model.DaysLeft <= 0)
+        {
+            <span>This policy has expired. Immediate continuation filing is required to restore coverage parameters and maintain registry standing.</span>
+        }
+        else
+        {
+            <span>This policy is scheduled to expire in @Model.DaysLeft days. Submitting a continuation request now ensures seamless protection without secondary assessment.</span>
+        }
+    </div>
+
+    <div class="renewal-section">
+        <div class="renewal-section-title">
+            <span>I. Active Classification Parameters</span>
+            <span style="color:var(--text3); font-weight:normal;">REF: @Model.PolicyNumber</span>
+        </div>
+        <div class="renewal-grid">
+            <div>
+                <div class="renewal-label">Classification</div>
+                <div class="renewal-value">@Model.PolicyTypeName</div>
+            </div>
+            <div>
+                <div class="renewal-label">Package Amount</div>
+                <div class="renewal-value">₹@Model.PackageAmount.ToString("N0")</div>
+            </div>
+            <div>
+                <div class="renewal-label">Tenure Length</div>
+                <div class="renewal-value">@Model.Tenure Months</div>
+            </div>
+            <div>
+                <div class="renewal-label">Registry Expiration</div>
+                <div class="renewal-value">@Model.ExpiryDate.ToString("dd MMM yyyy")</div>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="RenewConfirm" method="post">
+        <input type="hidden" name="policyId" value="@Model.Id" />
+        
+        <div style="font-size: 11px; color: var(--text3); font-style: italic; margin-bottom: 24px;">
+            By committing this filing, you agree to extend the terms of this policy under the current Bureau rate schedules and administrative protocols.
+        </div>
+
+        <div class="renewal-actions">
+            <a asp-action="GetAllPolicybyid" class="renewal-btn renewal-btn-outline">Abort Filing</a>
+            <button type="submit" class="renewal-btn renewal-btn-primary">Confirm Continuation</button>
+        </div>
+    </form>
+</div>

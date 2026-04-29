@@ -4,7 +4,7 @@ namespace InsureTrust.QueryService.Models;
 
 public class SupportQuery
 {
-    [Key]
+
     public int Id { get; set; }
 
     [Required]

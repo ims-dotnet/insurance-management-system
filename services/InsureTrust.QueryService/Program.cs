@@ -1,3 +1,6 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using InsureTrust.SupportService.Data;
 
 namespace InsureTrust.QueryService
 {
@@ -6,6 +9,8 @@ namespace InsureTrust.QueryService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<InsureTrustSupportServiceContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("InsureTrustSupportServiceContext") ?? throw new InvalidOperationException("Connection string 'InsureTrustSupportServiceContext' not found.")));
 
             // Add services to the container.
 
