@@ -1,3 +1,11 @@
 ﻿@{
-    Layout = "_Layout";
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+    var useAuthLayout =
+        string.Equals(controller, "Account", StringComparison.OrdinalIgnoreCase)
+        && (string.Equals(action, "Login", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(action, "Register", StringComparison.OrdinalIgnoreCase));
+
+    Layout = useAuthLayout ? "_AuthLayout" : "_Layout";
 }

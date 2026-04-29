@@ -1,7 +1,28 @@
+using InsureTrust.Web.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// ── HTTP Clients — all traffic flows through the YARP Gateway ─────────────────
+var gatewayUrl = builder.Configuration["ApiBaseUrls:Gateway"]
+    ?? throw new InvalidOperationException("ApiBaseUrls:Gateway is not configured.");
+
+builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+builder.Services.AddHttpClient<ICalculatorService, CalculatorService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+builder.Services.AddHttpClient<INotificationService, NotificationService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
 
 var app = builder.Build();
 
@@ -14,16 +35,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

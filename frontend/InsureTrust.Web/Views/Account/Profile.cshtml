@@ -1,0 +1,102 @@
+@using InsureTrust.Web.Services
+@model UpdateProfileRequestDto
+@{
+    ViewData["Title"] = "Personnel Record";
+}
+
+<section class="profile-shell">
+    <div class="page-heading">
+        <p class="meta-line">Form 84-B / Administrative Dossier</p>
+        <h1>Personnel Record</h1>
+    </div>
+
+    <div class="profile-grid">
+        <article class="panel-card">
+            <h2 class="section-title">I. Identification Parameters</h2>
+            <dl class="ledger-kv" id="profileDetails">
+                <div><dt>Full Legal Name</dt><dd id="profileName">—</dd></div>
+                <div><dt>Secure Routing Email</dt><dd id="profileEmail">—</dd></div>
+                <div><dt>Direct Extension</dt><dd id="profilePhone">—</dd></div>
+                <div><dt>Assigned Role</dt><dd id="profileRole">—</dd></div>
+                <div><dt>User Number</dt><dd id="profileUserNumber">—</dd></div>
+            </dl>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success" role="alert">@TempData["Success"]</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+            }
+
+            <form id="profileUpdateForm" asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="updName">Update Name</label>
+                        <input id="updName" name="Name" class="form-control-inst" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="updPhone">Update Phone</label>
+                        <input id="updPhone" name="PhoneNo" class="form-control-inst" />
+                    </div>
+                    @*  ── KYC Document Upload (temporarily disabled) ─────────
+                    <div class="col-12">
+                        <label class="form-label" for="updKyc">Attach New KYC Document</label>
+                        <input id="updKyc" name="KycDocument" type="file" class="form-control-box" accept=".pdf" />
+                    </div>
+                    ──────────────────────────────────────────────────────── *@
+                </div>
+                <p id="profileMessage" class="meta-note mt-3"></p>
+                <button type="submit" class="btn-inst btn-inst-success">Commit Revisions</button>
+            </form>
+        </article>
+
+        <aside class="panel-stack">
+            <article class="panel-card panel-accent">
+                <h2 class="section-title">III. Ledger Balance</h2>
+                <p class="meta-line">Available Premium Credits</p>
+                <p class="value-ledger" id="profileBalance">₹0.00</p>
+                <button type="button" class="btn-inst btn-inst-success w-100">Request Disbursement</button>
+            </article>
+
+            @*  ── KYC Mandates panel (temporarily disabled) ────────────────────
+            <article class="panel-card">
+                <h2 class="section-title">II. Security &amp; KYC Mandates</h2>
+                <p class="meta-line">Identity Verification</p>
+                <p><span id="profileKycStatus" class="status-badge status-pending">Pending</span></p>
+            </article>
+            ──────────────────────────────────────────────────────────────────── *@
+
+            @await Html.PartialAsync("_Calculator")
+        </aside>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            // Load profile data on page load
+            fetch('/Account/ProfileData')
+                .then(function (res) { return res.json(); })
+                .then(function (json) {
+                    if (json.success && json.data) {
+                        var d = json.data;
+                        var el = function (id) { return document.getElementById(id); };
+                        if (el('profileName')) el('profileName').textContent = d.name || '—';
+                        if (el('profileEmail')) el('profileEmail').textContent = d.email || '—';
+                        if (el('profilePhone')) el('profilePhone').textContent = d.phoneNo || '—';
+                        if (el('profileRole')) el('profileRole').textContent = d.role || '—';
+                        if (el('profileUserNumber')) el('profileUserNumber').textContent = d.userNumber || '—';
+                        if (el('profileBalance')) el('profileBalance').textContent = '₹' + (d.balance || 0).toFixed(2);
+                        // ── KYC status update (temporarily disabled) ────────
+                        // if (el('profileKycStatus')) {
+                        //     el('profileKycStatus').textContent = d.kycStatus || 'Pending';
+                        //     el('profileKycStatus').className = 'status-badge status-' + (d.kycStatus || 'pending').toLowerCase();
+                        // }
+                    }
+                })
+                .catch(function () { /* silent */ });
+        })();
+    </script>
+}

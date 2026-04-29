@@ -1,0 +1,66 @@
+@using InsureTrust.Web.Services
+@model RegisterRequestDto
+@{
+    ViewData["Title"] = "Enrollment Dossier";
+}
+
+<section class="dossier-sheet">
+    <div class="text-center">
+        <p class="dossier-overline">Institutional Risk & Assurance</p>
+        <h1 class="dossier-title">Enrollment Dossier</h1>
+        <p class="dossier-ref">Form Ref: KYC-7742-ALPHA</p>
+    </div>
+    <div class="auth-avatar-strip">
+        <img src="~/images/avatars/avatar-1.svg" alt="Avatar 1" />
+        <img src="~/images/avatars/avatar-2.svg" alt="Avatar 2" />
+        <img src="~/images/avatars/avatar-3.svg" alt="Avatar 3" />
+        <img src="~/images/avatars/avatar-4.svg" alt="Avatar 4" />
+        <img src="~/images/avatars/avatar-5.svg" alt="Avatar 5" />
+    </div>
+
+    <form id="registerForm" asp-controller="Account" asp-action="Register" method="post" enctype="multipart/form-data" novalidate>
+        <div asp-validation-summary="All" class="text-danger mb-3" style="color: #dc3545; font-weight: bold;"></div>
+        <h2 class="section-title">I. Primary Identification</h2>
+        <div class="row g-4">
+            <div class="col-md-6 form-group">
+                <label class="form-label" asp-for="Name">Full Legal Name</label>
+                <input asp-for="Name" class="form-control-inst" required />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" asp-for="Email">Email</label>
+                <input asp-for="Email" class="form-control-inst" type="email" required />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" asp-for="PhoneNo">Direct Extension</label>
+                <input asp-for="PhoneNo" class="form-control-inst" required />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" asp-for="PanCard">National Registry ID (PAN)</label>
+                <input asp-for="PanCard" class="form-control-inst" required />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" asp-for="Password">Password</label>
+                <input asp-for="Password" class="form-control-inst" type="password" required />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" asp-for="ConfirmPassword">Confirm Password</label>
+                <input asp-for="ConfirmPassword" class="form-control-inst" type="password" required />
+            </div>
+        </div>
+
+        @*  ── KYC Document Upload (temporarily disabled) ────────────────────
+        <h2 class="section-title mt-4">II. KYC Verification</h2>
+        <div class="upload-zone">
+            <label class="form-label" asp-for="KycDocument">Append Notarized Documents (PDF)</label>
+            <input asp-for="KycDocument" type="file" class="form-control-box" accept=".pdf" />
+        </div>
+        ──────────────────────────────────────────────────────────────────── *@
+
+        <p id="registerMessage" class="meta-note mt-3"></p>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a asp-controller="Account" asp-action="Login" class="btn-inst">Void</a>
+            <button type="submit" class="btn-inst btn-inst-danger">Seal & Submit</button>
+        </div>
+    </form>
+</section>
