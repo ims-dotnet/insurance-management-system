@@ -1,0 +1,318 @@
+@model InsureTrust.Productweb.DTOs.CreatePolicyTypeDto
+
+@{
+    ViewData["Title"] = "Define New Classification";
+}
+
+<style>
+    /* ── CREATE POLICY — ADMIN FORM ── */
+    .cp-page-eyebrow {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 8px;
+    }
+
+    .cp-page-heading {
+        font-family: var(--font-h);
+        font-size: 38px;
+        font-weight: 900;
+        color: var(--text);
+        line-height: 1.05;
+        margin-bottom: 10px;
+    }
+
+    .cp-page-sub {
+        font-size: 12px;
+        color: var(--text2);
+        max-width: 560px;
+        line-height: 1.7;
+        margin-bottom: 32px;
+    }
+
+    .cp-header-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 36px;
+    }
+
+    .cp-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding-top: 12px;
+    }
+
+    /* ── DOCUMENT CARD ── */
+    .cp-doc {
+        background: #fff;
+        border: 1px solid var(--border);
+        padding: 40px 48px;
+        max-width: 840px;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 60px;
+    }
+
+    .cp-doc-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .cp-doc-num {
+        font-size: 9px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+    }
+
+    .cp-doc-title {
+        font-family: var(--font-h);
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: 0.5px;
+    }
+
+    .cp-status-stamp {
+        border: 2px solid var(--border-dark);
+        padding: 5px 14px;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--text3);
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    /* ── SECTION HEADING ── */
+    .cp-section {
+        margin-bottom: 32px;
+    }
+
+    .cp-section-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--text);
+        margin-bottom: 24px;
+    }
+
+    .cp-section-num {
+        width: 24px;
+        height: 24px;
+        background: var(--text);
+        color: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 700;
+        flex-shrink: 0;
+        font-family: var(--font-h);
+    }
+
+    .cp-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text);
+    }
+
+    .cp-section-badge {
+        margin-left: auto;
+        background: var(--accent);
+        color: #fff;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 3px 10px;
+    }
+
+    /* ── FORM FIELDS GRID ── */
+    .cp-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px 32px;
+    }
+
+    .cp-form-grid-full {
+        grid-column: 1 / -1;
+    }
+
+    .cp-form-grid-icon {
+        max-width: 200px;
+    }
+
+    .cp-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── ACTION ROW ── */
+    .cp-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-top: 28px;
+        margin-top: 8px;
+        border-top: 1px solid var(--border);
+    }
+
+    .cp-footer-note {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text3);
+    }
+
+    /* ── ALERT MESSAGES ── */
+    .cp-alert {
+        padding: 12px 16px;
+        font-size: 12px;
+        margin-bottom: 20px;
+        border-left: 3px solid;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 840px;
+    }
+
+    .cp-alert-success {
+        background: #f0f7f0;
+        border-color: #2d5a2d;
+        color: #2d5a2d;
+    }
+
+    .cp-alert-error {
+        background: #fdf0f0;
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="cp-alert cp-alert-success">
+        <span>✓</span> @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="cp-alert cp-alert-error">
+        <span>✕</span> @TempData["Error"]
+    </div>
+}
+
+<div class="cp-header-row">
+    <div>
+        <div class="cp-page-eyebrow">Admin Module · Classification Registry</div>
+        <h1 class="cp-page-heading">DEFINE NEW<br>CLASSIFICATION</h1>
+        <p class="cp-page-sub">Register a new insurance product category with its nomenclature and coverage parameters into the active classification index.</p>
+    </div>
+    <div class="cp-header-actions">
+        <a asp-action="Index" class="bor-btn bor-btn-outline">
+            ← Back to Registry
+        </a>
+    </div>
+</div>
+
+<form asp-action="CreatePolicy" asp-controller="Policy" method="post" novalidate style="padding-bottom: 40px;">
+    @Html.AntiForgeryToken()
+
+    <div class="cp-doc">
+
+        <div class="cp-doc-meta">
+            <div>
+                <div class="cp-doc-num">Form BOR-ADM-100 · New Registry Indexing</div>
+                <div class="cp-doc-title">Administrative Classification Definition</div>
+            </div>
+            <div class="cp-status-stamp">New Filing</div>
+        </div>
+
+        @* Section I *@
+        <div class="cp-section">
+            <div class="cp-section-head">
+                <div class="cp-section-num">I</div>
+                <span class="cp-section-label">Nomenclature &amp; Categorization</span>
+                <span class="cp-section-badge">Admin Only</span>
+            </div>
+
+            <div class="cp-form-grid">
+                <div class="cp-field">
+                    <label class="field-label" asp-for="Name">Classification Name</label>
+                    <input asp-for="Name"
+                           class="bor-input"
+                           placeholder="e.g. Comprehensive Term Life" />
+                    <span asp-validation-for="Name" class="field-error"></span>
+                </div>
+
+                <div class="cp-field">
+                    <label class="field-label" asp-for="Category">Division Category</label>
+                    <input asp-for="Category"
+                           class="bor-input"
+                           placeholder="e.g. Life, Auto, Health" />
+                    <span asp-validation-for="Category" class="field-error"></span>
+                </div>
+
+                <div class="cp-field">
+                    <label class="field-label" asp-for="Icon">Identifying Icon</label>
+                    <input asp-for="Icon"
+                           class="bor-input"
+                           placeholder="e.g. 🛡️" />
+                    <span asp-validation-for="Icon" class="field-error"></span>
+                </div>
+            </div>
+        </div>
+
+        @* Section II *@
+        <div class="cp-section">
+            <div class="cp-section-head">
+                <div class="cp-section-num">II</div>
+                <span class="cp-section-label">Parameters &amp; Synopsis</span>
+            </div>
+
+            <div class="cp-field">
+                <label class="field-label" asp-for="Description">Classification Summary</label>
+                <textarea asp-for="Description"
+                          class="bor-textarea"
+                          rows="5"
+                          placeholder="Detail the coverage scope, limitations, and standard terms..."></textarea>
+                <span asp-validation-for="Description" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="cp-actions">
+            <span class="cp-footer-note">Form BOR-ADM-100 · Bureau of Risk</span>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a asp-action="Index" asp-controller="Policy" class="bor-btn bor-btn-outline">
+                    Abort Filing
+                </a>
+                <button type="submit" class="bor-btn bor-btn-primary">
+                    Commit to Registry →
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

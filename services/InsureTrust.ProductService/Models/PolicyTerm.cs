@@ -10,7 +10,7 @@ public class PolicyTerm
 
     [Required]
     public int PolicyTypeId { get; set; }
-
+    
     [Required]
     [MaxLength(1000)]
     public string TermText { get; set; } = string.Empty;

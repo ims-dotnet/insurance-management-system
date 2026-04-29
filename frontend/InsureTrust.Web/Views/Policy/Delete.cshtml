@@ -1,0 +1,47 @@
+@model InsureTrust.Productweb.DTOs.PolicyTypeDto
+
+@{
+    ViewData["Title"] = "Revoke Classification";
+}
+
+<!-- PAGE HEADER -->
+<div class="page-header-row">
+    <div>
+        <div class="page-eyebrow">Registry Management · Executive Action</div>
+        <h1 class="page-heading">Revoke Classification</h1>
+        <p class="page-sub">Permanently remove a policy classification from the master registry. This action cannot be reversed.</p>
+    </div>
+</div>
+
+<hr class="bor-divider" />
+
+<div class="delete-wrap">
+    <div class="delete-header">
+        <div class="page-eyebrow" style="color:var(--accent);">CRITICAL ACTION</div>
+        <div class="delete-title">Confirm Revocation</div>
+    </div>
+    
+    <div class="detail-advisory" style="border-left:3px solid var(--accent);margin-bottom:24px;">
+        <span class="advisory-label">Executive Warning</span>
+        You are about to expunge classification <strong>TYPE-@Model.Id.ToString("D3")</strong> from the Bureau registry. Existing policies under this type may be affected. Verify authorization before proceeding.
+    </div>
+
+    <dl class="delete-fields">
+        <dt>Classification Ref</dt>
+        <dd>TYPE-@Model.Id.ToString("D3")</dd>
+        
+        <dt>Nomenclature</dt>
+        <dd>@Model.Name</dd>
+        
+        <dt>Division Category</dt>
+        <dd>@Model.Category</dd>
+    </dl>
+
+    <div class="bor-divider"></div>
+
+    <form asp-action="DeleteConfirmed" method="post" style="display:flex;gap:12px;">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="bor-btn bor-btn-danger">Expunge Record</button>
+        <a asp-action="Index" class="bor-btn bor-btn-outline">Cancel Action</a>
+    </form>
+</div>

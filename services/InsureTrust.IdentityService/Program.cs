@@ -15,6 +15,11 @@ using InsureTrust.IdentityService.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
+<<<<<<< HEAD
+// Add services to the container.
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+//builder.Services.AddOpenApi();
+=======
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -108,13 +113,18 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+>>>>>>> main
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+<<<<<<< HEAD
+    //app.MapOpenApi();
+=======
     app.UseSwagger();
     app.UseSwaggerUI();
+>>>>>>> main
 }
 
 app.UseMiddleware<ApiExceptionMiddleware>();

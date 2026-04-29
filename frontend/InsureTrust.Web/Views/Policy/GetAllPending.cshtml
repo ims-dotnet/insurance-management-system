@@ -1,0 +1,77 @@
+@using InsureTrust.Productweb.DTOs
+@model IEnumerable<PolicyDto>
+
+@{
+    ViewData["Title"] = "Risk Assessment — Pending Queue";
+}
+
+<!-- PAGE HEADER -->
+<div class="page-header-row">
+    <div>
+        <div class="page-eyebrow">Risk Assessment · Pending Underwriting</div>
+        <h1 class="page-heading">Assessment Queue</h1>
+        <p class="page-sub">Policies awaiting administrative review and approval. Ensure compliance checks before granting active status.</p>
+    </div>
+</div>
+
+<hr class="bor-divider" />
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <div class="empty-msg">Queue Clear</div>
+        <div class="empty-sub">There are currently no pending policies requiring assessment.</div>
+    </div>
+}
+else
+{
+    <div class="bor-table-wrap">
+        <table class="bor-table">
+            <thead>
+                <tr>
+                    <th>Ref ID</th>
+                    <th>Policy Number</th>
+                    <th>Classification</th>
+                    <th>Status</th>
+                    <th>Requested Amount</th>
+                    <th>Term</th>
+                    <th>Filed Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>TYPE-@item.Id.ToString("D3")</td>
+                        <td class="policy-number">@item.PolicyNumber</td>
+                        <td>
+                            <div class="coverage-type">@item.PolicyTypeName</div>
+                            <div style="font-size:10px;color:var(--text3);">@item.Category</div>
+                        </td>
+                        <td>
+                            <span class="bor-badge badge-pending">PENDING</span>
+                        </td>
+                        <td>₹@item.PackageAmount.ToString("N0")</td>
+                        <td>@item.Tenure months</td>
+                        <td class="period-range">@item.PurchaseDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="#" class="bor-btn bor-btn-primary bor-btn-sm">Review</a>
+                                <a href="#" class="bor-btn bor-btn-danger bor-btn-sm">Reject</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="table-footer">
+            <span>Showing @Model.Count() pending assessments</span>
+            <div class="pagination-btns">
+                <a href="#">← Prev</a>
+                <a href="#">Next →</a>
+            </div>
+        </div>
+    </div>
+}

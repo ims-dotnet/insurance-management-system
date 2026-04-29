@@ -1,0 +1,194 @@
+@model InsureTrust.Productweb.DTOs.CreatePolicyDto
+
+@{
+    ViewData["Title"] = "Policy Endorsement";
+}
+
+<style>
+    /* ── POLICY ENDORSEMENT — Bureau of Risk ── */
+    .edit-wrap {
+        background: #fff;
+        border: 1px solid var(--border);
+        padding: 64px;
+        max-width: 860px;
+        margin: 0 auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+    }
+
+    .edit-header {
+        margin-bottom: 48px;
+        padding-bottom: 24px;
+        border-bottom: 2px solid var(--text);
+    }
+
+    .edit-form-num {
+        font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+        text-transform: uppercase; color: var(--text3); margin-bottom: 6px;
+    }
+
+    .edit-title {
+        font-family: var(--font-h); font-size: 32px; font-weight: 900;
+        color: var(--text);
+    }
+
+    .edit-section { margin-bottom: 48px; }
+    .edit-section-title {
+        display: flex; align-items: center; gap: 12px;
+        font-size: 13px; font-weight: 700; letter-spacing: 2px;
+        text-transform: uppercase; color: var(--text);
+        margin-bottom: 32px; border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+    }
+    .edit-section-num {
+        width: 28px; height: 28px; background: var(--text); color: var(--bg);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 700;
+    }
+
+    .edit-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+    }
+
+    .field-group { display: flex; flex-direction: column; margin-bottom: 24px; }
+    .field-label {
+        font-size: 10px; font-weight: 700; letter-spacing: 1px;
+        text-transform: uppercase; color: var(--text3);
+        margin-bottom: 12px;
+    }
+
+    .range-display {
+        font-family: var(--font-h);
+        font-size: 28px;
+        font-weight: 900;
+        color: var(--text);
+        margin-bottom: 8px;
+    }
+
+    .bor-range {
+        width: 100%;
+        accent-color: var(--text);
+        height: 4px;
+        background: var(--bg2);
+        outline: none;
+        -webkit-appearance: none;
+    }
+    .bor-range::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px; height: 16px;
+        background: var(--text);
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px var(--text);
+    }
+
+    .range-info {
+        display: flex; justify-content: space-between;
+        font-size: 10px; color: var(--text3);
+        margin-top: 10px; font-weight: 600;
+    }
+
+    .edit-advisory {
+        background: rgba(139, 26, 26, 0.05);
+        border: 1px solid var(--accent);
+        padding: 24px;
+        font-size: 13px;
+        color: var(--text2);
+        line-height: 1.6;
+    }
+
+    .edit-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 48px;
+        padding-top: 32px;
+        border-top: 1px solid var(--border);
+    }
+
+    .edit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px 32px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid var(--text);
+        cursor: pointer;
+    }
+
+    .edit-btn-primary { background: var(--text); color: var(--bg); }
+    .edit-btn-primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .edit-btn-outline { background: transparent; color: var(--text); }
+    .edit-btn-outline:hover { background: var(--bg2); }
+
+    .field-error { color: var(--accent); font-size: 11px; margin-top: 6px; }
+</style>
+
+<div class="edit-wrap">
+    <div class="edit-header">
+        <div class="edit-form-num">FORM BOR-SRV-050 · POLICY ENDORSEMENT</div>
+        <h1 class="edit-title">Endorsement Filing</h1>
+    </div>
+
+    <form asp-action="EditPolicy" method="post">
+        <input type="hidden" asp-for="PolicyTypeId" />
+        <input type="hidden" name="policyId" value="@ViewBag.PolicyId" />
+
+        <div class="edit-section">
+            <div class="edit-section-title">
+                <div class="edit-section-num">I</div>
+                Parameter Adjustments
+            </div>
+
+            <div class="edit-grid">
+                <div class="field-group">
+                    <label class="field-label" for="Tenure">Revised Tenure</label>
+                    <select asp-for="Tenure" class="bor-select" id="Tenure">
+                        <option value="12" selected="@(Model.Tenure == 12 ? "selected" : null)">12 months</option>
+                        <option value="24" selected="@(Model.Tenure == 24 ? "selected" : null)">24 months</option>
+                        <option value="36" selected="@(Model.Tenure == 36 ? "selected" : null)">36 months</option>
+                    </select>
+                    <span asp-validation-for="Tenure" class="field-error"></span>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="PackageAmount">Revised Package Value</label>
+                    <select asp-for="PackageAmount" class="bor-select" id="PackageAmount">
+                        <option value="5000" selected="@(Model.PackageAmount == 5000 ? "selected" : null)">₹5,000 / month</option>
+                        <option value="7500" selected="@(Model.PackageAmount == 7500 ? "selected" : null)">₹7,500 / month</option>
+                        <option value="10000" selected="@(Model.PackageAmount == 10000 ? "selected" : null)">₹10,000 / month</option>
+                        <option value="12500" selected="@(Model.PackageAmount == 12500 ? "selected" : null)">₹12,500 / month</option>
+                        <option value="15000" selected="@(Model.PackageAmount == 15000 ? "selected" : null)">₹15,000 / month</option>
+                    </select>
+                    <span asp-validation-for="PackageAmount" class="field-error"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="edit-section">
+            <div class="edit-section-title">
+                <div class="edit-section-num">II</div>
+                Endorsement Declaration
+            </div>
+            <div class="edit-advisory">
+                <strong>IMPORTANT:</strong> Endorsement filings result in immediate recalculation of premium parameters and coverage schedules. By committing this amendment, you authorize the Bureau to override all previous ledger entries for this policy reference.
+            </div>
+        </div>
+
+        <div class="edit-actions">
+            <a asp-action="GetAllPolicybyid" class="edit-btn edit-btn-outline">Abort Revision</a>
+            <button type="submit" class="edit-btn edit-btn-primary">Commit Amendment →</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

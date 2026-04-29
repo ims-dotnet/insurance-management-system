@@ -1,0 +1,88 @@
+@model InsureTrust.Productweb.DTOs.PolicyTypeDto
+
+@{
+    ViewData["Title"] = "Update Classification";
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<!-- PAGE HEADER -->
+<div class="page-header-row">
+    <div>
+        <div class="page-eyebrow">Registry Management · Administrative Action</div>
+        <h1 class="page-heading">Update Classification</h1>
+        <p class="page-sub">Modify an existing policy type classification within the Bureau registry.</p>
+    </div>
+    <a asp-action="Index" class="bor-btn bor-btn-outline">← Cancel</a>
+</div>
+
+<hr class="bor-divider" />
+
+<div class="doc-wrap">
+    <!-- Doc Header -->
+    <div class="doc-header-row">
+        <div style="text-align:left;">
+            <div class="doc-form-number">FORM BOR-ADM-101 · CLASSIFICATION REVISION</div>
+            <div class="doc-title">Type Revision Filing</div>
+            <div class="doc-subtitle" style="text-align:left;margin-top:4px;">Bureau of Risk · Division IV · Administrative Control</div>
+        </div>
+        <div style="text-align:right;">
+            <div class="doc-stamp">REVISION</div>
+            <div style="margin-top:8px;font-size:10px;color:var(--text3);letter-spacing:1px;">TYPE-@Model.Id.ToString("D3")</div>
+        </div>
+    </div>
+
+    <form asp-action="update" method="post">
+        
+        <input type="hidden" asp-for="Id" />
+
+        <div class="doc-section">
+            <div class="doc-section-title">
+                <div class="doc-section-num">I</div>
+                Nomenclature Revision
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="field-label" asp-for="Name">Classification Name</label>
+                    <input asp-for="Name" class="bor-input" />
+                    <span asp-validation-for="Name" class="field-error"></span>
+                </div>
+                <div class="form-field">
+                    <label class="field-label" asp-for="Category">Division Category</label>
+                    <input asp-for="Category" class="bor-input" />
+                    <span asp-validation-for="Category" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-field-full">
+                <label class="field-label" asp-for="Icon">Identifying Icon</label>
+                <input asp-for="Icon" class="bor-input" style="max-width:200px;" />
+                <span asp-validation-for="Icon" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="doc-section">
+            <div class="doc-section-title">
+                <div class="doc-section-num">II</div>
+                Parameters Revision
+            </div>
+
+            <div class="form-field-full">
+                <label class="field-label" asp-for="Description">Classification Summary</label>
+                <textarea asp-for="Description" class="bor-textarea"></textarea>
+                <span asp-validation-for="Description" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="doc-footer">
+            <div class="doc-footer-note">BOR-ADM-101 · Override existing registry entry</div>
+            <div class="doc-actions">
+                <button type="submit" class="bor-btn bor-btn-primary">Commit Revision →</button>
+            </div>
+        </div>
+
+    </form>
+</div>

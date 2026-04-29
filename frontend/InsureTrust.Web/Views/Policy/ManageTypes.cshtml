@@ -1,0 +1,475 @@
+@model IEnumerable<InsureTrust.Productweb.DTOs.PolicyTypeDto>
+
+@{
+    ViewData["Title"] = "Policy Type Definitions";
+    var list = Model?.ToList() ?? new List<InsureTrust.Productweb.DTOs.PolicyTypeDto>();
+}
+
+<style>
+    /* ── MANAGE TYPES — POLICY TYPE DEFINITIONS ── */
+    .mt-header-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 36px;
+    }
+
+    .mt-eyebrow {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 8px;
+    }
+
+    .mt-heading {
+        font-family: var(--font-h);
+        font-size: 38px;
+        font-weight: 900;
+        color: var(--text);
+        line-height: 1.05;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .mt-sub {
+        font-size: 12px;
+        color: var(--text2);
+        max-width: 540px;
+        line-height: 1.7;
+    }
+
+    .mt-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding-top: 12px;
+        flex-shrink: 0;
+    }
+
+    /* ── TWO-PANEL LAYOUT ── */
+    .mt-layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 0;
+        border: 1px solid var(--border);
+        background: #fff;
+        max-width: 960px;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 60px;
+    }
+
+    /* ── LEFT SIDEBAR ── */
+    .mt-sidebar {
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mt-sidebar-head {
+        padding: 20px 20px 14px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .mt-sidebar-title {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text);
+    }
+
+    .mt-sidebar-list {
+        flex: 1;
+        padding: 8px 0;
+    }
+
+    .mt-sidebar-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--bg2);
+        cursor: pointer;
+        transition: background 0.15s;
+        text-decoration: none;
+    }
+
+    .mt-sidebar-item:hover {
+        background: var(--bg);
+    }
+
+    .mt-sidebar-item.active {
+        background: var(--bg2);
+        border-left: 3px solid var(--accent);
+        padding-left: 17px;
+    }
+
+    .mt-sidebar-name {
+        font-size: 12px;
+        color: var(--text);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 130px;
+    }
+
+    .mt-sidebar-count {
+        font-size: 10px;
+        color: var(--text3);
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .mt-sidebar-archived {
+        color: var(--text3);
+        font-style: italic;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .mt-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 400px;
+    }
+
+    .mt-panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        gap: 12px;
+    }
+
+    .mt-panel-title {
+        font-family: var(--font-h);
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: 0.3px;
+    }
+
+    .mt-active-badge {
+        background: var(--accent);
+        color: #fff;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        white-space: nowrap;
+    }
+
+    /* ── TABLE ── */
+    .mt-table-wrap {
+        flex: 1;
+    }
+
+    .mt-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .mt-table thead tr {
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .mt-table th {
+        padding: 10px 20px;
+        text-align: left;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text3);
+        white-space: nowrap;
+    }
+
+    .mt-table td {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--bg2);
+        vertical-align: middle;
+        color: var(--text2);
+    }
+
+    .mt-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .mt-table tr:hover td {
+        background: rgba(0,0,0,.015);
+    }
+
+    .mt-name-col {
+        font-family: var(--font-b);
+        font-weight: 600;
+        color: var(--text);
+        font-size: 13px;
+    }
+
+    .mt-cat-tag {
+        display: inline-block;
+        font-size: 9px;
+        font-weight: 600;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 2px 8px;
+        color: var(--text3);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .mt-desc-col {
+        font-size: 11px;
+        color: var(--text3);
+        max-width: 260px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mt-actions-col {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .mt-edit-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-decoration: none;
+        border: 1px solid var(--border-dark);
+        color: var(--text);
+        background: transparent;
+        transition: all 0.15s;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .mt-edit-btn:hover {
+        background: var(--bg2);
+        color: var(--text);
+    }
+
+    .mt-delete-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-decoration: none;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        background: transparent;
+        transition: all 0.15s;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .mt-delete-btn:hover {
+        background: var(--accent);
+        color: #fff;
+    }
+
+    /* ── APPEND NEW FIELD ROW ── */
+    .mt-append-row {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        text-align: right;
+    }
+
+    .mt-append-btn {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .mt-append-btn:hover {
+        color: var(--accent);
+    }
+
+    /* ── EMPTY STATE ── */
+    .mt-empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 20px;
+        text-align: center;
+    }
+
+    .mt-empty-icon {
+        font-size: 40px;
+        color: var(--border-dark);
+        margin-bottom: 14px;
+        opacity: 0.6;
+    }
+
+    .mt-empty-msg {
+        font-family: var(--font-h);
+        font-size: 18px;
+        color: var(--text2);
+        margin-bottom: 6px;
+    }
+
+    .mt-empty-sub {
+        font-size: 11px;
+        color: var(--text3);
+    }
+
+    /* ── ALERTS ── */
+    .mt-alert {
+        padding: 12px 16px;
+        font-size: 12px;
+        margin-bottom: 20px;
+        border-left: 3px solid;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 960px;
+    }
+
+    .mt-alert-success { background: #f0f7f0; border-color: #2d5a2d; color: #2d5a2d; }
+    .mt-alert-error   { background: #fdf0f0; border-color: var(--accent); color: var(--accent); }
+
+    @@media (max-width: 680px) {
+        .mt-layout { grid-template-columns: 1fr; }
+        .mt-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="mt-alert mt-alert-success"><span>✓</span> @TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="mt-alert mt-alert-error"><span>✕</span> @TempData["Error"]</div>
+}
+
+@* ── Page Header ── *@
+<div class="mt-header-row">
+    <div>
+        <div class="mt-eyebrow">Admin Module · Classification Registry</div>
+        <h1 class="mt-heading">Policy Type<br>Definitions</h1>
+        <p class="mt-sub">Manage dynamic field structures and underwriting constraints for active policy classifications.</p>
+    </div>
+    <div class="mt-header-actions">
+        <a asp-action="Index" asp-controller="Policy" class="bor-btn bor-btn-outline">Export Ledger</a>
+        <a asp-action="CreatePolicy" asp-controller="Policy" class="bor-btn bor-btn-primary">+ Define New Type</a>
+    </div>
+</div>
+
+@* ── Two-Panel Layout ── *@
+<div class="mt-layout">
+
+    @* Left: Active Classification list *@
+    <div class="mt-sidebar">
+        <div class="mt-sidebar-head">
+            <div class="mt-sidebar-title">Active Classification</div>
+        </div>
+        <div class="mt-sidebar-list">
+            @if (!list.Any())
+            {
+                <div style="padding:20px; font-size:11px; color:var(--text3); text-align:center;">No types on file</div>
+            }
+            else
+            {
+                @foreach (var item in list)
+                {
+                    <a asp-action="PolicyTypeById" asp-route-id="@item.Id"
+                       class="mt-sidebar-item @(list.IndexOf(item) == 0 ? "active" : "")">
+                        <span class="mt-sidebar-name">@item.Name</span>
+                        <span class="mt-sidebar-count">@(item.RequiredFields?.Count ?? 0) Fields</span>
+                    </a>
+                }
+            }
+        </div>
+    </div>
+
+    @* Right: Table panel *@
+    <div class="mt-panel">
+        <div class="mt-panel-head">
+            <span class="mt-panel-title">Classification Registry</span>
+            @if (list.Any())
+            {
+                <span class="mt-active-badge">@list.Count Active</span>
+            }
+        </div>
+
+        @if (!list.Any())
+        {
+            <div class="mt-empty">
+                <div class="mt-empty-icon">📋</div>
+                <div class="mt-empty-msg">Registry Archive Empty</div>
+                <p class="mt-empty-sub">No active classifications found in the master index.</p>
+            </div>
+        }
+        else
+        {
+            <div class="mt-table-wrap">
+                <table class="mt-table">
+                    <thead>
+                        <tr>
+                            <th>Classification Name</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in list)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="mt-name-col">
+                                        @(string.IsNullOrEmpty(item.Icon) ? "" : item.Icon + " ")@item.Name
+                                    </div>
+                                </td>
+                                <td><span class="mt-cat-tag">@item.Category</span></td>
+                                <td>
+                                    <div class="mt-desc-col" title="@item.Description">
+                                        @(string.IsNullOrWhiteSpace(item.Description) ? "—" : item.Description)
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mt-actions-col">
+                                        <a asp-action="update" asp-route-id="@item.Id" class="mt-edit-btn">Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="mt-delete-btn">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-append-row">
+                <a asp-action="CreatePolicy" asp-controller="Policy" class="mt-append-btn">
+                    + Append New Classification
+                </a>
+            </div>
+        }
+    </div>
+</div>

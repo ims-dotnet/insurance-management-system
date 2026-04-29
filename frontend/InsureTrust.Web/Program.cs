@@ -1,9 +1,14 @@
 using InsureTrust.Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
+
 builder.Services.AddHttpClient();
 
 // ── HTTP Clients — all traffic flows through the YARP Gateway ─────────────────
@@ -24,22 +29,45 @@ builder.Services.AddHttpClient<INotificationService, NotificationService>(client
 {
     client.BaseAddress = new Uri(gatewayUrl);
 });
+>>>>>>> main
 
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpClient<IPolicyService, PolicyService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7296/");
+});
+
+// 🔥 BUILD
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
+// 🔥 MIDDLEWARE
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
 
+app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.UseStaticFiles();
 
