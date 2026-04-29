@@ -1,39 +1,36 @@
+<<<<<<< HEAD
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace InsureTrust.ClaimService.Models;
 
 public class Claim
+=======
+namespace InsureTrust.ClaimService.Models
+>>>>>>> main
 {
-    [Key]
-    public int Id { get; set; }
+    public class Claim
+    {
+        public int Id { get; set; }
 
-    [Required]
-    [MaxLength(20)]
-    public string ClaimNumber { get; set; } = string.Empty;  // CLM4001
+        public string ClaimNumber { get; set; } = string.Empty;
 
-    [Required]
-    public int UserPolicyId { get; set; }
+        public int UserId { get; set; }
 
-    [Required]
-    public int UserId { get; set; }
+        public int UserPolicyId { get; set; }
 
-    [Required]
-    [MaxLength(500)]
-    public string Description { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
 
-    [MaxLength(20)]
-    public string ClaimStatus { get; set; } = "Pending";  // Pending, Approved, Denied
+        public decimal MaturityAmount { get; set; }
 
-    [Precision(18, 2)]
-    public decimal MaturityAmount { get; set; }
+        public string ClaimStatus { get; set; } = "Pending";
 
-    [MaxLength(500)]
-    public string? AdminRemarks { get; set; }
+        public string? AdminRemarks { get; set; }
 
-    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? ProcessedAt { get; set; }
+        public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
-    public string? DocumentPathsJson { get; set; }  // JSON array of document paths
+        public DateTime? ProcessedAt { get; set; }
+
+        public string? DocumentPathsJson { get; set; }
+    }
 }
-

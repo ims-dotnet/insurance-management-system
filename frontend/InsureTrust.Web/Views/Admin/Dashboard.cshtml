@@ -1,0 +1,151 @@
+@model InsureTrust.Web.Models.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var totalCustomers = Model.Stats.TotalUsers;
+    var totalPolicies = Model.Stats.TotalActivePolicies + Model.Stats.TotalPendingPolicies;
+    var pendingApprovals = Model.Stats.TotalPendingPolicies;
+    var openTickets = Model.Stats.TotalOpenSupportTickets;
+    var totalClaims = Model.Stats.TotalPendingClaims;
+}
+
+<section class="admin-dashboard-reference">
+    <div class="admin-dashboard-headline">
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Insure Trust management console</p>
+        </div>
+        <button type="button" class="btn-inst admin-dashboard-create" onclick="return false;">+ Add New Policy</button>
+    </div>
+
+    <div class="admin-dashboard-kpi-grid">
+        <article class="admin-dashboard-kpi">
+            <p>Total Customers</p>
+            <h2>@totalCustomers.ToString("N0")</h2>
+            <span>registered users</span>
+        </article>
+        <article class="admin-dashboard-kpi">
+            <p>Total Policies</p>
+            <h2>@totalPolicies.ToString("N0")</h2>
+            <span>all statuses</span>
+        </article>
+        <article class="admin-dashboard-kpi">
+            <p>Pending Approvals</p>
+            <h2>@pendingApprovals.ToString("N0")</h2>
+            <span>awaiting action</span>
+        </article>
+        <article class="admin-dashboard-kpi">
+            <p>Open Support Tickets</p>
+            <h2>@openTickets.ToString("N0")</h2>
+            <span>support queries</span>
+        </article>
+    </div>
+
+    <div class="admin-dashboard-row">
+        <section class="admin-dashboard-box">
+            <div class="admin-dashboard-box-head">
+                <h3>Pending Policy Approvals</h3>
+            </div>
+            <div class="admin-dashboard-box-body">
+                @if (pendingApprovals > 0)
+                {
+                    <p>@pendingApprovals pending approvals awaiting review.</p>
+                    <a href="/Admin/Policies" class="btn-inst">Review Policies</a>
+                }
+                else
+                {
+                    <p><i class="fas fa-check-circle" aria-hidden="true"></i> No pending approvals</p>
+                }
+            </div>
+        </section>
+
+        <section class="admin-dashboard-box">
+            <div class="admin-dashboard-box-head admin-dashboard-box-head-ticket">
+                <h3>Support Tickets</h3>
+                <span class="admin-dashboard-pill">@openTickets Open</span>
+            </div>
+            <div class="admin-dashboard-box-body">
+                @if (openTickets > 0)
+                {
+                    <p>@openTickets open support tickets need attention.</p>
+                    <a href="/Admin/Support" class="btn-inst">Open Support Desk</a>
+                }
+                else
+                {
+                    <p>No tickets</p>
+                }
+            </div>
+        </section>
+    </div>
+
+    <section class="admin-dashboard-box admin-dashboard-box-claims">
+        <div class="admin-dashboard-box-head admin-dashboard-box-head-claims">
+            <h3>Claims Management</h3>
+            <span>@totalClaims total claims</span>
+        </div>
+        <div class="admin-dashboard-box-body">
+            @if (totalClaims > 0)
+            {
+                <p>@totalClaims claims waiting for admin action.</p>
+                <a href="/Admin/Claims" class="btn-inst">Review Claims</a>
+            }
+            else
+            {
+                <p>No claims submitted yet</p>
+            }
+        </div>
+    </section>
+
+
+
+    <section class="admin-dashboard-box admin-dashboard-box-customers">
+        <div class="admin-dashboard-box-head admin-dashboard-box-head-claims">
+            <h3>Registered Customers</h3>
+            <span>@Model.Users.Count customers</span>
+        </div>
+        <div class="admin-dashboard-customers-wrap">
+            <table class="table-ledger admin-dashboard-customers-table">
+                <thead>
+                    <tr>
+                        <th>User #</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>KYC</th>
+                        <th>Joined</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Users.Any())
+                    {
+                        @foreach (var user in Model.Users.Take(10))
+                        {
+                            var roleClass = string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase)
+                                ? "admin-customer-role admin-customer-role-admin"
+                                : "admin-customer-role";
+                            var kycClass = user.ActivePolicyCount > 0
+                                ? "admin-customer-kyc admin-customer-kyc-verified"
+                                : "admin-customer-kyc";
+                            <tr>
+                                <td>@user.UserNumber</td>
+                                <td>@user.Name</td>
+                                <td>@user.Email</td>
+                                <td><span class="@roleClass">@user.Role</span></td>
+                                <td><span class="@kycClass">@(user.ActivePolicyCount > 0 ? "Verified" : "Pending")</span></td>
+                                <td>@user.RegisteredAt.ToString("dd MMM yyyy")</td>
+                                <td>₹@user.TotalSpent.ToString("N0")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="admin-dashboard-empty">No customers found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>

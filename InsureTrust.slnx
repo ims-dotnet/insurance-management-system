@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/frontend/">
+    <File Path="frontend/InsureTrust.Web/Controllers/AccountController.cs" />
     <Project Path="frontend/InsureTrust.Web/InsureTrust.Web.csproj" />
   </Folder>
   <Folder Name="/gateways/">
@@ -13,6 +14,7 @@
     <Project Path="services/InsureTrust.NotificationService/InsureTrust.NotificationService.csproj" Id="95fee58e-a951-48d7-9b13-32dcb6be82bd" />
     <Project Path="services/InsureTrust.PaymentService/InsureTrust.PaymentService.csproj" />
     <Project Path="services/InsureTrust.ProductService/InsureTrust.ProductService.csproj" />
+    <Project Path="services/InsureTrust.QueryService/InsureTrust.SupportService.csproj" Id="4283b353-4f58-4958-b7d5-17d6b4a80559" />
   </Folder>
   <Folder Name="/shared/">
     <Project Path="shared/InsureTrust.Shared/InsureTrust.Shared.csproj" />

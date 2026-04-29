@@ -1,4 +1,4 @@
-﻿namespace InsureTrust.ClaimService.DTOs
+namespace InsureTrust.AdminService.DTOs
 {
     public class DashboardStatsDto
     {
@@ -34,4 +34,13 @@
         public DateTime PaymentDate { get; set; }
     }
 
+    public class CreatePolicyTypeDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal BaseMonthlyPremium { get; set; }
+        public int MinTenureMonths { get; set; }
+        public int MaxTenureMonths { get; set; }
+    }
 }

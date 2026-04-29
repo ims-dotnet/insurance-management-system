@@ -1,12 +1,35 @@
 using InsureTrust.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔥 SERVICES
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession();
+
+builder.Services.AddHttpClient();
+
+// ── HTTP Clients — all traffic flows through the YARP Gateway ─────────────────
+var gatewayUrl = builder.Configuration["ApiBaseUrls:Gateway"]
+    ?? throw new InvalidOperationException("ApiBaseUrls:Gateway is not configured.");
+
+builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+builder.Services.AddHttpClient<ICalculatorService, CalculatorService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+builder.Services.AddHttpClient<INotificationService, NotificationService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+>>>>>>> main
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -45,8 +68,13 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+app.UseStaticFiles();
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Policy}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
 
 app.Run();

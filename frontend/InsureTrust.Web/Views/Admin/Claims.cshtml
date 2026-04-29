@@ -1,0 +1,195 @@
+@model List<InsureTrust.Web.Models.AdminClaimViewModel>
+
+@{
+    ViewData["Title"] = "Claims Management";
+    var pendingCount = Model.Count(c => string.Equals(c.Status, "Pending", StringComparison.OrdinalIgnoreCase));
+    var approvedCount = Model.Count(c => string.Equals(c.Status, "Approved", StringComparison.OrdinalIgnoreCase));
+    var deniedCount = Model.Count(c => string.Equals(c.Status, "Denied", StringComparison.OrdinalIgnoreCase));
+    var totalMaturityAmount = Model.Sum(c => c.MaturityAmount);
+}
+
+<section class="admin-claims-page">
+    <div class="admin-ledger-head">
+        <div>
+            <p class="admin-ledger-index">Record Index 4.D</p>
+            <h1>Claims Management Ledger</h1>
+        </div>
+        <label class="admin-ledger-filter">
+            <i class="fas fa-notes-medical" aria-hidden="true"></i>
+            <input type="text" id="adminClaimsFilter" placeholder="Filter claims..." aria-label="Filter claims" />
+        </label>
+    </div>
+
+    <div class="admin-ledger-divider"></div>
+
+    @if (TempData["ClaimActionSuccess"] is string successMessage)
+    {
+        <div class="admin-claim-alert admin-claim-alert-success">@successMessage</div>
+    }
+
+    @if (TempData["ClaimActionError"] is string errorMessage)
+    {
+        <div class="admin-claim-alert admin-claim-alert-error">@errorMessage</div>
+    }
+
+    <div class="admin-claims-kpis">
+        <article class="admin-claims-kpi admin-claims-kpi-warn">
+            <p>Pending Claims</p>
+            <h2>@pendingCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-claims-kpi admin-claims-kpi-success">
+            <p>Approved Claims</p>
+            <h2>@approvedCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-claims-kpi admin-claims-kpi-danger">
+            <p>Denied Claims</p>
+            <h2>@deniedCount.ToString("N0")</h2>
+        </article>
+        <article class="admin-claims-kpi">
+            <p>Total Maturity Amount</p>
+            <h2>$@totalMaturityAmount.ToString("N2")</h2>
+        </article>
+    </div>
+
+    <div class="admin-panel admin-claims-panel">
+        <div class="admin-panel-head">
+            <h3>Claims Queue</h3>
+            <a href="/Admin/Dashboard" class="btn-inst">Back to Dashboard</a>
+        </div>
+
+        <div class="admin-claims-table-wrap">
+            <table class="table-ledger admin-claims-table" id="adminClaimsTable">
+                <thead>
+                    <tr>
+                        <th>Claim Number</th>
+                        <th>Policy Number</th>
+                        <th>Policy Type</th>
+                        <th>Description</th>
+                        <th>Maturity Amount</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Processed</th>
+                        <th>Documents</th>
+                        <th>Admin Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var claim in Model)
+                        {
+                            var status = string.IsNullOrWhiteSpace(claim.Status) ? "Pending" : claim.Status;
+                            var statusClass = string.Equals(status, "Approved", StringComparison.OrdinalIgnoreCase)
+                                ? "admin-chip admin-chip-success"
+                                : string.Equals(status, "Denied", StringComparison.OrdinalIgnoreCase)
+                                    ? "admin-chip admin-chip-danger"
+                                    : "admin-chip admin-chip-warn";
+
+                            <tr>
+                                <td>@claim.ClaimNumber</td>
+                                <td>@claim.PolicyNumber</td>
+                                <td>@claim.PolicyTypeName</td>
+                                <td class="admin-claims-description">@claim.Description</td>
+                                <td>$@claim.MaturityAmount.ToString("N2")</td>
+                                <td><span class="@statusClass">@status</span></td>
+                                <td>@claim.SubmittedAt.ToString("dd MMM yyyy")</td>
+                                <td>@(claim.ProcessedAt.HasValue ? claim.ProcessedAt.Value.ToString("dd MMM yyyy") : "-")</td>
+                                <td>
+                                    @if (claim.DocumentUrls != null && claim.DocumentUrls.Any())
+                                    {
+                                        <details class="admin-claims-docs">
+                                            <summary>View (@claim.DocumentUrls.Count)</summary>
+                                            <ul>
+                                                @foreach (var documentUrl in claim.DocumentUrls.Take(12))
+                                                {
+                                                    <li><a href="@documentUrl" target="_blank" rel="noopener noreferrer">Document</a></li>
+                                                }
+                                            </ul>
+                                        </details>
+                                    }
+                                    else
+                                    {
+                                        <span class="admin-claims-docs-empty">No files</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-controller="Admin" asp-action="UpdateClaimStatus" method="post" class="admin-claims-action-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@claim.Id" />
+                                        <textarea name="remarks" rows="2" class="form-control-box admin-claims-remarks" placeholder="Add remarks">@claim.AdminRemarks</textarea>
+                                        <div class="admin-claims-actions">
+                                            <button type="submit" name="action" value="Approve" class="btn-inst btn-inst-success">Approve</button>
+                                            <button type="submit" name="action" value="Deny" class="btn-inst btn-inst-danger">Deny</button>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td class="admin-claims-action-hint">Approve or Deny from remarks panel</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11" class="admin-claims-empty">No claims available right now.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById("adminClaimsFilter");
+            const table = document.getElementById("adminClaimsTable");
+
+            if (!input || !table) return;
+
+            // Filter logic
+            input.addEventListener("input", function () {
+                const term = input.value.trim().toLowerCase();
+                const rows = table.querySelectorAll("tbody tr");
+
+                rows.forEach(function (row) {
+                    if (row.querySelector(".admin-claims-empty")) return;
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? "" : "none";
+                });
+            });
+
+            // Form validation logic
+            const forms = document.querySelectorAll(".admin-claims-action-form");
+            forms.forEach(form => {
+                form.addEventListener("submit", function (e) {
+                    const submitter = e.submitter;
+                    const action = submitter.value;
+                    const remarks = form.querySelector(".admin-claims-remarks").value.trim();
+
+                    // 1. Validation: Deny MUST have remarks
+                    if (action === "Deny" && !remarks) {
+                        e.preventDefault();
+                        alert("ERROR: You must provide a reason in the remarks panel when denying a claim.");
+                        form.querySelector(".admin-claims-remarks").focus();
+                        return;
+                    }
+
+                    // 2. Validation: Max length check
+                    if (remarks.length > 500) {
+                        e.preventDefault();
+                        alert("ERROR: Remarks are too long. Maximum 500 characters allowed.");
+                        return;
+                    }
+
+                    // 3. Confirmation
+                    const confirmMsg = `Are you sure you want to ${action.toUpperCase()} this claim?`;
+                    if (!confirm(confirmMsg)) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        })();
+    </script>
+}

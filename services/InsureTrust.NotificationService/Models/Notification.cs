@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using InsureTrust.NotificationService.Models;
 
 namespace InsureTrust.NotificationService.Models
 {
