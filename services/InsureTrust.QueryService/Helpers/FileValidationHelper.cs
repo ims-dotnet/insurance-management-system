@@ -1,7 +1,7 @@
 ﻿
-using InsureTrust.SupportService.Exceptions;
+using InsureTrust.QueryService.Exceptions;
 
-namespace InsureTrust.SupportService.Helpers
+namespace InsureTrust.QueryService.Helpers
 {
     public static class FileValidationHelper
     {

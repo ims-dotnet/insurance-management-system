@@ -1,5 +1,6 @@
 using InsureTrust.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -7,21 +8,34 @@ namespace InsureTrust.Web.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
+        private readonly string _gatewayUrl;
 
-        public AdminController(IHttpClientFactory httpClientFactory)
+        public AdminController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
-            _httpClientFactory = httpClientFactory;
+            _gatewayUrl = configuration["ApiBaseUrls:Gateway"] ?? throw new InvalidOperationException("Gateway URL not configured.");
+            _httpClient = httpClientFactory.CreateClient();
+            _httpClient.BaseAddress = new Uri(_gatewayUrl);
+        }
+
+        private void AddToken()
+        {
+            var token = Request.Cookies["authToken"];
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
         }
 
         public async Task<IActionResult> Dashboard()
         {
-            var client = _httpClientFactory.CreateClient();
+            AddToken();
             var model = new AdminDashboardViewModel();
 
             try
             {
-                var statsResponse = await client.GetAsync("http://localhost:5067/api/admin/dashboard");
+                var statsResponse = await _httpClient.GetAsync("api/admin/dashboard");
                 if (statsResponse.IsSuccessStatusCode)
                 {
                     var content = await statsResponse.Content.ReadAsStringAsync();
@@ -32,7 +46,7 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                var usersResponse = await client.GetAsync("http://localhost:5067/api/admin/users");
+                var usersResponse = await _httpClient.GetAsync("api/admin/users");
                 if (usersResponse.IsSuccessStatusCode)
                 {
                     var content = await usersResponse.Content.ReadAsStringAsync();
@@ -43,7 +57,7 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                var transResponse = await client.GetAsync("http://localhost:5067/api/admin/transactions");
+                var transResponse = await _httpClient.GetAsync("api/admin/transactions");
                 if (transResponse.IsSuccessStatusCode)
                 {
                     var content = await transResponse.Content.ReadAsStringAsync();
@@ -56,28 +70,19 @@ namespace InsureTrust.Web.Controllers
             }
             catch
             {
-                // Handle API unreachability during development
+                // Handle API unreachability
             }
-
-            model.PolicyTypes = new List<AdminPolicyTypeViewModel>();
 
             return View(model);
         }
 
-        [HttpGet]
-        public IActionResult CreatePolicyType(int? id) => RedirectToAction(nameof(Dashboard));
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreatePolicyType(AdminPolicyTypeFormViewModel model, string submitAction = "save") => RedirectToAction(nameof(Dashboard));
-
         public async Task<IActionResult> Users()
         {
-            var client = _httpClientFactory.CreateClient();
+            AddToken();
             var users = new List<AdminUserViewModel>();
             try
             {
-                var response = await client.GetAsync("http://localhost:5067/api/admin/users");
+                var response = await _httpClient.GetAsync("api/admin/users");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -104,29 +109,16 @@ namespace InsureTrust.Web.Controllers
                 return RedirectToAction(nameof(Policies));
             }
 
-            var client = _httpClientFactory.CreateClient();
-
+            AddToken();
             try
             {
-                var payload = new
-                {
-                    Action = action,
-                    AdminRemarks = remarks ?? string.Empty
-                };
-
-                var json = JsonSerializer.Serialize(payload);
-                using var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await client.PutAsync($"http://localhost:5067/api/policy/{id}/approve", content);
+                var payload = new { Action = action, AdminRemarks = remarks ?? string.Empty };
+                var response = await _httpClient.PutAsJsonAsync($"api/policy/approve/{id}", payload);
 
                 if (response.IsSuccessStatusCode)
-                {
                     TempData["PolicyActionSuccess"] = $"Policy {action} action completed.";
-                }
                 else
-                {
-                    TempData["PolicyActionError"] = "Could not update the policy at this time.";
-                }
+                    TempData["PolicyActionError"] = "Could not update the policy.";
             }
             catch
             {
@@ -138,16 +130,15 @@ namespace InsureTrust.Web.Controllers
 
         public async Task<IActionResult> Claims()
         {
-            var client = _httpClientFactory.CreateClient();
+            AddToken();
             var claims = new List<AdminClaimViewModel>();
             try
             {
-                var response = await client.GetAsync("http://localhost:5067/api/claim/all");
+                var response = await _httpClient.GetAsync("api/claim/all");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
                     if (apiResponse.TryGetProperty("data", out var dataProperty))
                     {
                         claims = JsonSerializer.Deserialize<List<AdminClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminClaimViewModel>();
@@ -157,8 +148,6 @@ namespace InsureTrust.Web.Controllers
             catch { }
             return View(claims);
         }
-
-        public Task<IActionResult> ClaimsReview() => Task.FromResult<IActionResult>(RedirectToAction(nameof(Claims)));
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -170,40 +159,20 @@ namespace InsureTrust.Web.Controllers
                 return RedirectToAction(nameof(Claims));
             }
 
-            // Custom validation: Deny requires remarks
-            if (string.Equals(model.Action, "Deny", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(model.Remarks))
-            {
-                TempData["ClaimActionError"] = "Remarks are mandatory for denied claims.";
-                return RedirectToAction(nameof(Claims));
-            }
-
-            var client = _httpClientFactory.CreateClient();
-
+            AddToken();
             try
             {
-                var payload = new
-                {
-                    Action = model.Action,
-                    AdminRemarks = model.Remarks ?? string.Empty
-                };
-
-                var json = JsonSerializer.Serialize(payload);
-                using var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await client.PutAsync($"http://localhost:5067/api/claim/{model.Id}", content);
+                var payload = new { Action = model.Action, AdminRemarks = model.Remarks ?? string.Empty };
+                var response = await _httpClient.PutAsJsonAsync($"api/claim/{model.Id}", payload);
 
                 if (response.IsSuccessStatusCode)
-                {
                     TempData["ClaimActionSuccess"] = $"Claim {model.Action} action completed.";
-                }
                 else
-                {
-                    TempData["ClaimActionError"] = "Could not update claim status at this time.";
-                }
+                    TempData["ClaimActionError"] = "Could not update claim status.";
             }
             catch
             {
-                TempData["ClaimActionError"] = "Claim service is currently unavailable.";
+                TempData["ClaimActionError"] = "Claim service is unavailable.";
             }
 
             return RedirectToAction(nameof(Claims));
@@ -211,11 +180,11 @@ namespace InsureTrust.Web.Controllers
 
         public async Task<IActionResult> Transactions()
         {
-            var client = _httpClientFactory.CreateClient();
+            AddToken();
             var transactions = new List<AdminTransactionViewModel>();
             try
             {
-                var response = await client.GetAsync("http://localhost:5067/api/admin/transactions");
+                var response = await _httpClient.GetAsync("api/admin/transactions");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -232,18 +201,22 @@ namespace InsureTrust.Web.Controllers
 
         public async Task<IActionResult> Support()
         {
-            var client = _httpClientFactory.CreateClient();
+            AddToken();
             var tickets = new List<AdminSupportViewModel>();
             try
             {
-                var response = await client.GetAsync("http://localhost:5067/api/support/all");
+                var response = await _httpClient.GetAsync("api/queries/all");
                 if (response.IsSuccessStatusCode)
                 {
-                    tickets = JsonSerializer.Deserialize<List<AdminSupportViewModel>>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminSupportViewModel>();
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (apiResponse.TryGetProperty("data", out var dataProperty))
+                    {
+                        tickets = JsonSerializer.Deserialize<List<AdminSupportViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminSupportViewModel>();
+                    }
                 }
             }
             catch { }
-
             return View(tickets);
         }
 
@@ -257,33 +230,20 @@ namespace InsureTrust.Web.Controllers
                 return RedirectToAction(nameof(Support));
             }
 
-            var client = _httpClientFactory.CreateClient();
-
+            AddToken();
             try
             {
-                var payload = new
-                {
-                    Status = status,
-                    AdminResponse = adminResponse ?? string.Empty
-                };
-
-                var json = JsonSerializer.Serialize(payload);
-                using var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await client.PutAsync($"http://localhost:5067/api/support/{id}", content);
+                var payload = new { Status = status, AdminResponse = adminResponse ?? string.Empty };
+                var response = await _httpClient.PutAsJsonAsync($"api/queries/update/{id}", payload);
 
                 if (response.IsSuccessStatusCode)
-                {
                     TempData["SupportActionSuccess"] = "Support ticket updated successfully.";
-                }
                 else
-                {
-                    TempData["SupportActionError"] = "Could not update support ticket at this time.";
-                }
+                    TempData["SupportActionError"] = "Could not update support ticket.";
             }
             catch
             {
-                TempData["SupportActionError"] = "Support service is currently unavailable.";
+                TempData["SupportActionError"] = "Support service is unavailable.";
             }
 
             return RedirectToAction(nameof(Support));

@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace InsureTrust.Productweb.DTOs
+namespace InsureTrust.Web.Models
 {
     public class CreatePolicyTypeDto
     {

@@ -2,6 +2,7 @@ using InsureTrust.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 
+DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
@@ -30,6 +31,26 @@ builder.Services.AddHttpClient<INotificationService, NotificationService>(client
     client.BaseAddress = new Uri(gatewayUrl);
 });
 
+builder.Services.AddHttpClient<IPolicyService, PolicyService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+builder.Services.AddHttpClient<IRenewalService, RenewalService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+builder.Services.AddHttpClient<ISupportService, SupportService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+
+builder.Services.AddHttpClient<IClaimService, ClaimService>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -50,10 +71,6 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddHttpClient<IPolicyService, PolicyService>(client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7296/");
-});
 
 var app = builder.Build();
 
@@ -68,8 +85,6 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-app.UseStaticFiles();
 
 app.MapControllerRoute(
     name: "default",

@@ -1,8 +1,8 @@
-﻿using InsureTrust.SupportService.Data;
-using InsureTrust.SupportService.Models;
+﻿using InsureTrust.QueryService.Data;
+using InsureTrust.QueryService.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace InsureTrust.SupportService.Repositories
+namespace InsureTrust.QueryService.Repositories
 {
     public class SupportRepository : ISupportRepository
     {

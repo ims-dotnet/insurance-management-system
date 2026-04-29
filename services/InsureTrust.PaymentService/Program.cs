@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Serilog;
 
+DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
@@ -23,6 +24,7 @@ Log.Information("Payment Service starting up...");
 builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -56,7 +58,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<InitiateFirstPaymentDtoVali
 
 builder.Services.AddDbContext<PaymentDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentGateway, MockPaymentGateway>();

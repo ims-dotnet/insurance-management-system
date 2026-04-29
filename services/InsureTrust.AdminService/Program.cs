@@ -6,6 +6,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Serilog;
 
+DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // ================= SERILOG CONFIGURATION =================
@@ -21,6 +22,7 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddHttpContextAccessor();
 
 // ================= SWAGGER =================
 builder.Services.AddEndpointsApiExplorer();
@@ -29,22 +31,28 @@ builder.Services.AddSwaggerGen();
 // ================= HTTP CLIENT ( IMPORTANT) =================
 builder.Services.AddHttpClient<IAdminService, AdminService>(client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5000/"); 
+    var gatewayUrl = builder.Configuration["ServiceUrls:GatewayUrl"] 
+        ?? throw new InvalidOperationException("ServiceUrls:GatewayUrl is missing.");
+    client.BaseAddress = new Uri(gatewayUrl); 
 });
 
 // ================= JWT AUTH =================
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key missing.");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("Jwt:Issuer missing.");
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? throw new InvalidOperationException("Jwt:Audience missing.");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("THIS_IS_SECRET_KEY_CHANGE_IT") // same as Identity Service
-            )
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 

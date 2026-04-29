@@ -1,10 +1,8 @@
-﻿
-using InsureTrust.SupportService.DTOs;
-using InsureTrust.SupportService.Services;
+using InsureTrust.QueryService.DTOs;
 using System.Text;
 using System.Text.Json;
 
-namespace InsureTrust.SupportService.Services
+namespace InsureTrust.QueryService.Services
 {
     public class NotificationClient : INotificationClient
     {
@@ -21,10 +19,13 @@ namespace InsureTrust.SupportService.Services
 
         public async Task SendSupportStatusChangedAsync(int userId, string ticketNumber, string status)
         {
-            var baseUrl = _configuration["Services:IdentityServiceBaseUrl"];
+            // Prefer GatewayUrl for service-to-service communication (Audit S9)
+            var gatewayUrl = _configuration["Services:GatewayUrl"];
+            var baseUrl = !string.IsNullOrWhiteSpace(gatewayUrl) ? gatewayUrl : _configuration["Services:IdentityServiceBaseUrl"];
+
             if (string.IsNullOrWhiteSpace(baseUrl))
             {
-                _logger.LogWarning("Identity service base URL is not configured.");
+                _logger.LogWarning("Notification target URL (Gateway or IdentityService) is not configured.");
                 return;
             }
 
@@ -42,7 +43,8 @@ namespace InsureTrust.SupportService.Services
 
             try
             {
-                var response = await _httpClient.PostAsync($"{baseUrl}/api/notifications/send", content);
+                // Both internal IdentityService and Gateway match /api/notifications/send
+                var response = await _httpClient.PostAsync($"{baseUrl.TrimEnd('/')}/api/notifications/send", content);
                 response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)

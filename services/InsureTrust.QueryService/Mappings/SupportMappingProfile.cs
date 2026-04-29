@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using InsureTrust.SupportService.DTOs;
-using InsureTrust.SupportService.Models;
+using InsureTrust.QueryService.DTOs;
+using InsureTrust.QueryService.Models;
 
-namespace InsureTrust.SupportService.Mappings
+namespace InsureTrust.QueryService.Mappings
 {
     public class SupportMappingProfile : Profile
     {

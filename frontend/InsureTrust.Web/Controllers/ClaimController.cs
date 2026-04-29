@@ -1,36 +1,22 @@
 using InsureTrust.Web.Models;
+using InsureTrust.Web.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace InsureTrust.Web.Controllers
 {
     public class ClaimController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IClaimService _claimService;
 
-        public ClaimController(IHttpClientFactory httpClientFactory)
+        public ClaimController(IClaimService claimService)
         {
-            _httpClientFactory = httpClientFactory;
+            _claimService = claimService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync("http://localhost:7004/api/claim/my-claims"); // API Gateway or Service URL
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (apiResponse.TryGetProperty("data", out var dataProperty))
-                {
-                    var claims = JsonSerializer.Deserialize<List<ClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    return View(claims);
-                }
-            }
-
-            return View(new List<ClaimViewModel>());
+            var claims = await _claimService.GetMyClaimsAsync();
+            return View(claims);
         }
 
         public IActionResult SubmitClaim(int policyId)
@@ -47,24 +33,9 @@ namespace InsureTrust.Web.Controllers
                 return View(model);
             }
 
-            using var content = new MultipartFormDataContent();
-            content.Add(new StringContent(model.Description), "Description");
-            content.Add(new StringContent(model.MaturityAmount.ToString()), "MaturityAmount");
+            var success = await _claimService.SubmitClaimAsync(model.PolicyId, model);
 
-            if (model.Documents != null)
-            {
-                foreach (var file in model.Documents)
-                {
-                    var fileContent = new StreamContent(file.OpenReadStream());
-                    fileContent.Headers.Add("Content-Type", file.ContentType);
-                    content.Add(fileContent, "Documents", file.FileName);
-                }
-            }
-
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.PostAsync($"http://localhost:7004/api/claim/submit/{model.PolicyId}", content);
-
-            if (response.IsSuccessStatusCode)
+            if (success)
             {
                 return RedirectToAction("Index");
             }

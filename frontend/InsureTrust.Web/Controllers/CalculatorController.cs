@@ -1,3 +1,4 @@
+using InsureTrust.Web.Models;
 using InsureTrust.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ public class CalculatorController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Estimate([FromBody] CalculatorRequestDto request)
+    public async Task<IActionResult> Estimate([FromBody] CalculatorViewModel request)
     {
         if (!ModelState.IsValid)
         {

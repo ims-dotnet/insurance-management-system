@@ -9,37 +9,33 @@ namespace InsureTrust.Web.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string _baseUrl;
 
-        public SupportService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public SupportService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
-            
-            var supportServiceUrl = configuration["ServiceUrls:SupportService"] ?? "http://localhost:5135";
-            _baseUrl = $"{supportServiceUrl}/api/support";
         }
 
         public async Task<ApiResponse<SupportQueryViewModel>?> SubmitSupportQueryAsync(MultipartFormDataContent content)
         {
             AddJwtTokenIfAvailable();
-            var response = await _httpClient.PostAsync($"{_baseUrl}/submit", content);
+            var response = await _httpClient.PostAsync("api/queries/submit", content);
             return await HandleResponse<ApiResponse<SupportQueryViewModel>>(response);
         }
 
         public async Task<ApiResponse<List<SupportQueryViewModel>>?> GetMyQueriesAsync()
         {
-            return await GetAsync<ApiResponse<List<SupportQueryViewModel>>>($"{_baseUrl}/my-queries");
+            return await GetAsync<ApiResponse<List<SupportQueryViewModel>>>("api/queries/my-queries");
         }
 
         public async Task<ApiResponse<List<SupportQueryViewModel>>?> GetAllQueriesAsync()
         {
-            return await GetAsync<ApiResponse<List<SupportQueryViewModel>>>($"{_baseUrl}/all");
+            return await GetAsync<ApiResponse<List<SupportQueryViewModel>>>("api/queries/all");
         }
 
         public async Task<ApiResponse<object>?> UpdateQueryStatusAsync(int id, UpdateSupportStatusViewModel model)
         {
-            return await PutAsync<ApiResponse<object>>($"{_baseUrl}/update/{id}", model);
+            return await PutAsync<ApiResponse<object>>($"api/queries/update/{id}", model);
         }
 
 
@@ -65,8 +61,6 @@ namespace InsureTrust.Web.Services
             {
                 var friendlyError = await GetFriendlyErrorMessage(response);
                 
-                // Instead of throwing, we return a failed ApiResponse object
-                // to allow the UI to handle it gracefully.
                 try
                 {
                     var result = Activator.CreateInstance<T>();
@@ -77,7 +71,6 @@ namespace InsureTrust.Web.Services
                 }
                 catch
                 {
-                    // Fallback for types that can't be instantiated this way
                     return default;
                 }
             }
@@ -91,11 +84,10 @@ namespace InsureTrust.Web.Services
 
         private void AddJwtTokenIfAvailable()
         {
-            const string SessionKey = "JWToken";
             var context = _httpContextAccessor.HttpContext;
             if (context == null) return;
 
-            var token = context.Session.GetString(SessionKey);
+            var token = context.Request.Cookies["authToken"];
 
             _httpClient.DefaultRequestHeaders.Authorization = null;
             if (!string.IsNullOrWhiteSpace(token))

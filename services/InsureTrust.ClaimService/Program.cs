@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // ================= SERILOG CONFIGURATION =================
@@ -30,18 +31,22 @@ builder.Services.AddHttpClient();
 builder.Services.AddAutoMapper(typeof(Program));
 
 // ================= JWT AUTH =================
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key missing.");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("Jwt:Issuer missing.");
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? throw new InvalidOperationException("Jwt:Audience missing.");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("THIS_IS_SECRET_KEY_CHANGE_IT") // Must match Identity Service
-            )
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
@@ -55,14 +60,9 @@ builder.Services.AddScoped<IClaimService, ClaimService>();
 
 var app = builder.Build();
 
-<<<<<<< HEAD
-//change
-// Configure the HTTP request pipeline.
-=======
 // ================= MIDDLEWARE PIPELINE =================
 app.UseMiddleware<InsureTrust.ClaimService.Middleware.ExceptionMiddleware>();
 
->>>>>>> main
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -34,6 +34,18 @@ namespace InsureTrust.AdminService.DTOs
         public DateTime PaymentDate { get; set; }
     }
 
+    public class AdminPolicyDto
+    {
+        public int Id { get; set; }
+        public string Status { get; set; } = string.Empty;
+    }
+
+    public class AdminClaimDto
+    {
+        public int Id { get; set; }
+        public string ClaimStatus { get; set; } = string.Empty;
+    }
+
     public class CreatePolicyTypeDto
     {
         public string Name { get; set; } = string.Empty;

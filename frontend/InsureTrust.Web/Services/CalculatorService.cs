@@ -1,13 +1,11 @@
 using System.Net.Http.Json;
+using InsureTrust.Web.Models;
 
 namespace InsureTrust.Web.Services;
 
-public record CalculatorRequestDto(int Age, decimal PackageAmount, int Tenure, string? PolicyCategory);
-public record CalculatorResultDto(decimal EstimatedPremium, decimal TotalInvestment, decimal MaturityAmount, string Breakup);
-
 public interface ICalculatorService
 {
-    Task<CalculatorResultDto?> EstimateAsync(CalculatorRequestDto request);
+    Task<CalculatorResultViewModel?> EstimateAsync(CalculatorViewModel request);
 }
 
 public class CalculatorService : ICalculatorService
@@ -19,14 +17,14 @@ public class CalculatorService : ICalculatorService
         _httpClient = httpClient;
     }
 
-    public async Task<CalculatorResultDto?> EstimateAsync(CalculatorRequestDto request)
+    public async Task<CalculatorResultViewModel?> EstimateAsync(CalculatorViewModel request)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/calculator/estimate", request);
+            var response = await _httpClient.PostAsJsonAsync("api/calculator/estimate", request);
             if (response.IsSuccessStatusCode)
             {
-                var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<CalculatorResultDto>>();
+                var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<CalculatorResultViewModel>>();
                 return apiResponse?.Data;
             }
         }

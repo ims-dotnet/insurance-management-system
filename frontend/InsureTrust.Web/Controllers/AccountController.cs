@@ -34,7 +34,7 @@ public class AccountController : Controller
         {
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = false, // Must be false if JS needs to read it (site.js seems to read it)
+                HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Lax
             };
@@ -45,9 +45,6 @@ public class AccountController : Controller
             }
 
             Response.Cookies.Append("authToken", response.Token, cookieOptions);
-
-            // NOTE: Currently JS handles userProfile, but we can set it in cookie or let JS fetch it.
-            // Let's set it in a cookie that JS can read, or redirect and let JS loadProfile().
 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             {
@@ -63,11 +60,11 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Register()
     {
-        return View(new RegisterRequestDto());
+        return View(new RegisterViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Register(RegisterRequestDto model)
+    public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -99,11 +96,7 @@ public class AccountController : Controller
     [HttpGet]
     public async Task<IActionResult> ProfileData()
     {
-        var token = Request.Cookies["authToken"];
-        if (string.IsNullOrEmpty(token))
-            return Json(new { success = false, message = "Not authenticated." });
-
-        var profile = await _authService.GetProfileAsync(token);
+        var profile = await _authService.GetProfileAsync();
         if (profile == null)
             return Json(new { success = false, message = "Could not load profile." });
 
@@ -111,16 +104,9 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Profile(UpdateProfileRequestDto model)
+    public async Task<IActionResult> Profile(UpdateProfileViewModel model)
     {
-        var token = Request.Cookies["authToken"];
-        if (string.IsNullOrEmpty(token))
-        {
-            TempData["Error"] = "You must be logged in to update your profile.";
-            return RedirectToAction(nameof(Login));
-        }
-
-        var result = await _authService.UpdateProfileAsync(model, token);
+        var result = await _authService.UpdateProfileAsync(model);
         if (result != null)
         {
             TempData["Success"] = "Profile updated successfully.";

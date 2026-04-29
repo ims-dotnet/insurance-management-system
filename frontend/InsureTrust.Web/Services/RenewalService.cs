@@ -9,68 +9,63 @@ namespace InsureTrust.Web.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string _paymentBaseUrl;
 
-        public RenewalService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public RenewalService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
-            
-            var paymentServiceUrl = configuration["ServiceUrls:PaymentService"] ?? "https://localhost:7003";
-            
-            _paymentBaseUrl = $"{paymentServiceUrl}/api/payment";
         }
 
         public async Task<ApiResponse<PaymentResultViewModel>?> InitiateRenewalPaymentAsync(object request)
         {
             return await PostAsync<ApiResponse<PaymentResultViewModel>>(
-                $"{_paymentBaseUrl}/initiate-renewal-payment",
+                "api/payment/initiate-renewal-payment",
                 request);
         }
 
         public async Task<ApiResponse<PaymentResultViewModel>?> InitiateFirstPaymentAsync(object request)
         {
             return await PostAsync<ApiResponse<PaymentResultViewModel>>(
-                $"{_paymentBaseUrl}/initiate-first-payment",
+                "api/payment/initiate-first-payment",
                 request);
         }
 
         public async Task<ApiResponse<List<PaymentHistoryItemViewModel>>?> GetPaymentHistoryAsync()
         {
             return await GetAsync<ApiResponse<List<PaymentHistoryItemViewModel>>>(
-                $"{_paymentBaseUrl}/history");
+                "api/payment/history");
         }
 
         public async Task<ApiResponse<List<PaymentHistoryItemViewModel>>?> GetAllPaymentsAsync()
         {
             return await GetAsync<ApiResponse<List<PaymentHistoryItemViewModel>>>(
-                $"{_paymentBaseUrl}/all");
+                "api/payment/all");
         }
 
         public async Task ApprovePaymentAsync(int paymentId)
         {
             await PostAsync<ApiResponse<object>>(
-                $"{_paymentBaseUrl}/{paymentId}/approve",
+                $"api/payment/{paymentId}/approve",
                 new { });
         }
 
         public async Task RejectPaymentAsync(int paymentId, string reason)
         {
             await PostAsync<ApiResponse<object>>(
-                $"{_paymentBaseUrl}/{paymentId}/reject",
+                $"api/payment/{paymentId}/reject",
                 new { Reason = reason });
         }
 
         public async Task<ApiResponse<ProductPolicyViewModel>?> GetPolicyDetailsByNumberAsync(string policyNumber)
         {
             return await GetAsync<ApiResponse<ProductPolicyViewModel>>(
-                $"{_paymentBaseUrl}/policy-details/number/{policyNumber}");
+                $"api/payment/policy-details/number/{policyNumber}");
         }
 
         public async Task<ApiResponse<ProductPolicyViewModel>?> GetPolicyDetailsByIdAsync(int policyId)
         {
             return await GetAsync<ApiResponse<ProductPolicyViewModel>>(
-                $"{_paymentBaseUrl}/policy-details/{policyId}");
+                $"api/payment/policy-details/{policyId}");
         }
 
 
@@ -96,8 +91,6 @@ namespace InsureTrust.Web.Services
             {
                 var friendlyError = await GetFriendlyErrorMessage(response);
                 
-                // Instead of throwing, we return a failed ApiResponse object
-                // to allow the UI to handle it gracefully.
                 try
                 {
                     var result = Activator.CreateInstance<T>();
@@ -108,7 +101,6 @@ namespace InsureTrust.Web.Services
                 }
                 catch
                 {
-                    // Fallback for types that can't be instantiated this way
                     return default;
                 }
             }
@@ -122,11 +114,10 @@ namespace InsureTrust.Web.Services
 
         private void AddJwtTokenIfAvailable()
         {
-            const string SessionKey = "JWToken";
             var context = _httpContextAccessor.HttpContext;
             if (context == null) return;
 
-            var token = context.Session.GetString(SessionKey);
+            var token = context.Request.Cookies["authToken"];
 
             _httpClient.DefaultRequestHeaders.Authorization = null;
             if (!string.IsNullOrWhiteSpace(token))

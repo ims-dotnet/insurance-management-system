@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using InsureTrust.Web.Models;
 using System.Net.Http.Json;
 
 namespace InsureTrust.Web.Services;
@@ -9,35 +10,40 @@ public record UnreadCountResponseDto(int Count);
 
 public interface INotificationService
 {
-    Task<IEnumerable<NotificationDto>?> GetMyNotificationsAsync(string token);
-    Task<int> GetUnreadCountAsync(string token);
-    Task<bool> MarkReadAsync(int id, string token);
-    Task<bool> MarkAllReadAsync(string token);
+    Task<IEnumerable<NotificationDto>?> GetMyNotificationsAsync();
+    Task<int> GetUnreadCountAsync();
+    Task<bool> MarkReadAsync(int id);
+    Task<bool> MarkAllReadAsync();
     Task<bool> SendNotificationAsync(SendNotificationDto request);
 }
 
 public class NotificationService : INotificationService
 {
     private readonly HttpClient _httpClient;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public NotificationService(HttpClient httpClient)
+    public NotificationService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
     {
         _httpClient = httpClient;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    private void AddAuthorizationHeader(HttpRequestMessage request, string token)
+    private void AddAuthorizationHeader()
     {
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var token = _httpContextAccessor.HttpContext?.Request.Cookies["authToken"];
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+        if (!string.IsNullOrEmpty(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
     }
 
-    public async Task<IEnumerable<NotificationDto>?> GetMyNotificationsAsync(string token)
+    public async Task<IEnumerable<NotificationDto>?> GetMyNotificationsAsync()
     {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, "/api/notifications");
-            AddAuthorizationHeader(request, token);
-
-            var response = await _httpClient.SendAsync(request);
+            AddAuthorizationHeader();
+            var response = await _httpClient.GetAsync("/api/notifications");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<IEnumerable<NotificationDto>>();
@@ -48,14 +54,12 @@ public class NotificationService : INotificationService
         return null;
     }
 
-    public async Task<int> GetUnreadCountAsync(string token)
+    public async Task<int> GetUnreadCountAsync()
     {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, "/api/notifications/unread-count");
-            AddAuthorizationHeader(request, token);
-
-            var response = await _httpClient.SendAsync(request);
+            AddAuthorizationHeader();
+            var response = await _httpClient.GetAsync("/api/notifications/unread-count");
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<UnreadCountResponseDto>();
@@ -67,14 +71,12 @@ public class NotificationService : INotificationService
         return 0;
     }
 
-    public async Task<bool> MarkReadAsync(int id, string token)
+    public async Task<bool> MarkReadAsync(int id)
     {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, $"/api/notifications/mark-read/{id}");
-            AddAuthorizationHeader(request, token);
-
-            var response = await _httpClient.SendAsync(request);
+            AddAuthorizationHeader();
+            var response = await _httpClient.PutAsync($"/api/notifications/mark-read/{id}", null);
             return response.IsSuccessStatusCode;
         }
         catch { }
@@ -82,14 +84,12 @@ public class NotificationService : INotificationService
         return false;
     }
 
-    public async Task<bool> MarkAllReadAsync(string token)
+    public async Task<bool> MarkAllReadAsync()
     {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, "/api/notifications/mark-all-read");
-            AddAuthorizationHeader(request, token);
-
-            var response = await _httpClient.SendAsync(request);
+            AddAuthorizationHeader();
+            var response = await _httpClient.PutAsync("/api/notifications/mark-all-read", null);
             return response.IsSuccessStatusCode;
         }
         catch { }
@@ -101,6 +101,7 @@ public class NotificationService : INotificationService
     {
         try
         {
+            // Internal send endpoint is [AllowAnonymous]
             var response = await _httpClient.PostAsJsonAsync("/api/notifications/send", requestDto);
             return response.IsSuccessStatusCode;
         }

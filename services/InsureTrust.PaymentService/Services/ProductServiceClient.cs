@@ -1,4 +1,6 @@
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using InsureTrust.PaymentService.DTOs;
 
 namespace InsureTrust.PaymentService.Services
@@ -6,28 +8,54 @@ namespace InsureTrust.PaymentService.Services
     public class ProductServiceClient : IProductServiceClient
     {
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<ProductServiceClient> _logger;
 
-        public ProductServiceClient(HttpClient httpClient, ILogger<ProductServiceClient> logger)
+        public ProductServiceClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, ILogger<ProductServiceClient> logger)
         {
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+        }
+
+        private void AddAuthorizationHeader()
+        {
+            var authHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                var token = authHeader.Substring("Bearer ".Length).Trim();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
         }
 
         public async Task<ProductPolicyDto?> GetPolicyByPolicyIdAsync(int policyId)
         {
             try
             {
-                // Attempt Real Integration
-                var response = await _httpClient.GetAsync($"/api/policy/{policyId}");
+                AddAuthorizationHeader();
+                // Hit the Gateway route (api/policy/{id})
+                var response = await _httpClient.GetAsync($"api/policy/{policyId}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<ProductPolicyDto>();
+                    // If the response is wrapped, we need to unwrap it. 
+                    // Based on audit, we expect an ApiResponse structure.
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonDoc = JsonDocument.Parse(content);
+                    if (jsonDoc.RootElement.TryGetProperty("data", out var data))
+                    {
+                        return JsonSerializer.Deserialize<ProductPolicyDto>(data.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    }
+                    return JsonSerializer.Deserialize<ProductPolicyDto>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 }
             }
-            catch { /* Fallback to mock below */ }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to fetch real policy data for PolicyId: {PolicyId}", policyId);
+            }
 
-            _logger.LogInformation("Using MOCK data for GetPolicyByPolicyIdAsync (PolicyId: {PolicyId})", policyId);
+            _logger.LogWarning("Falling back to MOCK data for PolicyId: {PolicyId}", policyId);
             return new ProductPolicyDto
             {
                 PolicyId = policyId,
@@ -39,75 +67,63 @@ namespace InsureTrust.PaymentService.Services
 
         public async Task<ProductPolicyDto?> GetPolicyByNumberAsync(string policyNumber)
         {
+            // The ProductService doesn't have a direct 'by number' endpoint yet, 
+            // but we can search in 'all' if needed. For now, keep mock with a warning.
+            _logger.LogWarning("GetPolicyByNumberAsync requested for {PolicyNumber}. Routing to all search.", policyNumber);
             try
             {
-                // Attempt Real Integration
-                var response = await _httpClient.GetAsync($"/api/policy/details/number/{policyNumber}");
+                AddAuthorizationHeader();
+                var response = await _httpClient.GetAsync("api/policy/all");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<ProductPolicyDto>();
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonDoc = JsonDocument.Parse(content);
+                    JsonElement dataArray;
+                    if (jsonDoc.RootElement.TryGetProperty("data", out dataArray))
+                    {
+                        var policies = JsonSerializer.Deserialize<List<ProductPolicyDto>>(dataArray.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        return policies?.FirstOrDefault(p => p.PolicyNumber == policyNumber);
+                    }
                 }
             }
-            catch { /* Fallback to mock below */ }
+            catch { }
 
-            _logger.LogInformation("Using MOCK data for GetPolicyByNumberAsync (PolicyNumber: {PolicyNumber})", policyNumber);
-            
-            // Generate a consistent mock ID based on the policy number string
-            int consistentId = Math.Abs(policyNumber.GetHashCode() % 1000000);
-
-            return new ProductPolicyDto
-            {
-                PolicyId = 1,
-                UserPolicyId = consistentId,
-                PolicyNumber = policyNumber,
-                PolicyType = "Health",
-                PackageAmount = 5000m,
-                ExpiryDate = DateTime.UtcNow.AddDays(-3)
-            };
+            return null; // Let the service handle fallback
         }
 
         public async Task<bool> RenewPolicyByNumberAsync(string policyNumber)
         {
-            try
+            // Similar to above, find by number then renew by ID
+            var policy = await GetPolicyByNumberAsync(policyNumber);
+            if (policy != null)
             {
-                // Attempt Real Integration
-                var response = await _httpClient.PostAsync($"/api/policy/renew/number/{policyNumber}", null);
-                if (response.IsSuccessStatusCode) return true;
+                AddAuthorizationHeader();
+                var response = await _httpClient.PostAsync($"api/policy/renew/{policy.PolicyId}", null);
+                return response.IsSuccessStatusCode;
             }
-            catch { /* Fallback to mock below */ }
-
-            _logger.LogInformation("Using MOCK success for RenewPolicyByNumberAsync (PolicyNumber: {PolicyNumber})", policyNumber);
-            return true;
+            return false;
         }
 
         public async Task<ProductPolicyDto?> RegisterNewPolicyAsync(int userId, int policyId, decimal amount)
         {
             try
             {
-                // Attempt Real Integration
-                var request = new { userId, policyId, amount };
-                var response = await _httpClient.PostAsJsonAsync("/api/policy/register", request);
+                AddAuthorizationHeader();
+                var payload = new { PolicyTypeId = policyId, PackageAmount = amount }; // Match CreatePolicyDto in ProductService
+                var response = await _httpClient.PostAsJsonAsync("api/policy/purchase", payload);
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<ProductPolicyDto>();
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonDoc = JsonDocument.Parse(content);
+                    if (jsonDoc.RootElement.TryGetProperty("data", out var data))
+                    {
+                        return JsonSerializer.Deserialize<ProductPolicyDto>(data.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    }
+                    return JsonSerializer.Deserialize<ProductPolicyDto>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 }
             }
-            catch { /* Fallback to mock below */ }
-
-            _logger.LogInformation("Using MOCK registration for UserId: {UserId}", userId);
-            
-            // Use a stable-ish ID for the mock registration
-            int mockId = int.Parse(DateTime.UtcNow.ToString("ddHH") + new Random(userId).Next(1000, 9999));
-
-            return new ProductPolicyDto
-            {
-                PolicyId = policyId,
-                UserPolicyId = mockId,
-                PolicyNumber = $"POL-{DateTime.UtcNow:yyyy}-{mockId}",
-                PolicyType = "Health",
-                PackageAmount = amount,
-                ExpiryDate = DateTime.UtcNow.AddYears(1)
-            };
+            catch { }
+            return null;
         }
     }
 }

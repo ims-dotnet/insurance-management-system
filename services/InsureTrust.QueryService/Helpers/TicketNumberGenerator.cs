@@ -1,4 +1,4 @@
-﻿namespace InsureTrust.SupportService.Helpers
+﻿namespace InsureTrust.QueryService.Helpers
 {
     public static class TicketNumberGenerator
     {

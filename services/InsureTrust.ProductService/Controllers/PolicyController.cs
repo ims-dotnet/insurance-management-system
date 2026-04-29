@@ -1,4 +1,4 @@
-﻿using InsureTrust.ProductService.DTOs;
+using InsureTrust.ProductService.DTOs;
 using InsureTrust.ProductService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -110,6 +110,23 @@ namespace InsureTrust.ProductService.Controllers
             _logger.LogInformation("Policy type deleted");
 
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("{policyId}")]
+        public async Task<IActionResult> GetPolicyById(int policyId)
+        {
+            _logger.LogInformation("Fetching policy details for {PolicyId}", policyId);
+
+            if (policyId <= 0)
+                throw new ArgumentException("Invalid Policy Id");
+
+            var result = await _service.GetAllPoliciesAsync(); 
+            var policy = result.FirstOrDefault(p => p.Id == policyId);
+
+            if (policy == null) return NotFound(new { success = false, message = "Policy not found" });
+
+            return Ok(policy);
         }
 
         [Authorize(Roles = "Customer")]

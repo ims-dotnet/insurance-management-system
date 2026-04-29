@@ -1,4 +1,4 @@
-﻿namespace InsureTrust.SupportService.Services
+﻿namespace InsureTrust.QueryService.Services
 {
     public interface INotificationClient
     {

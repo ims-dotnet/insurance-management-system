@@ -1,25 +1,25 @@
 using AutoMapper;
-using InsureTrust.SupportService.DTOs;
-using InsureTrust.SupportService.Exceptions;
-using InsureTrust.SupportService.Helpers;
-using InsureTrust.SupportService.Models;
-using InsureTrust.SupportService.Repositories;
+using InsureTrust.QueryService.DTOs;
+using InsureTrust.QueryService.Exceptions;
+using InsureTrust.QueryService.Helpers;
+using InsureTrust.QueryService.Models;
+using InsureTrust.QueryService.Repositories;
 
-namespace InsureTrust.SupportService.Services
+namespace InsureTrust.QueryService.Services
 {
-    public class SupportService : ISupportService
+    public class QueryService : IQueryService
     {
 
         private readonly ISupportRepository _supportRepository;
         private readonly INotificationClient _notificationClient;
         private readonly IMapper _mapper;
-        private readonly ILogger<SupportService> _logger;
+        private readonly ILogger<QueryService> _logger;
 
-        public SupportService(
+        public QueryService(
             ISupportRepository supportRepository,
             INotificationClient notificationClient,
             IMapper mapper,
-            ILogger<SupportService> logger)
+            ILogger<QueryService> logger)
         {
             _supportRepository = supportRepository;
             _notificationClient = notificationClient;

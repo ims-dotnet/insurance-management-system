@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace InsureTrust.SupportService.Migrations
+namespace InsureTrust.QueryService.Migrations
 {
     /// <inheritdoc />
     public partial class Support : Migration

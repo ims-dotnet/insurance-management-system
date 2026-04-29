@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace InsureTrust.SupportService.Models
+namespace InsureTrust.QueryService.Models
 {
     public class SupportQuery
     {

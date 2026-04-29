@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace InsureTrust.SupportService.DTOs
+namespace InsureTrust.QueryService.DTOs
 {
     public class CreateSupportQueryDto
     {

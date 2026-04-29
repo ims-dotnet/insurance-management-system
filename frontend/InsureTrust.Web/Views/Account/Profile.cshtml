@@ -1,5 +1,5 @@
 @using InsureTrust.Web.Services
-@model UpdateProfileRequestDto
+@model UpdateProfileViewModel
 @{
     ViewData["Title"] = "Personnel Record";
 }
@@ -33,12 +33,12 @@
             <form id="profileUpdateForm" asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data" novalidate>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label" for="updName">Update Name</label>
-                        <input id="updName" name="Name" class="form-control-inst" />
+                        <label class="form-label" asp-for="Name">Update Name</label>
+                        <input asp-for="Name" class="form-control-inst" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label" for="updPhone">Update Phone</label>
-                        <input id="updPhone" name="PhoneNo" class="form-control-inst" />
+                        <label class="form-label" asp-for="PhoneNo">Update Phone</label>
+                        <input asp-for="PhoneNo" class="form-control-inst" />
                     </div>
                     @*  ── KYC Document Upload (temporarily disabled) ─────────
                     <div class="col-12">

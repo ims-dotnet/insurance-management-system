@@ -1,4 +1,4 @@
-﻿namespace InsureTrust.SupportService.Exceptions
+﻿namespace InsureTrust.QueryService.Exceptions
 {
     public class ForbiddenException : Exception
     {

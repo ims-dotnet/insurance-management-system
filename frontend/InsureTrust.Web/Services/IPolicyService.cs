@@ -1,4 +1,5 @@
-﻿using InsureTrust.Productweb.DTOs;
+using InsureTrust.Web.Models;
+﻿using InsureTrust.Web.Models;
 
 namespace InsureTrust.Web.Services
 {

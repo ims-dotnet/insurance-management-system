@@ -1,6 +1,6 @@
-﻿using InsureTrust.SupportService.Models;
+﻿using InsureTrust.QueryService.Models;
 
-namespace InsureTrust.SupportService.Repositories
+namespace InsureTrust.QueryService.Repositories
 {
     public interface ISupportRepository
     {

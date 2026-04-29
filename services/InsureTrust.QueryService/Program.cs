@@ -1,18 +1,17 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using InsureTrust.SupportService.Data;
-using InsureTrust.SupportService.Exceptions;
-using InsureTrust.SupportService.Mappings;
-using InsureTrust.SupportService.Repositories;
-using InsureTrust.SupportService.Services;
-using InsureTrust.SupportService.Validators;
+using InsureTrust.QueryService.Data;
+using InsureTrust.QueryService.Exceptions;
+using InsureTrust.QueryService.Mappings;
+using InsureTrust.QueryService.Repositories;
+using InsureTrust.QueryService.Services;
+using InsureTrust.QueryService.Validators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-
-
 using Serilog;
 
+DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
@@ -60,10 +59,10 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateSupportQueryDtoValidator>();
 
 builder.Services.AddDbContext<SupportDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<ISupportRepository, SupportRepository>();
-builder.Services.AddScoped<ISupportService, SupportService>();
+builder.Services.AddScoped<IQueryService, QueryService>();
 
 builder.Services.AddHttpClient<INotificationClient, NotificationClient>();
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace InsureTrust.SupportService.DTOs
+namespace InsureTrust.QueryService.DTOs
 {
     public class SendNotificationDto
     {

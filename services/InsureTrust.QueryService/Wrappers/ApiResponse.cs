@@ -1,4 +1,4 @@
-namespace InsureTrust.SupportService.Wrappers
+namespace InsureTrust.QueryService.Wrappers
 {
     public class ApiResponse<T>
     {

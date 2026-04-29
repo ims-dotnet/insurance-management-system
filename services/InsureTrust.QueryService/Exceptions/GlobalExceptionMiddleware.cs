@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
 using FluentValidation;
-using InsureTrust.SupportService.Wrappers;
+using InsureTrust.QueryService.Wrappers;
 
-namespace InsureTrust.SupportService.Exceptions
+namespace InsureTrust.QueryService.Exceptions
 {
     public class GlobalExceptionMiddleware
     {
@@ -24,7 +24,7 @@ namespace InsureTrust.SupportService.Exceptions
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred in SupportService.");
+                _logger.LogError(ex, "Unhandled exception occurred in QueryService.");
                 await HandleExceptionAsync(context, ex);
             }
         }

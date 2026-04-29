@@ -1,13 +1,4 @@
-<<<<<<< HEAD
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-
-namespace InsureTrust.ClaimService.Models;
-
-public class Claim
-=======
 namespace InsureTrust.ClaimService.Models
->>>>>>> main
 {
     public class Claim
     {

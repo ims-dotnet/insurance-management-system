@@ -1,22 +1,22 @@
-using InsureTrust.SupportService.DTOs;
-using InsureTrust.SupportService.Services;
-using InsureTrust.SupportService.Wrappers;
+using InsureTrust.QueryService.DTOs;
+using InsureTrust.QueryService.Services;
+using InsureTrust.QueryService.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace InsureTrust.SupportService.Controllers
+namespace InsureTrust.QueryService.Controllers
 {
     [ApiController]
-    [Route("api/support")]
+    [Route("api/queries")]
     public class SupportController : ControllerBase
     {
-        private readonly ISupportService _supportService;
+        private readonly IQueryService _queryService;
         private readonly IWebHostEnvironment _environment;
 
-        public SupportController(ISupportService supportService, IWebHostEnvironment environment)
+        public SupportController(IQueryService queryService, IWebHostEnvironment environment)
         {
-            _supportService = supportService;
+            _queryService = queryService;
             _environment = environment;
         }
 
@@ -28,7 +28,7 @@ namespace InsureTrust.SupportService.Controllers
             if (!TryGetUserId(out int userId))
                 return Unauthorized(new { message = "User identity could not be determined from the token." });
 
-            var result = await _supportService.SubmitQueryAsync(dto, userId, _environment.WebRootPath);
+            var result = await _queryService.SubmitQueryAsync(dto, userId, _environment.WebRootPath);
             return Ok(ApiResponse<SupportQueryDto>.SuccessResponse(result, "Support query submitted successfully."));
         }
 
@@ -39,7 +39,7 @@ namespace InsureTrust.SupportService.Controllers
             if (!TryGetUserId(out int userId))
                 return Unauthorized(new { message = "User identity could not be determined from the token." });
 
-            var result = await _supportService.GetMyQueriesAsync(userId);
+            var result = await _queryService.GetMyQueriesAsync(userId);
             return Ok(ApiResponse<IEnumerable<SupportQueryDto>>.SuccessResponse(result));
         }
 
@@ -47,7 +47,7 @@ namespace InsureTrust.SupportService.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllQueries()
         {
-            var result = await _supportService.GetAllQueriesAsync();
+            var result = await _queryService.GetAllQueriesAsync();
             return Ok(ApiResponse<IEnumerable<SupportQueryDto>>.SuccessResponse(result));
         }
 
@@ -55,7 +55,7 @@ namespace InsureTrust.SupportService.Controllers
         [HttpPut("update/{ticketId}")]
         public async Task<IActionResult> UpdateStatus(int ticketId, [FromBody] UpdateSupportStatusDto dto)
         {
-            var result = await _supportService.UpdateStatusAsync(ticketId, dto);
+            var result = await _queryService.UpdateStatusAsync(ticketId, dto);
             return Ok(ApiResponse<SupportQueryDto>.SuccessResponse(result, "Status updated successfully."));
         }
 

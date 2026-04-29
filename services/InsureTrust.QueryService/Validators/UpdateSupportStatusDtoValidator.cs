@@ -1,7 +1,7 @@
 using FluentValidation;
-using InsureTrust.SupportService.DTOs;
+using InsureTrust.QueryService.DTOs;
 
-namespace InsureTrust.SupportService.Validators
+namespace InsureTrust.QueryService.Validators
 {
     public class UpdateSupportStatusDtoValidator : AbstractValidator<UpdateSupportStatusDto>
     {

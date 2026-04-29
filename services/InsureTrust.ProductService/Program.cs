@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using InsureTrust.ProductService.Data;
 using InsureTrust.ProductService.DTOs;
@@ -15,10 +15,12 @@ using System.Security.Claims;
 using System.Text;
 
 
+DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<InsureTrustProductServiceContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
@@ -27,7 +29,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
-builder.Services.AddScoped<IPolicyService, PolicyService>(); builder.Services.AddScoped<IValidator<CreatePolicyTypeDto>, CreatePolicyTypeValidator>();
+builder.Services.AddScoped<IPolicyService, PolicyService>(); 
+builder.Services.AddScoped<IValidator<CreatePolicyTypeDto>, CreatePolicyTypeValidator>();
 builder.Services.AddScoped<IValidator<EditPolicyDto>, EditPolicyValidator>();
 
 builder.Services.AddScoped<IValidator<CreatePolicyDto>, CreatePolicyValidator>();
@@ -36,12 +39,18 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAutoMapper(typeof(MapperProfile));
+var mapperConfig = new AutoMapper.MapperConfiguration(mc =>
+{
+    mc.AddProfile(new MapperProfile());
+});
+AutoMapper.IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 
-var jwtKey = builder.Configuration["Jwt:Key"];
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
-var jwtAudience = builder.Configuration["Jwt:Audience"];
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not configured.");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("Jwt:Issuer is not configured.");
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? throw new InvalidOperationException("Jwt:Audience is not configured.");
+
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -62,16 +71,17 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//testing
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,5 +1,5 @@
 
-using InsureTrust.Productweb.DTOs;
+using InsureTrust.Web.Models;
 using InsureTrust.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;

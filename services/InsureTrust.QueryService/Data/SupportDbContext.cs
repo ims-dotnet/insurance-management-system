@@ -1,8 +1,8 @@
-﻿using InsureTrust.SupportService.Models;
+﻿using InsureTrust.QueryService.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
 
-namespace InsureTrust.SupportService.Data
+namespace InsureTrust.QueryService.Data
 {
     public class SupportDbContext : DbContext
     {

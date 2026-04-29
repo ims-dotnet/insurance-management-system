@@ -13,13 +13,9 @@ using FluentValidation.AspNetCore;
 using InsureTrust.IdentityService.Mappings;
 using InsureTrust.IdentityService.Validators;
 
+DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
-<<<<<<< HEAD
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
-=======
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -113,18 +109,15 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
->>>>>>> main
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-<<<<<<< HEAD
-    //app.MapOpenApi();
-=======
+
     app.UseSwagger();
     app.UseSwaggerUI();
->>>>>>> main
+
 }
 
 app.UseMiddleware<ApiExceptionMiddleware>();
@@ -133,4 +126,4 @@ app.UseCors(FrontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.Run();
+app.Run();public partial class Program { }
