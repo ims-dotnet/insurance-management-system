@@ -138,49 +138,54 @@ ul, ol {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    height: 64px;
+    width: 100%;
+    height: 60px;
     background: #000000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2.5rem;
-    z-index: 1000;
     border-bottom: 2px solid #fbbf24;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    z-index: 1000;
 }
 
 .admin-top-nav .nav-left .brand {
     display: flex;
     align-items: center;
+    color: #ffffff !important;
+}
+
+.admin-top-nav .nav-left .brand span {
+    color: #ffffff !important;
 }
 
 .admin-top-nav .nav-center {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     height: 100%;
 }
 
 .nav-link-admin {
-    color: #ffffff;
+    color: #ffffff !important;
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 1px;
     text-decoration: none;
     display: flex;
     align-items: center;
-    padding: 0 1rem;
-    transition: all 0.3s ease;
+    padding: 0 1.25rem;
+    transition: all 0.2s ease;
     border-bottom: 3px solid transparent;
 }
 
 .nav-link-admin:hover {
-    color: #fbbf24;
+    background: #fbbf24 !important;
+    color: #000000 !important;
 }
 
+/* User wants yellow ONLY on hover, so we remove the permanent yellow active state */
 .nav-link-admin.active {
-    background: #fbbf24;
-    color: #000000;
-    border-bottom: 3px solid #000000;
+    border-bottom: 3px solid #fbbf24;
 }
 
 .admin-top-nav .nav-right {
@@ -188,30 +193,77 @@ ul, ol {
     align-items: center;
 }
 
+/* Fix notification bell background in admin nav */
+.admin-top-nav .notification-bell {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
+    position: relative;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.admin-top-nav .notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+    font-size: 0.65rem;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    font-weight: 800;
+}
+
 .admin-user-info {
     display: flex;
     align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-user-info span {
+    color: #ffffff !important;
+    font-size: 0.85rem;
+    white-space: nowrap;
 }
 
 .initials-circle {
     width: 32px;
     height: 32px;
-    border-radius: 4px; /* Square with slight round */
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.8rem;
+    flex-shrink: 0;
+    background-color: #fbbf24 !important;
+    color: #000000 !important;
 }
 
 .btn-signout {
-    color: #64748b;
+    color: #ffffff !important;
     font-size: 0.75rem;
     font-weight: 700;
     text-decoration: none;
     padding: 0.4rem 0.8rem;
-    border: 1px solid #334155;
+    border: 1px solid #ffffff !important;
     border-radius: 4px;
     transition: all 0.3s ease;
+}
+
+.btn-signout:hover {
+    background: #ffffff !important;
+    color: #000000 !important;
 }
 
 .btn-signout:hover {

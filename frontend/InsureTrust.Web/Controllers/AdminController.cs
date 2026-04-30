@@ -30,12 +30,24 @@ namespace InsureTrust.Web.Controllers
 
         public async Task<IActionResult> Dashboard()
         {
+            ViewBag.HideSidebar = true;
             AddToken();
             var model = new AdminDashboardViewModel();
 
             try
             {
-                var statsResponse = await _httpClient.GetAsync("api/admin/dashboard");
+                var statsTask = _httpClient.GetAsync("api/admin/dashboard");
+                var usersTask = _httpClient.GetAsync("api/admin/users");
+                var transTask = _httpClient.GetAsync("api/admin/transactions");
+                var pendingPoliciesTask = _httpClient.GetAsync("api/policy/pending");
+                var allClaimsTask = _httpClient.GetAsync("api/claim/all");
+                var supportTask = _httpClient.GetAsync("api/queries/all");
+                var policyTypesTask = _httpClient.GetAsync("api/policy/types");
+
+                await Task.WhenAll(statsTask, usersTask, transTask, pendingPoliciesTask, allClaimsTask, supportTask, policyTypesTask);
+
+                // Process Stats
+                var statsResponse = await statsTask;
                 if (statsResponse.IsSuccessStatusCode)
                 {
                     var content = await statsResponse.Content.ReadAsStringAsync();
@@ -46,7 +58,8 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                var usersResponse = await _httpClient.GetAsync("api/admin/users");
+                // Process Users
+                var usersResponse = await usersTask;
                 if (usersResponse.IsSuccessStatusCode)
                 {
                     var content = await usersResponse.Content.ReadAsStringAsync();
@@ -57,7 +70,8 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                var transResponse = await _httpClient.GetAsync("api/admin/transactions");
+                // Process Transactions
+                var transResponse = await transTask;
                 if (transResponse.IsSuccessStatusCode)
                 {
                     var content = await transResponse.Content.ReadAsStringAsync();
@@ -68,8 +82,8 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                // Fetch Pending Policies
-                var pendingPoliciesResponse = await _httpClient.GetAsync("api/policy/pending");
+                // Process Pending Policies
+                var pendingPoliciesResponse = await pendingPoliciesTask;
                 if (pendingPoliciesResponse.IsSuccessStatusCode)
                 {
                     var content = await pendingPoliciesResponse.Content.ReadAsStringAsync();
@@ -80,11 +94,11 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                // Fetch Pending Claims
-                var pendingClaimsResponse = await _httpClient.GetAsync("api/claim/all");
-                if (pendingClaimsResponse.IsSuccessStatusCode)
+                // Process Claims
+                var allClaimsResponse = await allClaimsTask;
+                if (allClaimsResponse.IsSuccessStatusCode)
                 {
-                    var content = await pendingClaimsResponse.Content.ReadAsStringAsync();
+                    var content = await allClaimsResponse.Content.ReadAsStringAsync();
                     var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (apiResponse.TryGetProperty("data", out var dataProperty))
                     {
@@ -93,8 +107,8 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                // Fetch Support Tickets
-                var supportResponse = await _httpClient.GetAsync("api/queries/all");
+                // Process Support Tickets
+                var supportResponse = await supportTask;
                 if (supportResponse.IsSuccessStatusCode)
                 {
                     var content = await supportResponse.Content.ReadAsStringAsync();
@@ -107,8 +121,8 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
 
-                // Fetch Policy Types
-                var policyTypesResponse = await _httpClient.GetAsync("api/policy/types");
+                // Process Policy Types
+                var policyTypesResponse = await policyTypesTask;
                 if (policyTypesResponse.IsSuccessStatusCode)
                 {
                     var content = await policyTypesResponse.Content.ReadAsStringAsync();

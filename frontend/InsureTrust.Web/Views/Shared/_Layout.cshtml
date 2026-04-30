@@ -15,8 +15,11 @@
     <link rel="stylesheet" href="~/InsureTrust.Web.styles.css" asp-append-version="true" />
 </head>
 <body data-gateway-base="@gatewayBase">
-    <div class="institutional-wrapper @(User.IsInRole("Admin") ? "admin-mode" : "")">
-        @if (!User.IsInRole("Admin"))
+    @{
+        var isUserAdmin = User.IsInRole("Admin") || (ViewContext.RouteData.Values["controller"]?.ToString() == "Admin");
+    }
+    <div class="institutional-wrapper @(isUserAdmin ? "admin-mode" : "")">
+        @if (!isUserAdmin)
         {
             <aside class="sidebar-left">
             <div class="sidebar-brand py-4">
@@ -67,25 +70,25 @@
         }
 
         <div class="main-stage">
-            @if (User.IsInRole("Admin"))
+            @if (isUserAdmin)
             {
                 <nav class="admin-top-nav">
                     <div class="nav-left">
                         <div class="brand">
                             <i class="fa-solid fa-hexagon-nodes fs-5 text-warning"></i>
-                            <span class="ms-2 fw-black tracking-wider text-white">INSURE TRUST</span>
+                            <span class="ms-2 fw-black tracking-wider" style="color: #ffffff !important; font-size: 1.2rem;">INSURE TRUST</span>
                         </div>
                     </div>
                     <div class="nav-center">
-                        <a asp-controller="Admin" asp-action="Dashboard" class="nav-link-admin active">DASHBOARD</a>
+                        <a asp-controller="Admin" asp-action="Dashboard" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">DASHBOARD</a>
                         <a asp-controller="Policy" asp-action="CreatePolicy" class="nav-link-admin">+ NEW POLICY TYPE</a>
-                        <a asp-controller="Admin" asp-action="Support" class="nav-link-admin">SUPPORT</a>
+                        <a asp-controller="Admin" asp-action="Support" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Support" ? "active" : "")">SUPPORT</a>
                     </div>
                     <div class="nav-right">
                         @await Html.PartialAsync("_NotificationBell")
                         <div class="admin-user-info ms-4">
                             <div class="initials-circle bg-warning text-dark fw-bold">
-                                @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")@(User.Identity?.Name?.Split(' ').Length > 1 ? User.Identity?.Name?.Split(' ')[1].Substring(0, 1).ToUpper() : "D")
+                                @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")@(User.Identity?.Name?.Contains(" ") == true ? User.Identity?.Name?.Split(' ')[1].Substring(0, 1).ToUpper() : "D")
                             </div>
                             <span class="ms-2 fs-8 fw-bold text-white">@User.Identity?.Name</span>
                         </div>

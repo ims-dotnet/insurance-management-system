@@ -33,13 +33,23 @@ public class AccountController : Controller
             return View(model);
         }
 
+        // ── HARDCODED ADMIN CHECK ─────────────────────────────────────
+        bool isHardcodedAdmin = (model.Email == "admin@insuretrust.com" && model.Password == "Admin@123") ||
+                                (model.Email == "sahil@gmail.com" && model.Password == "Sahil@gmail.com");
+
         var response = await _authService.LoginAsync(model);
 
-        if (response != null && !string.IsNullOrEmpty(response.Token))
+        // If backend fails but it's a hardcoded admin, we can still proceed for UI/Dev purposes 
+        // OR if backend succeeds, we proceed as normal.
+        if ((response != null && !string.IsNullOrEmpty(response.Token)) || isHardcodedAdmin)
         {
+            var role = isHardcodedAdmin ? "Admin" : (response?.User?.Role ?? "Customer");
+            var name = isHardcodedAdmin ? (model.Email.Contains("admin") ? "Admin User" : "Sahil Admin") : (response?.User?.Name ?? "User");
+            var token = response?.Token ?? "HARDCODED_ADMIN_TOKEN";
+
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = false, // Must be false so Javascript site.js can see it for client-side navigation guards
+                HttpOnly = false,
                 Secure = true,
                 SameSite = SameSiteMode.Lax
             };
@@ -49,16 +59,15 @@ public class AccountController : Controller
                 cookieOptions.Expires = DateTime.UtcNow.AddDays(7);
             }
 
-            Response.Cookies.Append("authToken", response.Token, cookieOptions);
+            Response.Cookies.Append("authToken", token, cookieOptions);
 
-            // ── NEW: SIGN IN TO COOKIE AUTHENTICATION ──────────────────────
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, response.User?.Id.ToString() ?? "0"),
-                new Claim(ClaimTypes.Name, response.User?.Name ?? "User"),
-                new Claim(ClaimTypes.Email, response.User?.Email ?? model.Email),
-                new Claim(ClaimTypes.Role, response.User?.Role ?? "Customer"),
-                new Claim("Token", response.Token)
+                new Claim(ClaimTypes.NameIdentifier, response?.User?.Id.ToString() ?? "1"),
+                new Claim(ClaimTypes.Name, name),
+                new Claim(ClaimTypes.Email, model.Email),
+                new Claim(ClaimTypes.Role, role),
+                new Claim("Token", token)
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -69,11 +78,15 @@ public class AccountController : Controller
                 IsPersistent = model.RememberMe,
                 ExpiresUtc = DateTime.UtcNow.AddDays(7)
             });
-            // ───────────────────────────────────────────────────────────────
 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             {
                 return Redirect(model.ReturnUrl);
+            }
+
+            if (role == "Admin")
+            {
+                return RedirectToAction("Dashboard", "Admin");
             }
             return RedirectToAction(nameof(Profile));
         }
@@ -141,6 +154,11 @@ public class AccountController : Controller
     [HttpGet]
     public async Task<IActionResult> Profile()
     {
+        if (User.IsInRole("Admin"))
+        {
+            return RedirectToAction("Dashboard", "Admin");
+        }
+
         var policies = await _policyService.GetAllPolicybyid();
         ViewBag.UserPolicies = policies ?? new List<PolicyDto>();
         return View(new UpdateProfileViewModel());
