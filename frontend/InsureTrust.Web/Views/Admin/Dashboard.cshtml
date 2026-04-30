@@ -143,6 +143,55 @@
         </div>
     </div>
 
+    <!-- Claim Management Section -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="bg-white border-dark border-3 p-4 shadow-sm" style="border: 3px solid #000 !important; border-bottom-width: 6px !important; border-right-width: 6px !important;">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-dark border-2 pb-2">
+                    <h5 class="fw-bold text-dark text-uppercase mb-0">Claim Management</h5>
+                    <span class="text-muted fs-8 fw-bold">@Model.PendingClaims.Count pending claims</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered border-dark align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="fw-bold fs-8">CLAIM #</th>
+                                <th class="fw-bold fs-8">POLICY</th>
+                                <th class="fw-bold fs-8">USER</th>
+                                <th class="fw-bold fs-8 text-end">AMOUNT</th>
+                                <th class="fw-bold fs-8 text-center">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.PendingClaims.Any())
+                            {
+                                @foreach (var claim in Model.PendingClaims)
+                                {
+                                    <tr>
+                                        <td class="fw-bold fs-8">@claim.ClaimNumber</td>
+                                        <td class="fs-8">@claim.PolicyTypeName</td>
+                                        <td class="fs-8">User ID: @claim.Id</td> @* Mapping might need adjustment but showing ID for now *@
+                                        <td class="fw-bold fs-8 text-end">₹@claim.MaturityAmount.ToString("N0")</td>
+                                        <td class="text-center">
+                                            <a href="/Admin/Claims" class="btn btn-sm btn-dark rounded-0 px-3 fs-9 fw-bold">PROCESS</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted fw-bold">No pending claims to display.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Insurance Policy Types Section -->
     <div class="row g-4 mb-4">
         <div class="col-12">

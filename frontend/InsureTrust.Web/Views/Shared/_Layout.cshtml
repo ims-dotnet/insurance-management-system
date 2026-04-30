@@ -15,8 +15,10 @@
     <link rel="stylesheet" href="~/InsureTrust.Web.styles.css" asp-append-version="true" />
 </head>
 <body data-gateway-base="@gatewayBase">
-    <div class="institutional-wrapper">
-        <aside class="sidebar-left">
+    <div class="institutional-wrapper @(User.IsInRole("Admin") ? "admin-mode" : "")">
+        @if (!User.IsInRole("Admin"))
+        {
+            <aside class="sidebar-left">
             <div class="sidebar-brand py-4">
                 <div class="brand-name" style="font-size: 1.5rem;">InsureTrust</div>
                 <div class="brand-subtitle" style="font-size: 0.75rem; letter-spacing: 1px;">MANAGEMENT CONSOLE</div>
@@ -61,21 +63,51 @@
                 <a asp-controller="Support" asp-action="MyQueries" data-auth-required="true"><i class="fa-solid fa-headset me-2"></i> Support</a>
                 <a asp-controller="Account" asp-action="Logout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout</a>
             </div>
-        </aside>
+            </aside>
+        }
 
         <div class="main-stage">
-            <header class="main-header">
-                <div class="header-actions">
-                    @await Html.PartialAsync("_NotificationBell")
-                    <div class="header-user-profile">
-                        <img id="sidebarUserAvatar" class="header-avatar" src="~/images/avatars/avatar-1.svg" alt="User avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';" />
-                        <div class="user-details" style="@(User.Identity?.IsAuthenticated == true ? "display: block;" : "display: none;")">
-                            <p id="sidebarUserName">@(User.Identity?.Name ?? "Guest User")</p>
-                            <p id="sidebarUserEmail">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "guest@insuretrust")</p>
+            @if (User.IsInRole("Admin"))
+            {
+                <nav class="admin-top-nav">
+                    <div class="nav-left">
+                        <div class="brand">
+                            <i class="fa-solid fa-hexagon-nodes fs-5 text-warning"></i>
+                            <span class="ms-2 fw-black tracking-wider text-white">INSURE TRUST</span>
                         </div>
                     </div>
-                </div>
-            </header>
+                    <div class="nav-center">
+                        <a asp-controller="Admin" asp-action="Dashboard" class="nav-link-admin active">DASHBOARD</a>
+                        <a asp-controller="Policy" asp-action="CreatePolicy" class="nav-link-admin">+ NEW POLICY TYPE</a>
+                        <a asp-controller="Admin" asp-action="Support" class="nav-link-admin">SUPPORT</a>
+                    </div>
+                    <div class="nav-right">
+                        @await Html.PartialAsync("_NotificationBell")
+                        <div class="admin-user-info ms-4">
+                            <div class="initials-circle bg-warning text-dark fw-bold">
+                                @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")@(User.Identity?.Name?.Split(' ').Length > 1 ? User.Identity?.Name?.Split(' ')[1].Substring(0, 1).ToUpper() : "D")
+                            </div>
+                            <span class="ms-2 fs-8 fw-bold text-white">@User.Identity?.Name</span>
+                        </div>
+                        <a asp-controller="Account" asp-action="Logout" class="btn-signout ms-4">SIGN OUT</a>
+                    </div>
+                </nav>
+            }
+            else
+            {
+                <header class="main-header">
+                    <div class="header-actions">
+                        @await Html.PartialAsync("_NotificationBell")
+                        <div class="header-user-profile">
+                            <img id="sidebarUserAvatar" class="header-avatar" src="~/images/avatars/avatar-1.svg" alt="User avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';" />
+                            <div class="user-details" style="@(User.Identity?.IsAuthenticated == true ? "display: block;" : "display: none;")">
+                                <p id="sidebarUserName">@(User.Identity?.Name ?? "Guest User")</p>
+                                <p id="sidebarUserEmail">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "guest@insuretrust")</p>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            }
 
             <main role="main" class="main-content">
                 @RenderBody()
