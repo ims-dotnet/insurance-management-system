@@ -54,20 +54,11 @@ builder.Services.AddHttpClient<IClaimService, ClaimService>(client =>
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Events.OnRedirectToLogin = context =>
+        .AddCookie(options =>
         {
-            context.Response.StatusCode = 401;
-            return Task.CompletedTask;
-        };
-
-        options.Events.OnRedirectToAccessDenied = context =>
-        {
-            context.Response.StatusCode = 403;
-            return Task.CompletedTask;
-        };
-    });
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+        });
 
 builder.Services.AddAuthorization();
 

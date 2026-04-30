@@ -1,288 +1,176 @@
-﻿@model InsureTrust.Web.Models.CreateSupportQueryViewModel
+@model InsureTrust.Web.Models.CreateSupportQueryViewModel
 
 @{
     ViewData["Title"] = "Create Support Query";
 }
 
-<style>
-    .support-page {
-        max-width: 1100px;
-        margin: 40px auto;
-        padding: 0 16px;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .support-grid {
-        display: grid;
-        grid-template-columns: 1.15fr 0.85fr;
-        gap: 24px;
-    }
-
-    .support-card {
-        background: #fff;
-        border-radius: 22px;
-        padding: 28px;
-        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
-        border: 1px solid #e5e7eb;
-    }
-
-    .support-title {
-        margin-bottom: 24px;
-    }
-
-        .support-title h1 {
-            margin: 0 0 8px 0;
-            color: #111827;
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .support-title p {
-            margin: 0;
-            color: #6b7280;
-            font-size: 15px;
-        }
-
-    .badge-soft {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 999px;
-        background: #dbeafe;
-        color: #1d4ed8;
-        font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 18px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #374151;
-    }
-
-    .form-control {
-        width: 100%;
-        border: 1px solid #d1d5db;
-        border-radius: 14px;
-        padding: 12px 14px;
-        font-size: 15px;
-        transition: 0.2s ease;
-        box-sizing: border-box;
-    }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-        }
-
-    textarea.form-control {
-        min-height: 160px;
-        resize: vertical;
-    }
-
-    .btn-submit {
-        width: 100%;
-        border: none;
-        border-radius: 14px;
-        padding: 14px 18px;
-        font-size: 16px;
-        font-weight: 700;
-        color: white;
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        cursor: pointer;
-        transition: 0.2s ease;
-    }
-
-        .btn-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
-        }
-
-    .info-box {
-        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 18px;
-        margin-bottom: 16px;
-    }
-
-        .info-box h3 {
-            margin-top: 0;
-            font-size: 18px;
-            color: #111827;
-        }
-
-        .info-box ul {
-            margin: 0;
-            padding-left: 18px;
-            color: #4b5563;
-        }
-
-    .alert-success-custom {
-        background: #ecfdf5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
-        border-radius: 16px;
-        padding: 18px;
-        margin-bottom: 20px;
-    }
-
-    .alert-danger-custom {
-        background: #fef2f2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-        border-radius: 16px;
-        padding: 18px;
-        margin-bottom: 20px;
-    }
-
-    .ticket-box {
-        margin-top: 18px;
-        border-radius: 16px;
-        border: 1px solid #dbeafe;
-        background: #eff6ff;
-        padding: 18px;
-    }
-
-    .ticket-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 10px 0;
-        border-bottom: 1px solid rgba(0,0,0,0.06);
-    }
-
-        .ticket-row:last-child {
-            border-bottom: none;
-        }
-
-    .ticket-label {
-        font-weight: 700;
-        color: #1f2937;
-    }
-
-    @@media (max-width: 900px) {
-        .support-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<div class="support-page">
-    <div class="support-title">
-        <span class="badge-soft">Customer Support</span>
-        <h1>Create Support Query</h1>
-        <p>Raise a ticket for payment, renewal, claim, document, or account related issues.</p>
+<section class="fade-in-up">
+    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <span class="meta-line"><i class="fa-solid fa-headset me-1"></i> Help Center</span>
+            <h1 class="display-5 fw-bold text-white mb-0 mt-2">New Support Ticket</h1>
+            <p class="text-muted mt-2 fs-5">Raise an issue related to payments, policies, or your account.</p>
+        </div>
+        <div class="d-none d-md-flex align-items-center gap-3">
+            <a asp-controller="Support" asp-action="MyQueries" class="btn btn-outline-secondary rounded-pill px-4 text-white border-secondary border-opacity-25 hover-bg-dark">
+                <i class="fa-solid fa-clock-rotate-left me-2"></i>History
+            </a>
+        </div>
     </div>
 
-    <div class="support-grid">
-        <div class="support-card">
-            @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
-            {
-                <div class="alert-success-custom">
-                    <strong>@Model.SuccessMessage</strong>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="panel-card p-0 overflow-hidden border border-secondary border-opacity-25 rounded-4">
+                <div class="p-4 bg-dark bg-opacity-50 border-bottom border-secondary border-opacity-25">
+                    <h4 class="mb-0 text-white fw-bold"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i> Query Details</h4>
                 </div>
-            }
+                
+                <div class="p-4">
+                    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success bg-success bg-opacity-10 border border-success border-opacity-25 text-success rounded-3 p-3 mb-4 d-flex align-items-center">
+                            <i class="fa-solid fa-circle-check fs-5 me-2"></i> @Model.SuccessMessage
+                        </div>
+                    }
 
-            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-            {
-                <div class="alert-danger-custom">
-                    <strong>Error:</strong> @Model.ErrorMessage
+                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 p-3 mb-4 d-flex align-items-center">
+                            <i class="fa-solid fa-triangle-exclamation fs-5 me-2"></i> 
+                            <div>
+                                <strong>Error:</strong> @Model.ErrorMessage
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="CreateQuery" asp-controller="Support" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Subject" class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider">Subject Line</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                                    <i class="fa-solid fa-heading"></i>
+                                </span>
+                                <input asp-for="Subject" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" placeholder="E.g., Payment completed but policy not active" />
+                            </div>
+                            <span asp-validation-for="Subject" class="text-danger fs-7 mt-1 d-block"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Description" class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider">Detailed Description</label>
+                            <textarea asp-for="Description" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white rounded-3 p-3 shadow-none" rows="6" placeholder="Please describe your issue in detail to help us resolve it faster..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger fs-7 mt-1 d-block"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Attachment" class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider">Supporting Document (Optional)</label>
+                            <input asp-for="Attachment" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white rounded-3 shadow-none" type="file" />
+                            <div class="form-text text-muted fs-7 mt-2"><i class="fa-solid fa-circle-info me-1"></i> Accepted formats: PDF, JPG, PNG</div>
+                            <span asp-validation-for="Attachment" class="text-danger fs-7 mt-1 d-block"></span>
+                        </div>
+
+                        <div class="text-end mt-2">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-lg" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
+                                Submit Ticket <i class="fa-solid fa-paper-plane ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    @if (Model.CreatedTicket != null)
+                    {
+                        <div class="mt-5 p-4 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-4">
+                            <h4 class="text-success fw-bold mb-4 d-flex align-items-center">
+                                <i class="fa-solid fa-check-circle me-2"></i> Ticket Created Successfully
+                            </h4>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <p class="text-success text-opacity-75 text-uppercase tracking-wider fs-8 fw-bold mb-1">Ticket Number</p>
+                                    <p class="text-white fw-bold mb-0 font-monospace fs-5">#@Model.CreatedTicket.TicketNumber</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="text-success text-opacity-75 text-uppercase tracking-wider fs-8 fw-bold mb-1">Status</p>
+                                    <p class="text-white fw-medium mb-0">
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">@Model.CreatedTicket.Status</span>
+                                    </p>
+                                </div>
+                                <div class="col-12">
+                                    <p class="text-success text-opacity-75 text-uppercase tracking-wider fs-8 fw-bold mb-1">Subject</p>
+                                    <p class="text-white fw-medium mb-0">@Model.CreatedTicket.Subject</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
-            }
-
-            <form asp-action="CreateQuery" asp-controller="Support" method="post" enctype="multipart/form-data">
-                @Html.AntiForgeryToken()
-
-                <div class="form-group">
-                    <label asp-for="Subject" class="form-label"></label>
-                    <input asp-for="Subject" class="form-control" placeholder="Example: Payment not updated" />
-                    <span asp-validation-for="Subject" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Description" class="form-label"></label>
-                    <textarea asp-for="Description" class="form-control" placeholder="Describe your issue clearly so support can resolve it faster."></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Attachment" class="form-label"></label>
-                    <input asp-for="Attachment" class="form-control" type="file" />
-                    <span asp-validation-for="Attachment" class="text-danger"></span>
-                </div>
-
-                <button type="submit" class="btn-submit">Submit Support Ticket</button>
-            </form>
-
-            @if (Model.CreatedTicket != null)
-            {
-                <div class="ticket-box">
-                    <h4 style="margin-top:0;">Created Ticket Details</h4>
-
-                    <div class="ticket-row">
-                        <span class="ticket-label">Ticket Number</span>
-                        <span>@Model.CreatedTicket.TicketNumber</span>
-                    </div>
-
-                    <div class="ticket-row">
-                        <span class="ticket-label">Subject</span>
-                        <span>@Model.CreatedTicket.Subject</span>
-                    </div>
-
-                    <div class="ticket-row">
-                        <span class="ticket-label">Status</span>
-                        <span>@Model.CreatedTicket.Status</span>
-                    </div>
-
-                    <div class="ticket-row">
-                        <span class="ticket-label">Created At</span>
-                        <span>@Model.CreatedTicket.CreatedAt</span>
-                    </div>
-                </div>
-            }
+            </div>
         </div>
 
-        <div class="support-card">
-            <div class="info-box">
-                <h3>When to create a support query</h3>
-                <ul>
-                    <li>Payment completed but policy not updated</li>
-                    <li>Renewal issue or wrong calculation</li>
-                    <li>Claim upload or document issue</li>
-                    <li>Policy details mismatch</li>
-                    <li>General account or support request</li>
-                </ul>
-            </div>
+        <div class="col-lg-4">
+            <div class="d-flex flex-column gap-4">
+                <div class="panel-card border border-secondary border-opacity-25 rounded-4 p-4 bg-dark bg-opacity-25">
+                    <h4 class="text-white fw-bold mb-3 fs-5"><i class="fa-solid fa-lightbulb text-warning me-2"></i> Common Issues</h4>
+                    <ul class="list-unstyled mb-0 d-flex flex-column gap-3 text-muted">
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-check text-primary mt-1"></i>
+                            <span>Payment completed but policy not updated</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-check text-primary mt-1"></i>
+                            <span>Renewal issue or wrong calculation</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-check text-primary mt-1"></i>
+                            <span>Claim upload or document issue</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-check text-primary mt-1"></i>
+                            <span>Policy details mismatch</span>
+                        </li>
+                    </ul>
+                </div>
 
-            <div class="info-box">
-                <h3>Attachment guidance</h3>
-                <ul>
-                    <li>Upload payment screenshot or error screenshot if available</li>
-                    <li>Prefer PDF, JPG, JPEG, or PNG</li>
-                    
-                </ul>
-            </div>
-
-
-            <div class="info-box">
-                <h3>Quick access</h3>
-                <a asp-controller="Support" asp-action="MyQueries" class="btn btn-outline-primary w-100">
+                <div class="panel-card border border-secondary border-opacity-25 rounded-4 p-4 bg-dark bg-opacity-25">
+                    <h4 class="text-white fw-bold mb-3 fs-5"><i class="fa-solid fa-paperclip text-info me-2"></i> Attachments</h4>
+                    <p class="text-muted fs-7 mb-0">
+                        Including a screenshot of an error message or a receipt of your payment significantly speeds up the resolution process. Please ensure sensitive data is blurred.
+                    </p>
+                </div>
+                
+                <a asp-controller="Support" asp-action="MyQueries" class="btn btn-outline-primary w-100 py-3 rounded-pill fw-bold border-secondary border-opacity-25 hover-bg-dark text-white d-md-none">
                     View My Support Queries
                 </a>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .fs-8 { font-size: 0.75rem; }
+        .tracking-wider { letter-spacing: 1px; }
+        
+        .form-control:focus {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border-color: var(--primary) !important;
+        }
+        
+        .hover-bg-dark:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+    </style>
 }

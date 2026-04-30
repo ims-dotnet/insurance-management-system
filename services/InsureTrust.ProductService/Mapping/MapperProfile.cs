@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using InsureTrust.ProductService.DTOs;
 using InsureTrust.ProductService.Models;
 using System.Text.Json;
@@ -40,7 +40,9 @@ namespace InsureTrust.ProductService.Mapping
                     opt => opt.MapFrom(src => src.PolicyType.Category))
                 .ForMember(dest => dest.DaysLeft,
                     opt => opt.MapFrom(src =>
-                        (src.ExpiryDate - DateTime.UtcNow).Days));
+                        (src.ExpiryDate - DateTime.UtcNow).Days))
+                .ForMember(dest => dest.UserId,
+                    opt => opt.MapFrom(src => src.UserId));
 
             CreateMap<ApprovePolicyDto, UserPolicy>()
                 .ForMember(dest => dest.Status,

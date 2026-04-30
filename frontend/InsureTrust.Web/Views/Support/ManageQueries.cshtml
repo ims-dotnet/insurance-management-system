@@ -4,311 +4,174 @@
     ViewData["Title"] = "Manage Support Queries";
 }
 
-<style>
-    .admin-queries-page {
-        max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 20px;
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    .admin-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-    }
-
-    .admin-header h1 {
-        font-size: 32px;
-        font-weight: 800;
-        color: #111827;
-        margin: 0;
-    }
-
-    .stats-container {
-        display: flex;
-        gap: 16px;
-    }
-
-    .stat-badge {
-        padding: 8px 16px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 14px;
-        background: #f3f4f6;
-        color: #374151;
-    }
-
-    .query-card {
-        background: #ffffff;
-        border-radius: 24px;
-        padding: 28px;
-        margin-bottom: 24px;
-        border: 1px solid #f1f5f9;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .query-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    .query-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 20px;
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
-    }
-
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        background: #eff6ff;
-        color: #1d4ed8;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 16px;
-    }
-
-    .ticket-badge {
-        font-family: monospace;
-        background: #f8fafc;
-        color: #64748b;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        border: 1px solid #e2e8f0;
-    }
-
-    .subject {
-        font-size: 20px;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 8px 0;
-    }
-
-    .description {
-        color: #475569;
-        line-height: 1.6;
-        margin-bottom: 24px;
-        background: #f8fafc;
-        padding: 16px;
-        border-radius: 12px;
-        border-left: 4px solid #e2e8f0;
-    }
-
-    .admin-form {
-        background: #fcfcfd;
-        border-radius: 16px;
-        padding: 20px;
-        border: 1px solid #f1f5f9;
-    }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: 200px 1fr auto;
-        gap: 16px;
-        align-items: flex-end;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .form-group label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #64748b;
-    }
-
-    .form-select, .form-textarea {
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
-        background: #ffffff;
-        font-size: 14px;
-        transition: border-color 0.2s;
-    }
-
-    .form-select:focus, .form-textarea:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .form-textarea {
-        resize: vertical;
-        min-height: 44px;
-    }
-
-    .btn-update {
-        background: #1e293b;
-        color: #ffffff;
-        padding: 10px 24px;
-        border-radius: 10px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: background 0.2s;
-        height: 44px;
-    }
-
-    .btn-update:hover {
-        background: #0f172a;
-    }
-
-    .status-pill {
-        padding: 6px 12px;
-        border-radius: 9999px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .status-pending { background: #fef3c7; color: #92400e; }
-    .status-inprogress { background: #dbeafe; color: #1e40af; }
-    .status-resolved { background: #dcfce7; color: #166534; }
-
-    .attachment-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: #2563eb;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        margin-top: 12px;
-    }
-
-    .attachment-link:hover {
-        text-decoration: underline;
-    }
-
-    .alert {
-        padding: 16px 20px;
-        border-radius: 12px;
-        margin-bottom: 24px;
-        font-weight: 500;
-    }
-
-    .alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
-    .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
-
-    @@media (max-width: 900px) {
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-        .btn-update {
-            width: 100%;
-        }
-    }
-</style>
-
-<div class="admin-queries-page">
-    <div class="admin-header">
+<section class="fade-in-up">
+    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h1>Master Support Center</h1>
-            <p style="color: #64748b; margin-top: 4px;">Review and respond to all customer support queries.</p>
+            <span class="meta-line"><i class="fa-solid fa-user-shield me-1"></i> Admin Central</span>
+            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Support Desk</h1>
+            <p class="text-muted mt-2 fs-5">Review and manage all customer support inquiries.</p>
         </div>
-        <div class="stats-container">
-            <div class="stat-badge">Total: @(Model.Queries?.Count ?? 0)</div>
-            <div class="stat-badge" style="background: #fef3c7; color: #92400e;">Pending: @(Model.Queries?.Count(q => q.Status == "Pending") ?? 0)</div>
+        <div class="d-flex gap-3">
+            <div class="p-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 rounded-4 text-center">
+                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Total</p>
+                <h3 class="text-white fw-bold mb-0">@(Model.Queries?.Count ?? 0)</h3>
+            </div>
+            <div class="p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-4 text-center">
+                <p class="text-warning text-opacity-75 text-uppercase tracking-wider fs-8 fw-bold mb-1">Pending</p>
+                <h3 class="text-warning fw-bold mb-0">@(Model.Queries?.Count(q => q.Status == "Pending") ?? 0)</h3>
+            </div>
         </div>
     </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="alert alert-success bg-success bg-opacity-10 border border-success border-opacity-25 text-success rounded-3 p-3 mb-4 d-flex align-items-center">
+            <i class="fa-solid fa-circle-check fs-5 me-2"></i> @TempData["Success"]
+        </div>
     }
 
     @if (TempData["Error"] != null || !string.IsNullOrWhiteSpace(Model.ErrorMessage))
     {
-        <div class="alert alert-error">@(TempData["Error"] ?? Model.ErrorMessage)</div>
+        <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 p-3 mb-4 d-flex align-items-center">
+            <i class="fa-solid fa-triangle-exclamation fs-5 me-2"></i> @(TempData["Error"] ?? Model.ErrorMessage)
+        </div>
     }
 
     @if (Model.Queries == null || !Model.Queries.Any())
     {
-        <div style="text-align: center; padding: 60px; background: #f8fafc; border-radius: 24px; border: 2px dashed #e2e8f0;">
-            <p style="color: #64748b; font-size: 18px; font-weight: 500;">No support queries found in the system.</p>
+        <div class="text-center p-5 border border-secondary border-opacity-25 rounded-4 bg-dark bg-opacity-25 mt-4">
+            <i class="fa-solid fa-clipboard-check fa-4x text-success mb-3 opacity-50"></i>
+            <h3 class="text-white">All Caught Up!</h3>
+            <p class="text-muted">There are no support queries in the system.</p>
         </div>
     }
     else
     {
-        @foreach (var item in Model.Queries.OrderByDescending(q => q.CreatedAt))
-        {
-            var statusClass = item.Status?.ToLower() switch
+        <div class="row g-4">
+            @foreach (var item in Model.Queries.OrderByDescending(q => q.CreatedAt))
             {
-                "pending" => "status-pending",
-                "inprogress" => "status-inprogress",
-                "resolved" => "status-resolved",
-                _ => ""
-            };
-
-            <div class="query-card">
-                <div class="query-header">
-                    <div>
-                        <div class="user-info">
-                            <div class="user-avatar">U</div>
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b;">User ID: @item.UserId</div>
-                                <div style="font-size: 12px; color: #64748b;">Submitted on @item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
-                            </div>
-                        </div>
-                        <div class="ticket-badge">#@item.TicketNumber</div>
-                    </div>
-                    <span class="status-pill @statusClass">@item.Status</span>
-                </div>
-
-                <div class="subject">@item.Subject</div>
-                <div class="description">@item.Description</div>
- 
-                @if (!string.IsNullOrWhiteSpace(item.AttachmentUrl))
+                var statusClass = item.Status?.ToLower() switch
                 {
-                    <a href="http://localhost:5135@(item.AttachmentUrl)" target="_blank" class="attachment-link">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        View Attachment
-                    </a>
-                }
+                    "pending" => "bg-warning-subtle text-warning border-warning-subtle",
+                    "inprogress" => "bg-info-subtle text-info border-info-subtle",
+                    "resolved" => "bg-success-subtle text-success border-success-subtle",
+                    _ => "bg-secondary-subtle text-secondary border-secondary-subtle"
+                };
+                
+                var statusIcon = item.Status?.ToLower() switch
+                {
+                    "pending" => "fa-clock",
+                    "inprogress" => "fa-spinner fa-spin",
+                    "resolved" => "fa-check-circle",
+                    _ => "fa-circle-dot"
+                };
 
-                <div style="margin-top: 24px;">
-                    <form asp-action="UpdateStatus" method="post" class="admin-form">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="Id" value="@item.Id" />
-                        
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Update Status</label>
-                                <select name="Status" class="form-select">
-                                    <option value="Pending" selected="@(item.Status == "Pending")">Pending</option>
-                                    <option value="InProgress" selected="@(item.Status == "InProgress")">In Progress</option>
-                                    <option value="Resolved" selected="@(item.Status == "Resolved")">Resolved</option>
-                                </select>
+                <div class="col-12">
+                    <div class="panel-card p-0 border border-secondary border-opacity-25 rounded-4 overflow-hidden group">
+                        <div class="p-4 bg-dark bg-opacity-50 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-start">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-primary bg-opacity-25 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="fa-solid fa-user fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h5 class="text-white fw-bold mb-0">User ID: @item.UserId</h5>
+                                        <span class="badge bg-dark border border-secondary border-opacity-25 text-muted font-monospace fs-8 px-2 py-1">
+                                            <i class="fa-solid fa-hashtag me-1 text-primary"></i>@item.TicketNumber
+                                        </span>
+                                    </div>
+                                    <p class="text-muted fs-7 mb-0"><i class="fa-regular fa-clock me-1"></i> @item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</p>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Admin Response / Suggestions</label>
-                                <textarea name="AdminResponse" class="form-textarea" placeholder="Provide suggestion or feedback...">@item.AdminResponse</textarea>
-                            </div>
-                            <button type="submit" class="btn-update">Update Ticket</button>
+                            <span class="badge @statusClass border rounded-pill px-3 py-2 text-uppercase tracking-wider fs-7">
+                                <i class="fa-solid @statusIcon me-1"></i> @item.Status
+                            </span>
                         </div>
-                    </form>
+
+                        <div class="p-4">
+                            <h4 class="text-white fw-bold mb-3 fs-5">@item.Subject</h4>
+                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 border-start border-start-4 border-primary mb-4">
+                                <p class="text-muted mb-0 fs-6">@item.Description</p>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(item.AttachmentUrl))
+                            {
+                                <div class="mb-4">
+                                    <a href="@(item.AttachmentUrl)" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3 py-2">
+                                        <i class="fa-solid fa-paperclip me-2"></i>View Attachment
+                                    </a>
+                                </div>
+                            }
+
+                            <div class="bg-dark bg-opacity-50 rounded-4 p-4 border border-secondary border-opacity-25">
+                                <h5 class="text-white fs-6 fw-bold mb-3"><i class="fa-solid fa-reply text-primary me-2"></i>Admin Response</h5>
+                                <form asp-action="UpdateStatus" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@item.Id" />
+                                    
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-3 form-group mb-0">
+                                            <label class="form-label text-muted fw-bold text-uppercase fs-8 tracking-wider mb-2">Update Status</label>
+                                            <select name="Status" class="form-select bg-dark border-secondary border-opacity-50 text-white shadow-none">
+                                                <option value="Pending" selected="@(item.Status == "Pending")">Pending</option>
+                                                <option value="InProgress" selected="@(item.Status == "InProgress")">In Progress</option>
+                                                <option value="Resolved" selected="@(item.Status == "Resolved")">Resolved</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-7 form-group mb-0">
+                                            <label class="form-label text-muted fw-bold text-uppercase fs-8 tracking-wider mb-2">Message</label>
+                                            <textarea name="AdminResponse" class="form-control bg-dark border-secondary border-opacity-50 text-white shadow-none" rows="1" placeholder="Provide suggestion or feedback...">@item.AdminResponse</textarea>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-primary w-100 fw-bold rounded-3 shadow-lg" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
+                                                Update
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     }
-</div>
+</section>
+
+@section Scripts {
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .fs-8 { font-size: 0.75rem; }
+        .tracking-wider { letter-spacing: 1px; }
+        
+        .border-start-4 {
+            border-left-width: 4px !important;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border-color: var(--primary) !important;
+            box-shadow: none !important;
+        }
+        
+        .group {
+            transition: all 0.3s ease;
+        }
+        .group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-color: rgba(59, 130, 246, 0.3) !important;
+        }
+    </style>
+}

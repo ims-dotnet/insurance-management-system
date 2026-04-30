@@ -1,3 +1,4 @@
+using InsureTrust.ProductService.Common;
 using InsureTrust.ProductService.DTOs;
 using InsureTrust.ProductService.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +43,7 @@ namespace InsureTrust.ProductService.Controllers
 
             _logger.LogInformation("Fetched {Count} policy types", result.Count());
 
-            return Ok(result);
+            return Ok(ApiResponse<IEnumerable<PolicyTypeDto>>.Ok(result));
         }
 
         [AllowAnonymous]
@@ -59,10 +60,10 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.GetPolicyTypeByIdAsync(id);
 
-            return Ok(result);
+            return Ok(ApiResponse<PolicyTypeDto>.Ok(result));
         }
 
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("types")]
         public async Task<IActionResult> CreatePolicyType([FromBody] CreatePolicyTypeDto dto)
         {
@@ -73,7 +74,7 @@ namespace InsureTrust.ProductService.Controllers
 
             _logger.LogInformation("Policy type created with ID {Id}", result.Id);
 
-            return CreatedAtAction(nameof(GetPolicyTypeById), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetPolicyTypeById), new { id = result.Id }, ApiResponse<PolicyTypeDto>.Ok(result));
         }
 
         [Authorize(Roles = "Admin")]
@@ -93,7 +94,7 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.UpdatePolicyTypeAsync(id, dto);
 
-            return Ok(result);
+            return Ok(ApiResponse<PolicyTypeDto>.Ok(result));
         }
 
         [Authorize(Roles = "Admin")]
@@ -126,7 +127,7 @@ namespace InsureTrust.ProductService.Controllers
 
             if (policy == null) return NotFound(new { success = false, message = "Policy not found" });
 
-            return Ok(policy);
+            return Ok(ApiResponse<PolicyDto>.Ok(policy));
         }
 
         [Authorize(Roles = "Customer")]
@@ -139,7 +140,7 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.GetMyPoliciesAsync(userId);
 
-            return Ok(result);
+            return Ok(ApiResponse<IEnumerable<PolicyDto>>.Ok(result));
         }
 
         [Authorize(Roles = "Admin")]
@@ -150,7 +151,7 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.GetAllPoliciesAsync();
 
-            return Ok(result);
+            return Ok(ApiResponse<IEnumerable<PolicyDto>>.Ok(result));
         }
 
         [Authorize(Roles = "Admin")]
@@ -161,10 +162,10 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.GetPendingPoliciesAsync();
 
-            return Ok(result);
+            return Ok(ApiResponse<IEnumerable<PolicyDto>>.Ok(result));
         }
 
-        //[Authorize(Roles = "Customer")]
+        [Authorize]
         [HttpPost("purchase")]
         public async Task<IActionResult> PurchasePolicy([FromBody] CreatePolicyDto dto)
         {
@@ -180,7 +181,7 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.PurchaseAsync(dto, userId);
 
-            return Ok(result);
+            return Ok(ApiResponse<PolicyDto>.Ok(result));
         }
 
         [Authorize(Roles = "Admin")]
@@ -196,7 +197,7 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.ApprovePolicyAsync(policyId, dto, adminId);
 
-            return Ok(result);
+            return Ok(ApiResponse<PolicyDto>.Ok(result));
         }
 
         [Authorize(Roles = "Customer")]
@@ -211,7 +212,7 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.EditPolicyAsync(policyId, dto, userId);
 
-            return Ok(result);
+            return Ok(ApiResponse<PolicyDto>.Ok(result));
         }
 
         [Authorize(Roles = "Admin")]
@@ -243,7 +244,7 @@ namespace InsureTrust.ProductService.Controllers
 
             var result = await _service.RenewPolicyAsync(policyId, userId);
 
-            return Ok(result);
+            return Ok(ApiResponse<PolicyDto>.Ok(result));
         }
     }
 }

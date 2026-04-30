@@ -1,249 +1,118 @@
 @model IEnumerable<InsureTrust.Web.Models.PolicyTypeDto>
 
 @{
-    ViewData["Title"] = "Bureau Registry · Classifications";
+    ViewData["Title"] = "Policy Desk";
 }
 
-<style>
-    /* ── REGISTRY INDEX — Bureau of Risk ── */
-    .registry-header { margin-bottom: 40px; }
-    .registry-eyebrow {
-        font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
-        text-transform: uppercase; color: var(--text3); margin-bottom: 8px;
-    }
-    .registry-heading {
-        font-family: var(--font-h); font-size: 36px; font-weight: 900;
-        color: var(--text); line-height: 1.1; margin-bottom: 12px;
-    }
-    .registry-sub { font-size: 13px; color: var(--text2); max-width: 600px; line-height: 1.6; }
-
-    /* ── REGISTRY GRID ── */
-    .registry-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 32px;
-        margin-top: 48px;
-    }
-
-    .registry-item {
-        background: #fff;
-        border: 1px solid var(--border);
-        display: flex;
-        flex-direction: column;
-        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-        position: relative;
-    }
-
-    .registry-item:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-        border-color: var(--border-dark);
-    }
-
-    .registry-item-top {
-        padding: 32px 32px 24px;
-        flex-grow: 1;
-    }
-
-    .registry-item-icon {
-        width: 56px;
-        height: 56px;
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        margin-bottom: 24px;
-    }
-
-    .registry-item-category {
-        font-size: 9px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 8px;
-    }
-
-    .registry-item-name {
-        font-family: var(--font-h);
-        font-size: 24px;
-        font-weight: 900;
-        color: var(--text);
-        margin-bottom: 12px;
-        line-height: 1.2;
-    }
-
-    .registry-item-desc {
-        font-family: var(--font-doc);
-        font-size: 14px;
-        color: var(--text2);
-        line-height: 1.6;
-        margin-bottom: 24px;
-    }
-
-    .registry-item-meta {
-        padding: 16px 32px;
-        background: var(--bg);
-        border-top: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .registry-price {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text);
-    }
-
-    .registry-price span {
-        font-size: 10px;
-        font-weight: 400;
-        color: var(--text3);
-        margin-left: 4px;
-    }
-
-    .registry-action-btn {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--text);
-        text-decoration: none;
-        border-bottom: 2px solid var(--text);
-        padding-bottom: 2px;
-        transition: all 0.2s;
-    }
-
-    .registry-action-btn:hover {
-        color: var(--accent);
-        border-bottom-color: var(--accent);
-    }
-
-    .registry-admin-tools {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        display: flex;
-        gap: 8px;
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
-
-    .registry-item:hover .registry-admin-tools {
-        opacity: 1;
-    }
-
-    .tool-btn {
-        width: 28px;
-        height: 28px;
-        background: #fff;
-        border: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        color: var(--text2);
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-
-    .tool-btn:hover {
-        background: var(--bg2);
-        color: var(--text);
-    }
-
-    .tool-btn-danger:hover {
-        background: var(--accent);
-        color: #fff;
-        border-color: var(--accent);
-    }
-
-    .empty-registry {
-        text-align: center;
-        padding: 100px 0;
-        border: 1px dashed var(--border-dark);
-        margin-top: 48px;
-    }
-
-    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-    .empty-msg { font-family: var(--font-h); font-size: 24px; color: var(--text2); }
-
-    .new-classification-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: var(--text);
-        color: var(--bg);
-        padding: 12px 24px;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        text-decoration: none;
-        margin-top: 24px;
-        transition: background 0.2s;
-    }
-
-    .new-classification-btn:hover {
-        background: var(--accent);
-        color: #fff;
-    }
-</style>
-
-<div class="registry-header">
-    <div class="registry-eyebrow">Division IV · Personnel Risk Management</div>
-    <h1 class="registry-heading">Insurance Classifications</h1>
-    <p class="registry-sub">Official directory of approved insurance products and coverage parameters. Select a classification to begin filing a new policy record.</p>
-    
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="CreatePolicy" class="new-classification-btn">
-            <span>+ New Classification</span>
-        </a>
-    }
-</div>
-
-@if (!Model.Any())
-{
-    <div class="empty-registry">
-        <div class="empty-icon">📋</div>
-        <div class="empty-msg">Registry Archive Empty</div>
-        <p style="color:var(--text3); margin-top:8px;">No active classifications found in the master index.</p>
-    </div>
-}
-else
-{
-    <div class="registry-grid">
-        @foreach (var item in Model)
+<section class="fade-in-up">
+    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <span class="meta-line"><i class="fa-solid fa-shield-halved me-1"></i> Coverage Options</span>
+            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Insurance Policies</h1>
+            <p class="text-muted mt-2 fs-5">Select a coverage plan that fits your needs.</p>
+        </div>
+        @if (User.IsInRole("Admin"))
         {
-            <div class="registry-item">
-                @if (User.IsInRole("Admin"))
-                {
-                    <div class="registry-admin-tools">
-                        <a asp-action="update" asp-route-id="@item.Id" class="tool-btn" title="Edit Classification">✎</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="tool-btn tool-btn-danger" title="Revoke Classification">✕</a>
-                    </div>
-                }
-
-                <div class="registry-item-top">
-                    <div class="registry-item-icon">
-                        @(string.IsNullOrEmpty(item.Icon) ? "📜" : item.Icon)
-                    </div>
-                    <div class="registry-item-category">@item.Category Division</div>
-                    <h2 class="registry-item-name">@item.Name</h2>
-                    <p class="registry-item-desc">@item.Description</p>
-                </div>
-
-                <div class="registry-item-meta">
-                    <div class="registry-price">
-                        From ₹3,000<span>/month</span>
-                    </div>
-                    <a asp-action="Purchase" asp-route-id="@item.Id" class="registry-action-btn">Buy Policy →</a>
-                </div>
+            <div class="d-none d-md-flex align-items-center gap-3">
+                <a asp-action="CreatePolicy" class="btn-inst btn-inst-primary shadow-lg">
+                    <i class="fa-solid fa-plus me-2"></i>New Classification
+                </a>
             </div>
         }
     </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center p-5 border border-secondary border-opacity-25 rounded-4 bg-dark bg-opacity-25 mt-4">
+            <i class="fa-solid fa-folder-open fa-4x text-muted mb-3 opacity-50"></i>
+            <h3 class="text-white">No Policies Available</h3>
+            <p class="text-muted">There are currently no active insurance policies in the system.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="panel-card h-100 d-flex flex-column p-0 border border-secondary border-opacity-25 rounded-4 overflow-hidden position-relative group">
+                        
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="position-absolute top-0 end-0 p-3 z-3 d-flex gap-2">
+                                <a asp-action="update" asp-route-id="@item.Id" class="btn btn-sm btn-dark border-secondary border-opacity-50 text-white rounded-circle" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center;" title="Edit">
+                                    <i class="fa-solid fa-pen fs-7"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger rounded-circle" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center;" title="Delete">
+                                    <i class="fa-solid fa-trash fs-7"></i>
+                                </a>
+                            </div>
+                        }
+
+                        <div class="p-4 flex-grow-1">
+                            <div class="mb-4 text-primary fs-1">
+                                @if (string.IsNullOrEmpty(item.Icon))
+                                {
+                                    <i class="fa-solid fa-file-shield"></i>
+                                }
+                                else
+                                {
+                                    <span>@item.Icon</span>
+                                }
+                            </div>
+                            
+                            <div class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill mb-3 fs-7 px-3 py-1 text-uppercase tracking-wider">
+                                @item.Category Division
+                            </div>
+                            
+                            <h3 class="text-white fw-bold mb-3">@item.Name</h3>
+                            <p class="text-muted fs-7 mb-0 line-clamp-3">@item.Description</p>
+                        </div>
+
+                        <div class="p-4 bg-dark bg-opacity-50 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-white fw-bold fs-5">From ₹3,000</span>
+                                <span class="text-muted fs-7">/month</span>
+                            </div>
+                            <a asp-action="Purchase" asp-route-id="@item.Id" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
+                                Buy Policy <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+@section Scripts {
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .tracking-wider { letter-spacing: 1px; }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        .group:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            border-color: rgba(59, 130, 246, 0.4) !important;
+        }
+        .group {
+            transition: all 0.3s ease;
+        }
+    </style>
 }

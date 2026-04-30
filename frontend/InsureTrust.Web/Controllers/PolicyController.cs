@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace InsureTrust.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class PolicyController : Controller
     {
         private readonly IPolicyService _service;

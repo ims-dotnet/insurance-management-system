@@ -9,143 +9,202 @@
     var totalClaims = Model.Stats.TotalPendingClaims;
 }
 
-<section class="admin-dashboard-reference">
-    <div class="admin-dashboard-headline">
+<section class="admin-dashboard-reference fade-in-up">
+    <div class="page-heading d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1>Admin Dashboard</h1>
-            <p>Insure Trust management console</p>
+            <span class="meta-line fs-8 py-1 px-2"><i class="fa-solid fa-user-shield me-1"></i> ADMIN CONSOLE</span>
+            <h1 class="fw-bold text-white mb-0 mt-2" style="font-size: 1.75rem; letter-spacing: 1px;">ADMIN DASHBOARD</h1>
+            <p class="text-muted mt-1 fs-7">Insure Trust management console</p>
         </div>
-        <button type="button" class="btn-inst admin-dashboard-create" onclick="return false;">+ Add New Policy</button>
+        <div class="d-none d-md-flex align-items-center gap-3">
+            <a asp-controller="Policy" asp-action="CreatePolicy" class="btn btn-warning fw-bold text-dark rounded-0 px-4 py-2 border-dark border-3 shadow-sm" style="background: #fbbf24; border: 3px solid #000 !important;">
+                + CREATE NEW POLICY TYPE
+            </a>
+        </div>
     </div>
 
-    <div class="admin-dashboard-kpi-grid">
-        <article class="admin-dashboard-kpi">
-            <p>Total Customers</p>
-            <h2>@totalCustomers.ToString("N0")</h2>
-            <span>registered users</span>
-        </article>
-        <article class="admin-dashboard-kpi">
-            <p>Total Policies</p>
-            <h2>@totalPolicies.ToString("N0")</h2>
-            <span>all statuses</span>
-        </article>
-        <article class="admin-dashboard-kpi">
-            <p>Pending Approvals</p>
-            <h2>@pendingApprovals.ToString("N0")</h2>
-            <span>awaiting action</span>
-        </article>
-        <article class="admin-dashboard-kpi">
-            <p>Open Support Tickets</p>
-            <h2>@openTickets.ToString("N0")</h2>
-            <span>support queries</span>
-        </article>
+    <!-- Top KPIs - Neo-Brutalism Style -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="bg-white border-dark border-3 p-3 shadow-sm h-100" style="border: 3px solid #000 !important; border-bottom-width: 8px !important; border-right-width: 8px !important; background: #dbeafe !important;">
+                <p class="text-uppercase tracking-wider text-muted mb-1 fw-bold fs-8">Total Customers</p>
+                <h2 class="fw-black text-dark mb-0" style="font-size: 2.5rem;">@totalCustomers</h2>
+                <div class="mt-1 text-muted fs-8">registered users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="bg-white border-dark border-3 p-3 shadow-sm h-100" style="border: 3px solid #000 !important; border-bottom-width: 8px !important; border-right-width: 8px !important; background: #fef9c3 !important;">
+                <p class="text-uppercase tracking-wider text-muted mb-1 fw-bold fs-8">Total Policies</p>
+                <h2 class="fw-black text-dark mb-0" style="font-size: 2.5rem;">@totalPolicies</h2>
+                <div class="mt-1 text-muted fs-8">all statuses</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="bg-white border-dark border-3 p-3 shadow-sm h-100" style="border: 3px solid #000 !important; border-bottom-width: 8px !important; border-right-width: 8px !important; background: #dcfce7 !important;">
+                <p class="text-uppercase tracking-wider text-muted mb-1 fw-bold fs-8">Pending Approvals</p>
+                <h2 class="fw-black text-dark mb-0" style="font-size: 2.5rem;">@pendingApprovals</h2>
+                <div class="mt-1 text-muted fs-8">awaiting action</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="bg-white border-dark border-3 p-3 shadow-sm h-100" style="border: 3px solid #000 !important; border-bottom-width: 8px !important; border-right-width: 8px !important; background: #fee2e2 !important;">
+                <p class="text-uppercase tracking-wider text-muted mb-1 fw-bold fs-8">Open Tickets</p>
+                <h2 class="fw-black text-dark mb-0" style="font-size: 2.5rem;">@openTickets</h2>
+                <div class="mt-1 text-muted fs-8">support queries</div>
+            </div>
+        </div>
     </div>
 
-    <div class="admin-dashboard-row">
-        <section class="admin-dashboard-box">
-            <div class="admin-dashboard-box-head">
-                <h3>Pending Policy Approvals</h3>
-            </div>
-            <div class="admin-dashboard-box-body">
-                @if (pendingApprovals > 0)
-                {
-                    <p>@pendingApprovals pending approvals awaiting review.</p>
-                    <a href="/Admin/Policies" class="btn-inst">Review Policies</a>
-                }
-                else
-                {
-                    <p><i class="fas fa-check-circle" aria-hidden="true"></i> No pending approvals</p>
-                }
-            </div>
-        </section>
-
-        <section class="admin-dashboard-box">
-            <div class="admin-dashboard-box-head admin-dashboard-box-head-ticket">
-                <h3>Support Tickets</h3>
-                <span class="admin-dashboard-pill">@openTickets Open</span>
-            </div>
-            <div class="admin-dashboard-box-body">
-                @if (openTickets > 0)
-                {
-                    <p>@openTickets open support tickets need attention.</p>
-                    <a href="/Admin/Support" class="btn-inst">Open Support Desk</a>
-                }
-                else
-                {
-                    <p>No tickets</p>
-                }
-            </div>
-        </section>
-    </div>
-
-    <section class="admin-dashboard-box admin-dashboard-box-claims">
-        <div class="admin-dashboard-box-head admin-dashboard-box-head-claims">
-            <h3>Claims Management</h3>
-            <span>@totalClaims total claims</span>
-        </div>
-        <div class="admin-dashboard-box-body">
-            @if (totalClaims > 0)
-            {
-                <p>@totalClaims claims waiting for admin action.</p>
-                <a href="/Admin/Claims" class="btn-inst">Review Claims</a>
-            }
-            else
-            {
-                <p>No claims submitted yet</p>
-            }
-        </div>
-    </section>
-
-
-
-    <section class="admin-dashboard-box admin-dashboard-box-customers">
-        <div class="admin-dashboard-box-head admin-dashboard-box-head-claims">
-            <h3>Registered Customers</h3>
-            <span>@Model.Users.Count customers</span>
-        </div>
-        <div class="admin-dashboard-customers-wrap">
-            <table class="table-ledger admin-dashboard-customers-table">
-                <thead>
-                    <tr>
-                        <th>User #</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>KYC</th>
-                        <th>Joined</th>
-                        <th>Balance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Users.Any())
+    <div class="row g-4 mb-4">
+        <!-- Pending Policy Approvals -->
+        <div class="col-lg-7">
+            <div class="bg-white border-dark border-3 p-4 shadow-sm h-100" style="border: 3px solid #000 !important; border-bottom-width: 6px !important; border-right-width: 6px !important;">
+                <h5 class="fw-bold text-dark text-uppercase mb-4 border-bottom border-dark border-2 pb-2">Pending Policy Approvals</h5>
+                
+                <div class="d-flex flex-column gap-3">
+                    @if (Model.PendingPolicies.Any())
                     {
-                        @foreach (var user in Model.Users.Take(10))
+                        @foreach (var p in Model.PendingPolicies)
                         {
-                            var roleClass = string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase)
-                                ? "admin-customer-role admin-customer-role-admin"
-                                : "admin-customer-role";
-                            var kycClass = user.ActivePolicyCount > 0
-                                ? "admin-customer-kyc admin-customer-kyc-verified"
-                                : "admin-customer-kyc";
-                            <tr>
-                                <td>@user.UserNumber</td>
-                                <td>@user.Name</td>
-                                <td>@user.Email</td>
-                                <td><span class="@roleClass">@user.Role</span></td>
-                                <td><span class="@kycClass">@(user.ActivePolicyCount > 0 ? "Verified" : "Pending")</span></td>
-                                <td>@user.RegisteredAt.ToString("dd MMM yyyy")</td>
-                                <td>₹@user.TotalSpent.ToString("N0")</td>
-                            </tr>
+                            <div class="p-3 border-dark border-2 d-flex justify-content-between align-items-center" style="border: 2px solid #000;">
+                                <div>
+                                    <h6 class="fw-bold mb-1">@p.PolicyNumber - @p.UserName</h6>
+                                    <p class="text-muted mb-0 fs-8">@p.PolicyType — @p.PurchaseDate.ToString("dd MMM")</p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <form asp-action="UpdatePolicyStatus" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@p.Id" />
+                                        <input type="hidden" name="action" value="Active" />
+                                        <button type="submit" class="btn btn-sm btn-success rounded-0 border-dark border-2 fw-bold">Accept</button>
+                                    </form>
+                                    <form asp-action="UpdatePolicyStatus" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@p.Id" />
+                                        <input type="hidden" name="action" value="Rejected" />
+                                        <button type="submit" class="btn btn-sm btn-danger rounded-0 border-dark border-2 fw-bold">Reject</button>
+                                    </form>
+                                </div>
+                            </div>
                         }
                     }
                     else
                     {
-                        <tr>
-                            <td colspan="7" class="admin-dashboard-empty">No customers found.</td>
-                        </tr>
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-check text-success fs-3 mb-2"></i>
+                            <p class="fw-bold text-muted mb-0">No pending approvals</p>
+                        </div>
                     }
-                </tbody>
-            </table>
+                </div>
+            </div>
         </div>
-    </section>
+
+        <!-- Support Tickets -->
+        <div class="col-lg-5">
+            <div class="bg-white border-dark border-3 p-4 shadow-sm h-100" style="border: 3px solid #000 !important; border-bottom-width: 6px !important; border-right-width: 6px !important;">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-dark border-2 pb-2">
+                    <h5 class="fw-bold text-dark text-uppercase mb-0">Support Tickets</h5>
+                    <span class="badge bg-warning text-dark border-dark border-2 px-2 py-1 fs-9 fw-bold" style="border: 1px solid #000;">@openTickets OPEN</span>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    @if (Model.SupportTickets.Any())
+                    {
+                        @foreach (var t in Model.SupportTickets)
+                        {
+                            <div class="p-3 border-dark border-2" style="border: 2px solid #000;">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="fw-bold mb-0">@t.TicketNumber - @t.Subject</h6>
+                                        <small class="text-muted">Aaroh • @t.CreatedAt.ToString("dd MMM")</small>
+                                    </div>
+                                    <form asp-action="UpdateSupportStatus" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <select name="status" onchange="this.form.submit()" class="form-select form-select-sm rounded-0 border-dark border-2 fw-bold" style="width: auto;">
+                                            <option value="Pending" selected="@(t.Status == "Pending")">Pending</option>
+                                            <option value="InProgress" selected="@(t.Status == "InProgress")">In Progress</option>
+                                            <option value="Resolved" selected="@(t.Status == "Resolved")">Resolved</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-headset text-muted fs-3 mb-2"></i>
+                            <p class="fw-bold text-muted mb-0">No active tickets</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Claims Management -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="bg-white border-dark border-3 p-4 shadow-sm" style="border: 3px solid #000 !important; border-bottom-width: 6px !important; border-right-width: 6px !important;">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-dark border-2 pb-2">
+                    <h5 class="fw-bold text-dark text-uppercase mb-0">Claims Management</h5>
+                    <span class="text-muted fs-8 fw-bold">@Model.PendingClaims.Count total claims</span>
+                </div>
+                
+                @if (Model.PendingClaims.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered border-dark align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="fw-bold">Claim ID</th>
+                                    <th class="fw-bold">Policy</th>
+                                    <th class="fw-bold">Amount</th>
+                                    <th class="fw-bold text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in Model.PendingClaims)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">@c.ClaimNumber</td>
+                                        <td>@c.PolicyTypeName</td>
+                                        <td class="fw-bold">₹@c.MaturityAmount.ToString("N0")</td>
+                                        <td class="text-end">
+                                            <a href="/Admin/Claims" class="btn btn-sm btn-dark rounded-0 px-3">Process</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <p class="text-muted fw-bold mb-0">No claims submitted yet</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </section>
+
+@section Scripts {
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .tracking-wider { letter-spacing: 1px; }
+    </style>
+}

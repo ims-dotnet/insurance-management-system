@@ -8,63 +8,86 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Executive Ledger</title>
+    <title>@ViewData["Title"] - InsureTrust</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InsureTrust.Web.styles.css" asp-append-version="true" />
 </head>
-<body
-    data-gateway-base="@gatewayBase">
+<body data-gateway-base="@gatewayBase">
     <div class="institutional-wrapper">
         <aside class="sidebar-left">
-            <div class="sidebar-header">
-                <img id="sidebarUserAvatar" class="user-avatar" src="~/images/avatars/avatar-1.svg" alt="User avatar" />
-                <div class="user-details">
-                    <p id="sidebarUserName" class="sidebar-title">Guest User</p>
-                    <p id="sidebarUserEmail" class="sidebar-subtitle">guest@insuretrust</p>
-                </div>
-                <div class="user-actions">
-                    @await Html.PartialAsync("_NotificationBell")
-                </div>
+            <div class="sidebar-brand py-4">
+                <div class="brand-name" style="font-size: 1.5rem;">InsureTrust</div>
+                <div class="brand-subtitle" style="font-size: 0.75rem; letter-spacing: 1px;">MANAGEMENT CONSOLE</div>
             </div>
-            <a asp-controller="Account" asp-action="Register" class="btn-inst w-100 text-center mb-3">Create Account</a>
+
+            @if (!(User.Identity?.IsAuthenticated ?? false))
+            {
+                <a asp-controller="Account" asp-action="Register" class="btn-inst btn-inst-primary w-100 text-center mb-4 py-2 fs-7">
+                    <i class="fa-solid fa-user-plus"></i> Create Account
+                </a>
+            }
+            else if (User.IsInRole("Admin"))
+            {
+                 <div class="alert alert-warning bg-warning bg-opacity-10 border-0 text-warning rounded-0 p-2 mb-4 fs-8 text-center fw-bold" style="border: 2px solid #fbbf24 !important;">
+                    <i class="fa-solid fa-user-shield me-1"></i> ADMIN: @User.Identity.Name
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info bg-primary bg-opacity-10 border-0 text-primary rounded-4 p-3 mb-4 fs-7 text-center">
+                    <i class="fa-solid fa-circle-check me-1"></i> Connected as <strong>@User.Identity.Name</strong>
+                </div>
+            }
 
             <nav class="nav-ledger">
-                <a asp-controller="Home" asp-action="Index">Dashboard</a>
-                <a asp-controller="Policy" asp-action="Index" data-auth-required="true">Policy Desk</a>
-                <a asp-controller="Claim" asp-action="Index" data-auth-required="true">Claim Desk</a>
-                <a asp-controller="Notification" asp-action="Index" data-auth-required="true">Notification History</a>
-                <a asp-controller="Account" asp-action="Profile" data-auth-required="true">Profile</a>
-                <button type="button" id="openCalculatorPanel" class="btn-link-ledger">Calculator</button>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Dashboard" class="fs-7 py-2"><i class="fa-solid fa-gauge-high me-2"></i> Admin Dashboard</a>
+                }
+                else
+                {
+                    <a asp-controller="Home" asp-action="Index" class="fs-7 py-2"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard</a>
+                }
+                <a asp-controller="Policy" asp-action="GetAllPolicybyid" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-shield-halved me-2"></i> Policy Desk</a>
+                <a asp-controller="Claim" asp-action="Index" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Claim Desk</a>
+                <a asp-controller="Notification" asp-action="Index" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-bell me-2"></i> Notifications</a>
+                <a asp-controller="Account" asp-action="Profile" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-user me-2"></i> Profile</a>
+                <button type="button" id="openCalculatorPanel" class="btn-link-ledger fs-7 py-2"><i class="fa-solid fa-calculator me-2"></i> Calculator</button>
             </nav>
 
             <div class="sidebar-footer">
-                <a asp-controller="Support" asp-action="Index" data-auth-required="true">Support</a>
-                <a asp-controller="Account" asp-action="Logout">Logout</a>
+                <a asp-controller="Support" asp-action="MyQueries" data-auth-required="true"><i class="fa-solid fa-headset me-2"></i> Support</a>
+                <a asp-controller="Account" asp-action="Logout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout</a>
             </div>
         </aside>
 
         <div class="main-stage">
-            <main role="main" class="main-content pb-3">
+            <header class="main-header">
+                <div class="header-actions">
+                    @await Html.PartialAsync("_NotificationBell")
+                    <div class="header-user-profile">
+                        <img id="sidebarUserAvatar" class="header-avatar" src="~/images/avatars/avatar-1.svg" alt="User avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';" />
+                        <div class="user-details" style="@(User.Identity?.IsAuthenticated == true ? "display: block;" : "display: none;")">
+                            <p id="sidebarUserName">@(User.Identity?.Name ?? "Guest User")</p>
+                            <p id="sidebarUserEmail">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "guest@insuretrust")</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main role="main" class="main-content">
                 @RenderBody()
             </main>
-
-            <footer class="app-footer">
-                <div>©️ 1954 Institutional Risk & Assurance. All rights reserved.</div>
-                <div class="footer-links">
-                    <span>Privacy Ledger</span>
-                    <span>Compliance Protocol</span>
-                    <span>Regulatory Filings</span>
-                </div>
-            </footer>
         </div>
     </div>
 
-    <div id="calculatorPopup" class="calculator-popup" aria-hidden="true">
-        <div class="calculator-popup-panel" role="dialog" aria-modal="true" aria-label="Calculator">
-            <div class="calculator-popup-header">
-                <span>Quick Calculator</span>
-                <button type="button" id="closeCalculatorPopup" class="btn-close-ledger" aria-label="Close calculator">×</button>
+    <div id="calculatorPopup" class="calculator-popup" aria-hidden="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div class="calculator-popup-panel" role="dialog" aria-modal="true" aria-label="Calculator" style="width: 100%; max-width: 500px;">
+            <div class="calculator-popup-header d-flex justify-content-between align-items-center mb-3">
+                <span class="fs-5 fw-bold text-white"><i class="fa-solid fa-calculator me-2 text-primary"></i> Quick Calculator</span>
+                <button type="button" id="closeCalculatorPopup" class="btn btn-sm btn-outline-light rounded-circle" aria-label="Close calculator"><i class="fa-solid fa-xmark"></i></button>
             </div>
             @await Html.PartialAsync("_Calculator")
         </div>
@@ -73,6 +96,17 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Simple script to toggle calculator popup since we hid it by default
+        $(document).ready(function() {
+            $('#openCalculatorPanel').click(function() {
+                $('#calculatorPopup').css('display', 'flex').attr('aria-hidden', 'false');
+            });
+            $('#closeCalculatorPopup').click(function() {
+                $('#calculatorPopup').css('display', 'none').attr('aria-hidden', 'true');
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

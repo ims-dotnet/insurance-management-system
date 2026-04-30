@@ -20,7 +20,7 @@ namespace InsureTrust.QueryService.Controllers
             _environment = environment;
         }
 
-        [Authorize(Roles = "Customer")]
+        [Authorize]
         [HttpPost("submit")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Submit([FromForm] CreateSupportQueryDto dto)
@@ -32,7 +32,7 @@ namespace InsureTrust.QueryService.Controllers
             return Ok(ApiResponse<SupportQueryDto>.SuccessResponse(result, "Support query submitted successfully."));
         }
 
-        [Authorize(Roles = "Customer")]
+        [Authorize]
         [HttpGet("my-queries")]
         public async Task<IActionResult> GetMyQueries()
         {

@@ -1,46 +1,117 @@
 @model InsureTrust.Web.Models.LoginViewModel
 @{
-    ViewData["Title"] = "Validate and Enter";
+    ViewData["Title"] = "Secure Login";
 }
 
-<section class="auth-card">
-    <div class="auth-badge">✓</div>
-    <h1 class="auth-title">Insure Trust</h1>
-    <p class="auth-subtitle">Secure Login</p>
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <section class="auth-card fade-in-up">
+        <div class="auth-badge">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Enter your credentials to access your account</p>
 
-    <form asp-action="Login" method="post" class="auth-form" novalidate>
-        <input type="hidden" asp-for="ReturnUrl" />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Login" method="post" class="auth-form" novalidate>
+            <input type="hidden" asp-for="ReturnUrl" />
+            
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 p-3 mb-4 fs-7">
+                    <div asp-validation-summary="ModelOnly" class="mb-0"></div>
+                </div>
+            }
+            
+            <div class="form-group">
+                <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="LoginMode">Login Type</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </span>
+                    <select asp-for="LoginMode" class="form-select bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none">
+                        <option value="user" class="bg-dark text-white">User Account</option>
+                        <option value="admin" class="bg-dark text-white">Admin Portal</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="Email">Email Address</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <i class="fa-solid fa-envelope"></i>
+                    </span>
+                    <input asp-for="Email" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" type="email" placeholder="name@example.com" required />
+                </div>
+                <span asp-validation-for="Email" class="text-danger fs-7 mt-1 d-block"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="Password">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+                    <input asp-for="Password" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" type="password" placeholder="••••••••" required />
+                </div>
+                <span asp-validation-for="Password" class="text-danger fs-7 mt-1 d-block"></span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input bg-dark border-secondary" type="checkbox" asp-for="RememberMe" id="RememberMe">
+                    <label class="form-check-label text-muted fs-7" for="RememberMe">
+                        Remember me
+                    </label>
+                </div>
+                <a asp-controller="Account" asp-action="ForgotPassword" class="text-primary text-decoration-none fs-7 hover-accent transition-all">Forgot password?</a>
+            </div>
+
+            <p id="loginMessage" class="meta-note d-none"></p>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg mb-3" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
+                Sign In <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+            
+            <p class="text-center text-muted fs-7 mb-0">
+                Don't have an account? <a asp-controller="Account" asp-action="Register" class="text-primary text-decoration-none fw-bold hover-accent transition-all">Create Account</a>
+            </p>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <style>
+        .min-vh-100 {
+            min-height: calc(100vh - var(--header-height));
+            margin-top: calc(var(--header-height) * -1); /* Full center ignoring header */
+        }
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .tracking-wider { letter-spacing: 1px; }
+        .hover-accent:hover { color: var(--accent) !important; }
+        .transition-all { transition: all 0.3s ease; }
         
-        <div class="form-group">
-            <label class="form-label" asp-for="LoginMode">Login Type</label>
-            <select asp-for="LoginMode" class="form-control-inst">
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label class="form-label" asp-for="Email">Email</label>
-            <input asp-for="Email" class="form-control-inst" type="email" required />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label" asp-for="Password">Password</label>
-            <input asp-for="Password" class="form-control-inst" type="password" required />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-
-        <div class="auth-row">
-            <label class="checkbox-label">
-                <input asp-for="RememberMe" type="checkbox" /> Remember me
-            </label>
-            <a asp-controller="Account" asp-action="ForgotPassword" class="meta-link">Forgot password?</a>
-        </div>
-
-        <p id="loginMessage" class="meta-note"></p>
-
-        <button type="submit" class="btn-inst btn-inst-success w-100">Login</button>
-        <a asp-controller="Account" asp-action="Register" class="btn-inst w-100 mt-2 text-center">Create Account</a>
-    </form>
-</section>
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border-color: var(--primary) !important;
+            box-shadow: none !important;
+        }
+        
+        /* Make sure the form container doesn't clash with the main stage */
+        .auth-card {
+            margin: 0 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+}

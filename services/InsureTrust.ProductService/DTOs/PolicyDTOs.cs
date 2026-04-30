@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace InsureTrust.ProductService.DTOs
 {
@@ -91,6 +91,7 @@ namespace InsureTrust.ProductService.DTOs
         public int DaysLeft { get; set; }
         public decimal PackageAmount { get; set; }
         public int Tenure { get; set; }
+        public int UserId { get; set; }
         public string? AdminRemarks { get; set; }
     }
 

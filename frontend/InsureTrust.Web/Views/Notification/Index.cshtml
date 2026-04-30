@@ -1,43 +1,150 @@
 @model IEnumerable<InsureTrust.Web.Services.NotificationDto>
 @{
-    ViewData["Title"] = "Notification History";
+    ViewData["Title"] = "Notification Hub";
 }
 
-<section class="profile-shell">
-    <div class="page-heading">
-        <p class="meta-line">Alerts and Updates</p>
-        <h1>Notification History</h1>
+<section class="notification-shell fade-in">
+    <div class="page-heading mb-5">
+        <div class="meta-line"><i class="fa-solid fa-bell me-1"></i> System Dispatches</div>
+        <h1 class="display-5 fw-bold text-white mb-2">Notification History</h1>
+        <p class="text-muted">Stay updated with your policy status, claims, and institutional alerts.</p>
     </div>
 
-    <article class="panel-card">
-        <h2 class="section-title">Recent Dispatches</h2>
-        <table class="table-ledger">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Title</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="notificationLedgerBody">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="section-title mb-0">Recent Alerts</h3>
+                @if (Model != null && Model.Any(n => !n.IsRead))
+                {
+                    <form asp-action="MarkAllRead" method="post">
+                        <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3">Mark all as read</button>
+                    </form>
+                }
+            </div>
+
+            <div class="notification-list d-flex flex-column gap-3">
                 @if (Model != null && Model.Any())
                 {
-                    foreach (var item in Model)
+                    @foreach (var item in Model.OrderByDescending(n => n.CreatedAt))
                     {
-                        <tr>
-                            <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
-                            <td>@item.Title</td>
-                            <td>@(item.IsRead ? "Read" : "Unread")</td>
-                        </tr>
+                        var colorClass = item.ColorCode.ToLower() switch
+                        {
+                            "green" => "border-success",
+                            "red" => "border-danger",
+                            "goldenrod" => "border-warning",
+                            "yellow" => "border-warning",
+                            _ => "border-primary"
+                        };
+
+                        var bgClass = item.ColorCode.ToLower() switch
+                        {
+                            "green" => "bg-success",
+                            "red" => "bg-danger",
+                            "goldenrod" => "bg-warning",
+                            "yellow" => "bg-warning",
+                            _ => "bg-primary"
+                        };
+
+                        <div class="notification-card p-4 rounded-4 border-start border-4 @colorClass @(item.IsRead ? "opacity-75" : "shadow-glow")" 
+                             style="background: rgba(255,255,255,0.03); backdrop-filter: blur(10px);">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex gap-3">
+                                    <div class="notification-icon rounded-circle d-flex align-items-center justify-content-center @bgClass @(item.IsRead ? "bg-opacity-25" : "bg-opacity-50")" 
+                                         style="width: 45px; height: 45px; min-width: 45px;">
+                                        <i class="fa-solid @(item.IsRead ? "fa-envelope-open" : "fa-envelope") text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-white mb-1">@item.Title</h5>
+                                        <p class="text-muted mb-2">@item.Message</p>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> @item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</small>
+                                            @if (!item.IsRead)
+                                            {
+                                                <form asp-action="MarkRead" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-link p-0 text-primary text-decoration-none fs-7 fw-bold">Mark as read</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (!item.IsRead)
+                                {
+                                    <div class="unread-dot @bgClass rounded-circle" style="width: 10px; height: 10px;"></div>
+                                }
+                            </div>
+                        </div>
                     }
                 }
                 else
                 {
-                    <tr>
-                        <td colspan="3">No notifications found.</td>
-                    </tr>
+                    <div class="panel-card text-center py-5">
+                        <div class="opacity-25 mb-3">
+                            <i class="fa-solid fa-bell-slash fa-4x text-muted"></i>
+                        </div>
+                        <h4 class="text-white">All Clear!</h4>
+                        <p class="text-muted">You have no notifications at the moment.</p>
+                    </div>
                 }
-            </tbody>
-        </table>
-    </article>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="panel-card">
+                <h4 class="section-title mb-4">Legend</h4>
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-warning" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="text-white fw-bold">Pending Approval</div>
+                            <small class="text-muted">Applications or claims under review</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-success" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="text-white fw-bold">Approved</div>
+                            <small class="text-muted">Granting of policy or claim payout</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-danger" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="text-white fw-bold">Rejected</div>
+                            <small class="text-muted">Request declined by administration</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="text-white fw-bold">System Alerts</div>
+                            <small class="text-muted">General updates and security logs</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
+
+@section Scripts {
+    <style>
+        .notification-card {
+            transition: all 0.3s ease;
+        }
+        .notification-card:hover {
+            transform: translateX(10px);
+            background: rgba(255,255,255,0.06) !important;
+        }
+        .shadow-glow {
+            box-shadow: 0 0 15px rgba(255,255,255,0.05);
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+}

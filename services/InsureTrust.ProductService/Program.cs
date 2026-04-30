@@ -30,6 +30,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IPolicyService, PolicyService>(); 
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IValidator<CreatePolicyTypeDto>, CreatePolicyTypeValidator>();
 builder.Services.AddScoped<IValidator<EditPolicyDto>, EditPolicyValidator>();
 

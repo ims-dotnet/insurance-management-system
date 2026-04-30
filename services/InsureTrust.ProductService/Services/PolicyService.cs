@@ -1,4 +1,4 @@
-﻿using InsureTrust.ProductService.DTOs;
+using InsureTrust.ProductService.DTOs;
 using InsureTrust.ProductService.Repository;
 
 namespace InsureTrust.ProductService.Services
@@ -6,10 +6,31 @@ namespace InsureTrust.ProductService.Services
     public class PolicyService : IPolicyService
     {
         private readonly IPolicyRepository _repo;
+        private readonly HttpClient _httpClient;
+        private readonly string _notificationUrl;
 
-        public PolicyService(IPolicyRepository repo)
+        public PolicyService(IPolicyRepository repo, HttpClient httpClient, IConfiguration configuration)
         {
             _repo = repo;
+            _httpClient = httpClient;
+            _notificationUrl = configuration["ServiceUrls:NotificationUrl"] ?? "https://localhost:7016/api/notifications/send";
+        }
+
+        private async Task SendNotification(int userId, string title, string message, string color, string feature)
+        {
+            try
+            {
+                var payload = new
+                {
+                    UserId = userId,
+                    Title = title,
+                    Message = message,
+                    ColorCode = color,
+                    Feature = feature
+                };
+                await _httpClient.PostAsJsonAsync(_notificationUrl, payload);
+            }
+            catch { /* Log failure but don't break flow */ }
         }
 
         public async Task<IEnumerable<PolicyTypeDto>> GetPolicyTypesAsync()
@@ -72,7 +93,16 @@ namespace InsureTrust.ProductService.Services
 
             if (dto.Tenure < 0) dto.Tenure = 0;
 
-            return await _repo.PurchaseAsync(dto, userId);
+            var result = await _repo.PurchaseAsync(dto, userId);
+            
+            if (result != null && result.Id > 0)
+            {
+                await SendNotification(userId, "Policy Purchased", 
+                    $"Your request for {result.PolicyTypeName} is pending approval.", 
+                    "GoldenRod", "Policy");
+            }
+
+            return result;
         }
 
         public async Task<PolicyDto> ApprovePolicyAsync(int policyId, ApprovePolicyDto dto, int adminId)
@@ -82,7 +112,23 @@ namespace InsureTrust.ProductService.Services
 
             dto.Action = dto.Action?.Trim() ?? "Reject";
 
-            return await _repo.ApprovePolicyAsync(policyId, dto, adminId) ?? new PolicyDto();
+            var result = await _repo.ApprovePolicyAsync(policyId, dto, adminId);
+            
+            if (result != null)
+            {
+                string status = result.Status ?? "Processed";
+                string color = status.ToLower() == "active" ? "Green" : "Red";
+                string message = status.ToLower() == "active" 
+                    ? $"Your policy {result.PolicyNumber} has been approved." 
+                    : $"Your policy request {result.PolicyNumber} was rejected. Reason: {dto.AdminRemarks}";
+
+                await SendNotification(result.UserId, $"Policy {status}", message, color, "Policy");
+                
+                // Also notify admin of their own action as requested
+                await SendNotification(adminId, "Action Completed", $"You have {status.ToLower()} policy {result.PolicyNumber}.", "Blue", "AdminAction");
+            }
+
+            return result ?? new PolicyDto();
         }
 
         public async Task<PolicyDto> EditPolicyAsync(int policyId, EditPolicyDto dto, int userId)

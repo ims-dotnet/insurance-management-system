@@ -12,12 +12,33 @@ namespace InsureTrust.ClaimService.Services
         private readonly IClaimRepository _repo;
         private readonly IMapper _mapper;
         private readonly ILogger<ClaimService> _logger;
+        private readonly HttpClient _httpClient;
+        private readonly string _notificationUrl;
 
-        public ClaimService(IClaimRepository repo, IMapper mapper, ILogger<ClaimService> logger)
+        public ClaimService(IClaimRepository repo, IMapper mapper, ILogger<ClaimService> logger, HttpClient httpClient, IConfiguration configuration)
         {
             _repo = repo;
             _mapper = mapper;
             _logger = logger;
+            _httpClient = httpClient;
+            _notificationUrl = configuration["ServiceUrls:NotificationUrl"] ?? "https://localhost:7016/api/notifications/send";
+        }
+
+        private async Task SendNotification(int userId, string title, string message, string color, string feature)
+        {
+            try
+            {
+                var payload = new
+                {
+                    UserId = userId,
+                    Title = title,
+                    Message = message,
+                    ColorCode = color,
+                    Feature = feature
+                };
+                await _httpClient.PostAsJsonAsync(_notificationUrl, payload);
+            }
+            catch { /* Log failure but don't break flow */ }
         }
 
         public async Task<IEnumerable<ClaimDto>> GetMyClaimsAsync(int userId)
@@ -68,6 +89,10 @@ namespace InsureTrust.ClaimService.Services
             await _repo.AddAsync(claim);
             await _repo.SaveChangesAsync();
 
+            await SendNotification(userId, "Claim Submitted", 
+                $"Your claim {claim.ClaimNumber} has been received and is pending review.", 
+                "GoldenRod", "Claim");
+
             _logger.LogInformation("New claim submitted: {ClaimNumber} for Policy {PolicyId} by User {UserId}", claim.ClaimNumber, policyId, userId);
 
             return _mapper.Map<ClaimDto>(claim);
@@ -83,6 +108,14 @@ namespace InsureTrust.ClaimService.Services
             claim.ProcessedAt = DateTime.UtcNow;
 
             await _repo.SaveChangesAsync();
+
+            string status = claim.ClaimStatus; // "Approved" or "Denied"
+            string color = status.ToLower() == "approved" ? "Green" : "Red";
+            string message = status.ToLower() == "approved"
+                ? $"Your claim {claim.ClaimNumber} has been approved."
+                : $"Your claim {claim.ClaimNumber} was rejected. Remarks: {dto.AdminRemarks}";
+
+            await SendNotification(claim.UserId, $"Claim {status}", message, color, "Claim");
 
             _logger.LogWarning("Claim {ClaimId} status updated to {Status} by Admin. Remarks: {Remarks}", claimId, dto.Action, dto.AdminRemarks);
             

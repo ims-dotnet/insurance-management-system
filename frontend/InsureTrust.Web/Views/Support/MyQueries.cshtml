@@ -4,214 +4,176 @@
     ViewData["Title"] = "My Support Queries";
 }
 
-<style>
-    .queries-page {
-        max-width: 1150px;
-        margin: 40px auto;
-        padding: 0 16px;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .queries-header {
-        margin-bottom: 24px;
-    }
-
-        .queries-header h1 {
-            margin: 0 0 8px 0;
-            font-size: 32px;
-            color: #111827;
-        }
-
-        .queries-header p {
-            margin: 0;
-            color: #6b7280;
-        }
-
-    .queries-grid {
-        display: grid;
-        gap: 18px;
-    }
-
-    .query-card {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 22px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.06);
-    }
-
-    .query-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: flex-start;
-        margin-bottom: 14px;
-        flex-wrap: wrap;
-    }
-
-    .ticket-no {
-        font-weight: 700;
-        color: #1d4ed8;
-        font-size: 14px;
-    }
-
-    .subject {
-        font-size: 22px;
-        font-weight: 700;
-        color: #111827;
-        margin-top: 6px;
-    }
-
-    .status-badge {
-        padding: 8px 14px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .status-pending {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .status-inprogress {
-        background: #dbeafe;
-        color: #1d4ed8;
-    }
-
-    .status-resolved {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .meta-row {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 16px;
-    }
-
-    .meta-box {
-        background: #f9fafb;
-        border-radius: 14px;
-        padding: 14px;
-        border: 1px solid #eef2f7;
-    }
-
-    .meta-label {
-        font-size: 13px;
-        color: #6b7280;
-        margin-bottom: 4px;
-    }
-
-    .meta-value {
-        font-weight: 600;
-        color: #111827;
-    }
-
-    .error-box {
-        background: #fef2f2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-        border-radius: 16px;
-        padding: 16px;
-        margin-bottom: 20px;
-    }
-
-    .empty-box {
-        background: #ffffff;
-        border-radius: 20px;
-        border: 1px dashed #cbd5e1;
-        padding: 40px 24px;
-        text-align: center;
-        color: #6b7280;
-    }
-
-    @@media (max-width: 768px) {
-        .meta-row {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<div class="queries-page">
-    <div class="queries-header">
-        <h1>My Support Queries</h1>
-        <p>Track all your submitted support tickets and admin responses.</p>
+<section class="fade-in-up">
+    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <span class="meta-line"><i class="fa-solid fa-headset me-1"></i> Help Center</span>
+            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Support Queries</h1>
+            <p class="text-muted mt-2 fs-5">Track your submitted tickets and our responses.</p>
+        </div>
+        <div class="d-none d-md-flex align-items-center gap-3">
+            <a asp-controller="Support" asp-action="CreateQuery" class="btn-inst btn-inst-primary shadow-lg">
+                <i class="fa-solid fa-plus me-2"></i>New Ticket
+            </a>
+        </div>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
     {
-        <div class="error-box">
-            <strong>Error:</strong> @Model.ErrorMessage
+        <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 p-4 mb-4 d-flex align-items-center">
+            <i class="fa-solid fa-triangle-exclamation fs-4 me-3"></i> 
+            <div>
+                <h5 class="mb-1 fw-bold">Error Loading Data</h5>
+                <p class="mb-0 fs-7">@Model.ErrorMessage</p>
+            </div>
         </div>
     }
 
     @if (Model.Queries == null || !Model.Queries.Any())
     {
-        <div class="empty-box">
-            <h3>No support queries found</h3>
-            <p>You have not submitted any support ticket yet.</p>
-            <a asp-controller="Support" asp-action="CreateQuery" class="btn btn-primary">Create Support Query</a>
+        <div class="text-center p-5 border border-secondary border-opacity-25 rounded-4 bg-dark bg-opacity-25 mt-4">
+            <i class="fa-solid fa-ticket fa-4x text-muted mb-3 opacity-50"></i>
+            <h3 class="text-white">No Tickets Found</h3>
+            <p class="text-muted mb-4">You have not submitted any support tickets yet.</p>
+            <a asp-controller="Support" asp-action="CreateQuery" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
+                Create Support Query <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
         </div>
     }
     else
     {
-        <div class="queries-grid">
+        <div class="row g-4">
             @foreach (var item in Model.Queries)
             {
                 var statusClass = item.Status?.ToLower() switch
                 {
-                    "pending" => "status-pending",
-                    "inprogress" => "status-inprogress",
-                    "resolved" => "status-resolved",
-                    _ => "status-inprogress"
+                    "pending" => "bg-warning-subtle text-warning border-warning-subtle",
+                    "inprogress" => "bg-info-subtle text-info border-info-subtle",
+                    "resolved" => "bg-success-subtle text-success border-success-subtle",
+                    _ => "bg-secondary-subtle text-secondary border-secondary-subtle"
+                };
+                
+                var statusIcon = item.Status?.ToLower() switch
+                {
+                    "pending" => "fa-clock",
+                    "inprogress" => "fa-spinner fa-spin",
+                    "resolved" => "fa-check-circle",
+                    _ => "fa-circle-dot"
                 };
 
-                <div class="query-card">
-                    <div class="query-top">
-                        <div>
-                            <div class="ticket-no">@item.TicketNumber</div>
-                            <div class="subject">@item.Subject</div>
-                        </div>
-
-                        <span class="status-badge @statusClass">@item.Status</span>
-                    </div>
-
-                    <p style="color:#4b5563; margin-bottom:16px;">@item.Description</p>
-
-                    <div class="meta-row">
-                        <div class="meta-box">
-                            <div class="meta-label">Created At</div>
-                            <div class="meta-value">@item.CreatedAt</div>
-                        </div>
-
-                        <div class="meta-box">
-                            <div class="meta-label">Resolved At</div>
-                            <div class="meta-value">@(item.ResolvedAt?.ToString() ?? "Not resolved yet")</div>
-                        </div>
-
-                        <div class="meta-box">
-                            <div class="meta-label">Attachment</div>
-                            <div class="meta-value">
-                                @if (!string.IsNullOrWhiteSpace(item.AttachmentUrl))
-                                {
-                                    <a href="http://localhost:5135@(item.AttachmentUrl)" target="_blank">Open attachment</a>
-                                }
-                                else
-                                {
-                                    <span>No attachment</span>
-                                }
+                <div class="col-12">
+                    <div class="panel-card p-4 border border-secondary border-opacity-25 rounded-4 position-relative group overflow-hidden">
+                        
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-dark border border-secondary border-opacity-25 text-muted font-monospace fs-7 px-3 py-1">
+                                        <i class="fa-solid fa-hashtag me-1 text-primary"></i>@item.TicketNumber
+                                    </span>
+                                </div>
+                                <h3 class="text-white fw-bold mb-0 fs-4">@item.Subject</h3>
                             </div>
+                            <span class="badge @statusClass border rounded-pill px-3 py-2 text-uppercase tracking-wider fs-7">
+                                <i class="fa-solid @statusIcon me-1"></i> @item.Status
+                            </span>
                         </div>
 
-                        <div class="meta-box">
-                            <div class="meta-label">Admin Response</div>
-                            <div class="meta-value">@(item.AdminResponse ?? "No response yet")</div>
+                        <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 mb-4">
+                            <p class="text-muted mb-0 fs-6 line-clamp-2">@item.Description</p>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6 col-md-3">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Created At</p>
+                                <p class="text-white fw-medium mb-0 fs-7"><i class="fa-regular fa-calendar text-muted me-1"></i> @item.CreatedAt</p>
+                            </div>
+
+                            <div class="col-sm-6 col-md-3">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Resolved At</p>
+                                <p class="text-white fw-medium mb-0 fs-7">
+                                    @if (item.ResolvedAt != null)
+                                    {
+                                        <span><i class="fa-regular fa-calendar-check text-success me-1"></i> @item.ResolvedAt</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Pending...</span>
+                                    }
+                                </p>
+                            </div>
+
+                            <div class="col-sm-6 col-md-3">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Attachment</p>
+                                <div class="mb-0 fs-7">
+                                    @if (!string.IsNullOrWhiteSpace(item.AttachmentUrl))
+                                    {
+                                        <a href="@(item.AttachmentUrl)" target="_blank" class="text-info text-decoration-none hover-accent">
+                                            <i class="fa-solid fa-paperclip me-1"></i> View File
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">None</span>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-6 col-md-3">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Admin Response</p>
+                                <p class="text-white fw-medium mb-0 fs-7 line-clamp-2">
+                                    @if (!string.IsNullOrWhiteSpace(item.AdminResponse))
+                                    {
+                                        <i class="fa-solid fa-reply text-primary me-1"></i> @item.AdminResponse
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Awaiting response...</span>
+                                    }
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             }
         </div>
     }
-</div>
+</section>
+
+@section Scripts {
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .fs-8 { font-size: 0.75rem; }
+        .tracking-wider { letter-spacing: 1px; }
+        
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        
+        .hover-accent:hover {
+            color: var(--accent) !important;
+        }
+        
+        .group {
+            transition: all 0.3s ease;
+        }
+        .group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-color: rgba(59, 130, 246, 0.3) !important;
+        }
+    </style>
+}

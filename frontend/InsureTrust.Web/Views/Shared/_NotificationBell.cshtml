@@ -1,4 +1,6 @@
-<button type="button" class="icon-btn notification-bell" id="notificationBell" title="Notifications" aria-label="Notifications">
-    <span aria-hidden="true">🔔</span>
-    <span class="notification-badge" id="unreadCountBadge">0</span>
-</button>
+<a asp-controller="Notification" asp-action="Index" class="text-decoration-none">
+    <button type="button" class="icon-btn notification-bell" id="notificationBell" title="Notifications" aria-label="Notifications">
+        <span aria-hidden="true">🔔</span>
+        <span class="notification-badge" id="unreadCountBadge">0</span>
+    </button>
+</a>

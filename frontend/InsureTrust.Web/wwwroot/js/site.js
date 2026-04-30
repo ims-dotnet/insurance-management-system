@@ -111,7 +111,7 @@
         const token = getAuthToken();
         if (!token) return;
 
-        const badge = document.getElementById('notifBadge');
+        const badge = document.getElementById('unreadCountBadge');
         if (!badge) return;
 
         try {

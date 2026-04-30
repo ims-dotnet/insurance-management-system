@@ -1,106 +1,120 @@
 @model IEnumerable<InsureTrust.Web.Models.ClaimViewModel>
 
 @{
-    ViewData["Title"] = "Your Claims Ledger";
+    ViewData["Title"] = "Claims Center";
     var claims = Model.ToList();
     var total = claims.Sum(c => c.MaturityAmount);
 }
 
-<div style="margin-bottom: 2rem;">
-    <div style="font-family: var(--font-heading); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-ink); margin-bottom: 0.25rem;">RECORD INDEX 4.A</div>
-    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; font-weight: bold; text-transform: none; margin: 0;">Your Claims Ledger</h1>
-        <div style="display: flex; align-items: center; gap: 1rem; flex: 0 0 auto; margin-left: 2rem;">
-            <input type="text" id="ledger-filter" placeholder="FILTER LEDGER..." onkeyup="filterLedger(this.value)"
-                style="background: transparent; border: none; border-bottom: 1px solid var(--accent-red); padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem; color: var(--accent-red); width: 200px; outline: none;" />
-            <span style="color: var(--text-ink); font-size: 1rem;">&#9776;</span>
+<section class="fade-in-up">
+    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <span class="meta-line"><i class="fa-solid fa-file-invoice-dollar me-1"></i> Claims Center</span>
+            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Your Claims Ledger</h1>
+            <p class="text-muted mt-2 fs-5">Track and manage your insurance claims.</p>
+        </div>
+        <div class="d-none d-md-flex align-items-center gap-3">
+            <a asp-action="SubmitClaim" class="btn-inst btn-inst-primary shadow-lg">
+                <i class="fa-solid fa-plus me-2"></i>File New Claim
+            </a>
         </div>
     </div>
-</div>
 
-<hr class="divider-thick" style="border-top-color: var(--accent-green); margin-bottom: 0;" />
+    <div class="panel-card h-100 p-0 overflow-hidden mb-4 border border-secondary border-opacity-25 rounded-4">
+        <div class="p-4 bg-dark bg-opacity-50 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-white fw-bold"><i class="fa-solid fa-list-check me-2 text-info"></i> Claims History</h4>
+            <div class="input-group" style="width: 250px;">
+                <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="ledger-filter" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 shadow-none" placeholder="Search claims..." onkeyup="filterLedger(this.value)">
+            </div>
+        </div>
 
-<table class="table-ledger" id="claims-table" style="margin-bottom: 0;">
-    <thead>
-        <tr>
-            <th>CLAIM ID</th>
-            <th>DATE FILED</th>
-            <th>POLICY REF</th>
-            <th style="text-align: right;">CLAIM AMOUNT</th>
-            <th>STATUS</th>
-            <th style="text-align: right;">ACTION</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (!claims.Any())
-        {
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 3rem; font-family: var(--font-heading); opacity: 0.5;">
-                    No claims on record. File a new claim to begin.
-                </td>
-            </tr>
-        }
-        else
-        {
-            @foreach (var claim in claims)
-            {
-                <tr>
-                    <td style="font-family: var(--font-heading); font-weight: bold;">@claim.ClaimNumber</td>
-                    <td>@claim.SubmittedAt.ToString("MMM dd, yyyy")</td>
-                    <td>@claim.PolicyNumber</td>
-                    <td style="text-align: right; font-family: var(--font-heading);">$@claim.MaturityAmount.ToString("N2")</td>
-                    <td>
-                        @{
-                            var statusLower = claim.ClaimStatus.ToLower();
-                            string badgeStyle;
-                            if (statusLower == "pending")
-                                badgeStyle = "background-color: #4a4a2a; color: #fff; border: none;";
-                            else if (statusLower == "verification" || statusLower == "under review")
-                                badgeStyle = "background-color: var(--accent-red); color: #fff; border: none;";
-                            else if (statusLower == "approved" || statusLower == "paid" || statusLower == "cleared")
-                                badgeStyle = "background-color: var(--accent-green); color: #fff; border: none;";
-                            else if (statusLower == "denied" || statusLower == "rejected")
-                                badgeStyle = "background-color: #c0392b; color: #fff; border: none;";
-                            else
-                                badgeStyle = "background-color: var(--border-light); color: var(--text-ink); border: 1px solid var(--border-dark);";
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle" id="claims-table">
+                <thead class="text-uppercase fs-7 text-muted">
+                    <tr>
+                        <th class="border-0 bg-transparent ps-4 py-3">Claim ID</th>
+                        <th class="border-0 bg-transparent py-3">Date Filed</th>
+                        <th class="border-0 bg-transparent py-3">Policy Ref</th>
+                        <th class="border-0 bg-transparent py-3 text-end">Claim Amount</th>
+                        <th class="border-0 bg-transparent py-3 text-center">Status</th>
+                        <th class="border-0 bg-transparent pe-4 py-3 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!claims.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted bg-transparent">
+                                <i class="fa-solid fa-folder-open fa-3x mb-3 opacity-50"></i>
+                                <h5 class="text-white">No Claims Found</h5>
+                                <p class="mb-0">You have no claims on record. File a new claim to begin.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var claim in claims)
+                        {
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td class="bg-transparent ps-4 py-3 fw-bold text-white">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-hashtag text-muted fs-7"></i>
+                                        @claim.ClaimNumber
+                                    </div>
+                                </td>
+                                <td class="bg-transparent py-3 text-muted">@claim.SubmittedAt.ToString("MMM dd, yyyy")</td>
+                                <td class="bg-transparent py-3 text-info">@claim.PolicyNumber</td>
+                                <td class="bg-transparent py-3 text-end fw-bold text-white">₹@claim.MaturityAmount.ToString("N0")</td>
+                                <td class="bg-transparent py-3 text-center">
+                                    @{
+                                        var statusLower = claim.ClaimStatus.ToLower();
+                                        string badgeClass = "bg-secondary-subtle text-secondary border-secondary-subtle";
+                                        
+                                        if (statusLower == "pending") badgeClass = "bg-warning-subtle text-warning border-warning-subtle";
+                                        else if (statusLower == "verification" || statusLower == "under review") badgeClass = "bg-info-subtle text-info border-info-subtle";
+                                        else if (statusLower == "approved" || statusLower == "paid" || statusLower == "cleared") badgeClass = "bg-success-subtle text-success border-success-subtle";
+                                        else if (statusLower == "denied" || statusLower == "rejected") badgeClass = "bg-danger-subtle text-danger border-danger-subtle";
+                                    }
+                                    <span class="badge @badgeClass border rounded-pill px-3 py-1 text-uppercase tracking-wider">
+                                        @claim.ClaimStatus
+                                    </span>
+                                </td>
+                                <td class="bg-transparent pe-4 py-3 text-end">
+                                    <button class="btn btn-sm btn-outline-light rounded-pill px-3 fs-7">
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
                         }
-                        <span class="status-badge" style="@badgeStyle padding: 0.3rem 0.75rem; font-size: 0.65rem; letter-spacing: 1px;">
-                            @claim.ClaimStatus.ToUpper()
-                        </span>
-                    </td>
-                    <td style="text-align: right;">
-                        <button class="btn-inst" style="font-size: 0.65rem; line-height: 1.4; padding: 0.3rem 0.6rem; text-align: center;">
-                            VIEW<br/>DETAILS
-                        </button>
-                    </td>
-                </tr>
-            }
-        }
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="3" style="font-family: var(--font-heading); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; padding-top: 1.25rem; border-top: 2px solid var(--accent-green); color: var(--text-ink);">
-                TOTAL ACTIVE EXPOSURE
-            </td>
-            <td style="text-align: right; font-family: var(--font-heading); font-size: 1.1rem; font-weight: bold; padding-top: 1.25rem; border-top: 2px solid var(--accent-green);">
-                $@total.ToString("N2")
-            </td>
-            <td colspan="2" style="border-top: 2px solid var(--accent-green);"></td>
-        </tr>
-    </tfoot>
-</table>
-
-<hr style="border: none; border-top: 1px solid var(--border-light); margin: 2rem 0;" />
-
-<div style="display: flex; justify-content: space-between; align-items: center;">
-    <span style="font-family: var(--font-sans); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-ink); opacity: 0.7;">
-        PAGE 1 OF 42 &bull; SORTED BY DATE FILED (DESC)
-    </span>
-    <div style="display: flex; gap: 0.25rem;">
-        <button class="btn-inst" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;">&lt;</button>
-        <button class="btn-inst" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;">&gt;</button>
+                    }
+                </tbody>
+                @if (claims.Any())
+                {
+                    <tfoot>
+                        <tr style="border-top: 2px solid rgba(59, 130, 246, 0.5);">
+                            <td colspan="3" class="bg-dark bg-opacity-50 ps-4 py-3 text-muted fw-bold text-uppercase fs-7 tracking-wider">
+                                Total Active Exposure
+                            </td>
+                            <td class="bg-dark bg-opacity-50 py-3 text-end fw-bolder text-white fs-5">
+                                ₹@total.ToString("N0")
+                            </td>
+                            <td colspan="2" class="bg-dark bg-opacity-50 pe-4 py-3"></td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
     </div>
-</div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <span class="text-muted fs-7 text-uppercase tracking-wider">
+            Showing all claims &bull; Sorted by Date (Desc)
+        </span>
+    </div>
+</section>
 
 @section Scripts {
     <script>
@@ -112,4 +126,24 @@
             });
         }
     </script>
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .tracking-wider { letter-spacing: 1px; }
+        
+        #ledger-filter:focus {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border-color: var(--primary) !important;
+        }
+    </style>
 }

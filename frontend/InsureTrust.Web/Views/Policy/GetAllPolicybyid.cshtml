@@ -162,11 +162,17 @@
     }
 </style>
 
-<!-- Page Header -->
-<div class="myp-header">
-    <div class="myp-eyebrow">Policy Archive</div>
-    <div class="myp-heading">My Policies</div>
-    <div class="myp-sub">Manage all your insurance policies in one place</div>
+<div class="myp-header d-flex justify-content-between align-items-end">
+    <div>
+        <div class="myp-eyebrow">Policy Archive</div>
+        <div class="myp-heading">Policy Desk</div>
+        <div class="myp-sub">Manage all your insurance policies in one place</div>
+    </div>
+    <div>
+        <a asp-controller="Policy" asp-action="Index" class="btn btn-primary rounded-pill px-4 fw-bold shadow-lg border-0" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+            <i class="fa-solid fa-cart-plus me-2"></i> Buy New Policy
+        </a>
+    </div>
 </div>
 
 @if (Model == null || !Model.Any())

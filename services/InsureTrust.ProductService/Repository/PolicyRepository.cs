@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using InsureTrust.ProductService.Data;
 using InsureTrust.ProductService.DTOs;
 using InsureTrust.ProductService.Models;
@@ -130,7 +130,7 @@ namespace InsureTrust.ProductService.Repository
             var entity = await _context.UserPolicies.FindAsync(policyId);
             if (entity == null) return null;
 
-            entity.Status = dto.Action == "Grant" ? "Active" : "Rejected";
+            entity.Status = (dto.Action == "Grant" || dto.Action == "Active") ? "Active" : "Rejected";
             entity.AdminRemarks = dto.AdminRemarks;
 
             await _context.SaveChangesAsync();

@@ -2,55 +2,120 @@
     ViewData["Title"] = "Policy Infrastructure";
 }
 
-<section class="admin-policy-hub">
+<section class="admin-policy-hub fade-in-up">
 
-    <div class="admin-policy-hub-head">
+    <div class="page-heading d-flex justify-content-between align-items-end mb-5">
         <div class="admin-policy-hub-intro">
-            <p class="admin-policy-hub-label">CONTROL CENTER OVERVIEW</p>
-            <h1>Policy Infrastructure</h1>
-            <p class="admin-policy-hub-desc">
+            <span class="meta-line text-primary fw-bold text-uppercase tracking-wider fs-8"><i class="fa-solid fa-user-shield me-1"></i> Control Center Overview</span>
+            <h1 class="display-5 fw-bold text-white mb-2 mt-2">Policy Infrastructure</h1>
+            <p class="text-muted fs-5 mb-0">
                 Command your institutional insurance ecosystem. Manage regulatory compliance,
                 financial parameters, and operational flows from a centralized ledger interface.
             </p>
         </div>
-        <div>
-            <a href="javascript:void(0);" class="admin-policy-hub-new-btn">+ NEW POLICY</a>
+        <div class="d-none d-md-block">
+            <a asp-controller="Policy" asp-action="CreatePolicy" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-lg border-0" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fa-solid fa-plus me-2"></i> New Policy Type
+            </a>
         </div>
     </div>
 
-    <!-- <div class="admin-ledger-divider"></div> -->
-
-    <!-- Core Management -->
-    <h4 class="admin-policy-hub-section">Core Management</h4>
-    <div class="admin-ledger-divider" style="margin-bottom: 1.75rem;"></div>
-
-    <div class="admin-policy-hub-grid">
-
-        <a href="javascript:void(0);" class="admin-policy-hub-card">
-            <div class="admin-policy-hub-card-icon">
-                <i class="fas fa-layer-group"></i>
+    <div class="row g-4">
+        <!-- Manage Policy Types -->
+        <div class="col-md-4">
+            <div class="panel-card h-100 p-0 overflow-hidden border border-secondary border-opacity-10 hover-lift transition-all">
+                <div class="p-4 bg-dark bg-opacity-25 border-bottom border-secondary border-opacity-10">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-4 text-primary fs-3">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-1">Schema</span>
+                    </div>
+                    <h3 class="text-white fw-bold mb-2">Manage Types</h3>
+                    <p class="text-muted fs-7 mb-0">Edit, add, or remove categories (Life, Health, Vehicle) to define your product portfolio.</p>
+                </div>
+                <div class="p-3 bg-dark bg-opacity-50">
+                    <a asp-controller="Policy" asp-action="ManageTypes" class="btn btn-link text-primary text-decoration-none fw-bold fs-7 d-flex align-items-center justify-content-between p-0">
+                        Launch Designer <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <h3>Manage Policy Types</h3>
-            <p>Edit, add, or remove categories (Life, Health, Vehicle) to define your product portfolio.</p>
-        </a>
+        </div>
 
-        <a href="javascript:void(0);" class="admin-policy-hub-card">
-            <div class="admin-policy-hub-card-icon">
-                <i class="fas fa-database"></i>
+        <!-- All Sold Policies -->
+        <div class="col-md-4">
+            <div class="panel-card h-100 p-0 overflow-hidden border border-secondary border-opacity-10 hover-lift transition-all">
+                <div class="p-4 bg-dark bg-opacity-25 border-bottom border-secondary border-opacity-10">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="bg-info bg-opacity-10 p-3 rounded-4 text-info fs-3">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill px-3 py-1">Registry</span>
+                    </div>
+                    <h3 class="text-white fw-bold mb-2">Registry Database</h3>
+                    <p class="text-muted fs-7 mb-0">View a master database of every policy purchased by customers across all jurisdictions.</p>
+                </div>
+                <div class="p-3 bg-dark bg-opacity-50">
+                    <a asp-controller="Policy" asp-action="GetAllPolicy" class="btn btn-link text-info text-decoration-none fw-bold fs-7 d-flex align-items-center justify-content-between p-0">
+                        View Records <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <h3>All Sold Policies</h3>
-            <p>View a master database of every policy purchased by customers across all jurisdictions.</p>
-        </a>
+        </div>
 
-        <a href="javascript:void(0);" class="admin-policy-hub-card admin-policy-hub-card-live">
-            <span class="admin-policy-hub-dot"></span>
-            <div class="admin-policy-hub-card-icon">
-                <i class="fas fa-clipboard-check"></i>
+        <!-- Pending Approvals -->
+        <div class="col-md-4">
+            <div class="panel-card h-100 p-0 overflow-hidden border border-warning border-opacity-10 hover-lift transition-all position-relative">
+                <div class="position-absolute top-0 end-0 p-3">
+                    <span class="admin-policy-hub-dot"></span>
+                </div>
+                <div class="p-4 bg-dark bg-opacity-25 border-bottom border-secondary border-opacity-10">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-4 text-warning fs-3">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-1">Live Queue</span>
+                    </div>
+                    <h3 class="text-white fw-bold mb-2">Pending Queue</h3>
+                    <p class="text-muted fs-7 mb-0">Review and sign off on new policy applications awaiting institutional verification.</p>
+                </div>
+                <div class="p-3 bg-dark bg-opacity-50">
+                    <a asp-controller="Policy" asp-action="GetAllPending" class="btn btn-link text-warning text-decoration-none fw-bold fs-7 d-flex align-items-center justify-content-between p-0">
+                        Process Queue <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <h3>Pending Approvals</h3>
-            <p>Review and sign off on new policy applications awaiting institutional verification.</p>
-        </a>
-
+        </div>
     </div>
 
 </section>
+
+@section Scripts {
+    <style>
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        .admin-policy-hub-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--warning);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--warning);
+            animation: pulse 2s infinite;
+        }
+        @@keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .fs-8 { font-size: 0.75rem; }
+    </style>
+}

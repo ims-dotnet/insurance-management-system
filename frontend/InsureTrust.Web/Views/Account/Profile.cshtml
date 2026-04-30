@@ -1,75 +1,177 @@
 @using InsureTrust.Web.Services
 @model UpdateProfileViewModel
 @{
-    ViewData["Title"] = "Personnel Record";
+    ViewData["Title"] = "User Profile";
 }
 
-<section class="profile-shell">
-    <div class="page-heading">
-        <p class="meta-line">Form 84-B / Administrative Dossier</p>
-        <h1>Personnel Record</h1>
+<section class="profile-shell fade-in-up">
+    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <span class="meta-line"><i class="fa-solid fa-user-circle me-1"></i> Account Settings</span>
+            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Your Profile</h1>
+            <p class="text-muted mt-2 fs-5">Manage your personal information and preferences.</p>
+        </div>
     </div>
 
-    <div class="profile-grid">
-        <article class="panel-card">
-            <h2 class="section-title">I. Identification Parameters</h2>
-            <dl class="ledger-kv" id="profileDetails">
-                <div><dt>Full Legal Name</dt><dd id="profileName">—</dd></div>
-                <div><dt>Secure Routing Email</dt><dd id="profileEmail">—</dd></div>
-                <div><dt>Direct Extension</dt><dd id="profilePhone">—</dd></div>
-                <div><dt>Assigned Role</dt><dd id="profileRole">—</dd></div>
-                <div><dt>User Number</dt><dd id="profileUserNumber">—</dd></div>
-            </dl>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success bg-success bg-opacity-10 border border-success border-opacity-25 text-success rounded-3 p-3 mb-4 d-flex align-items-center">
+            <i class="fa-solid fa-circle-check fs-5 me-2"></i> @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 p-3 mb-4 d-flex align-items-center">
+            <i class="fa-solid fa-triangle-exclamation fs-5 me-2"></i> @TempData["Error"]
+        </div>
+    }
 
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success" role="alert">@TempData["Success"]</div>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
-            }
-
-            <form id="profileUpdateForm" asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data" novalidate>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label" asp-for="Name">Update Name</label>
-                        <input asp-for="Name" class="form-control-inst" />
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="panel-card h-100 p-0 overflow-hidden border border-secondary border-opacity-25 rounded-4">
+                <div class="p-4 bg-dark bg-opacity-50 border-bottom border-secondary border-opacity-25 d-flex align-items-center gap-4">
+                    <div class="position-relative">
+                        <img src="~/images/avatars/avatar-1.svg" alt="Profile" class="rounded-circle border border-2 border-primary" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';" />
+                        <button class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0" style="width: 28px; height: 28px; padding: 0;">
+                            <i class="fa-solid fa-camera fs-8"></i>
+                        </button>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label" asp-for="PhoneNo">Update Phone</label>
-                        <input asp-for="PhoneNo" class="form-control-inst" />
+                    <div>
+                        <h3 class="text-white fw-bold mb-1" id="profileNameDisplay">Loading...</h3>
+                        <p class="text-muted mb-0 fs-7 d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-envelope"></i> <span id="profileEmailDisplay">--</span>
+                        </p>
                     </div>
-                    @*  ── KYC Document Upload (temporarily disabled) ─────────
-                    <div class="col-12">
-                        <label class="form-label" for="updKyc">Attach New KYC Document</label>
-                        <input id="updKyc" name="KycDocument" type="file" class="form-control-box" accept=".pdf" />
-                    </div>
-                    ──────────────────────────────────────────────────────── *@
                 </div>
-                <p id="profileMessage" class="meta-note mt-3"></p>
-                <button type="submit" class="btn-inst btn-inst-success">Commit Revisions</button>
-            </form>
-        </article>
 
-        <aside class="panel-stack">
-            <article class="panel-card panel-accent">
-                <h2 class="section-title">III. Ledger Balance</h2>
-                <p class="meta-line">Available Premium Credits</p>
-                <p class="value-ledger" id="profileBalance">₹0.00</p>
-                <button type="button" class="btn-inst btn-inst-success w-100">Request Disbursement</button>
-            </article>
+                <div class="p-4">
+                    <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-address-card text-primary me-2"></i> Personal Details</h4>
+                    
+                    <div class="row g-4 mb-5">
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Direct Extension</p>
+                                <p class="text-white fw-medium mb-0 fs-6" id="profilePhoneDisplay">--</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Assigned Role</p>
+                                <p class="text-white fw-medium mb-0 fs-6">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1" id="profileRoleDisplay">--</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">User Identifier</p>
+                                <p class="text-white fw-medium mb-0 fs-6 font-monospace" id="profileUserNumberDisplay">--</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
+                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Account Status</p>
+                                <p class="text-white fw-medium mb-0 fs-6">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1"><i class="fa-solid fa-check-circle me-1"></i> Active</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-            @*  ── KYC Mandates panel (temporarily disabled) ────────────────────
-            <article class="panel-card">
-                <h2 class="section-title">II. Security &amp; KYC Mandates</h2>
-                <p class="meta-line">Identity Verification</p>
-                <p><span id="profileKycStatus" class="status-badge status-pending">Pending</span></p>
-            </article>
-            ──────────────────────────────────────────────────────────────────── *@
+                    <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-user-pen text-accent me-2"></i> Update Information</h4>
+                    <form id="profileUpdateForm" asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data" novalidate>
+                        <div class="row g-4">
+                            <div class="col-md-6 form-group">
+                                <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="Name">Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                                        <i class="fa-solid fa-user"></i>
+                                    </span>
+                                    <input asp-for="Name" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" />
+                                </div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="PhoneNo">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                                        <i class="fa-solid fa-phone"></i>
+                                    </span>
+                                    <input asp-for="PhoneNo" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" />
+                                </div>
+                            </div>
+                        </div>
+                        <p id="profileMessage" class="meta-note mt-3 d-none"></p>
+                        <div class="mt-4 text-end">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-lg" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
 
-            @await Html.PartialAsync("_Calculator")
-        </aside>
+                    <div class="mt-5 pt-4 border-top border-secondary border-opacity-10">
+                        <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-file-shield text-success me-2"></i> Your Policy Portfolio</h4>
+                        
+                        <div class="d-flex flex-column gap-3">
+                            @{
+                                var policies = ViewBag.UserPolicies as IEnumerable<PolicyDto>;
+                            }
+                            @if (policies != null && policies.Any())
+                            {
+                                @foreach (var p in policies)
+                                {
+                                    <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <h6 class="text-white mb-0 fw-bold">@p.PolicyNumber</h6>
+                                                <span class="badge @(p.Status?.ToLower() == "active" ? "bg-success" : "bg-warning") bg-opacity-10 text-@(p.Status?.ToLower() == "active" ? "success" : "warning") border @(p.Status?.ToLower() == "active" ? "border-success" : "border-warning") border-opacity-25 fs-9">
+                                                    @p.Status
+                                                </span>
+                                            </div>
+                                            <p class="text-muted mb-0 fs-7">@p.PolicyTypeName — Expires @p.ExpiryDate.ToString("dd MMM yyyy")</p>
+                                        </div>
+                                        <a href="/Policy/GetAllPolicybyid" class="btn btn-sm btn-outline-primary rounded-pill px-3 fs-8">Details</a>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center bg-dark bg-opacity-10 rounded-3 border border-dashed border-secondary border-opacity-25">
+                                    <i class="fa-solid fa-folder-open text-muted fs-2 mb-2"></i>
+                                    <p class="text-muted mb-0">No active policies found in your portfolio.</p>
+                                    <a href="/Policy" class="btn btn-link text-primary text-decoration-none fs-7 mt-2">Browse Plans <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="d-flex flex-column gap-4">
+                <div class="panel-card p-0 overflow-hidden border border-primary border-opacity-25 rounded-4" style="background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="text-white fw-bold mb-0 fs-5"><i class="fa-solid fa-wallet text-success me-2"></i> Wallet</h4>
+                            <i class="fa-brands fa-cc-visa text-muted fs-3 opacity-50"></i>
+                        </div>
+                        <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Available Balance</p>
+                        <h2 class="display-5 fw-bolder text-white mb-4" id="profileBalanceDisplay">₹0</h2>
+                        <button type="button" class="btn btn-outline-success w-100 rounded-pill fw-bold bg-success bg-opacity-10 border-success border-opacity-50 hover-bg-success">
+                            <i class="fa-solid fa-money-bill-transfer me-2"></i> Request Disbursement
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-card border border-secondary border-opacity-25 rounded-4">
+                    <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-calculator text-primary me-2"></i> Quick Estimate</h4>
+                    <p class="text-muted fs-7 mb-4">Calculate premium rates for different policy configurations instantly.</p>
+                    <div class="bg-dark bg-opacity-25 p-3 rounded-3 border border-secondary border-opacity-25">
+                        @await Html.PartialAsync("_Calculator")
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -83,20 +185,51 @@
                     if (json.success && json.data) {
                         var d = json.data;
                         var el = function (id) { return document.getElementById(id); };
-                        if (el('profileName')) el('profileName').textContent = d.name || '—';
-                        if (el('profileEmail')) el('profileEmail').textContent = d.email || '—';
-                        if (el('profilePhone')) el('profilePhone').textContent = d.phoneNo || '—';
-                        if (el('profileRole')) el('profileRole').textContent = d.role || '—';
-                        if (el('profileUserNumber')) el('profileUserNumber').textContent = d.userNumber || '—';
-                        if (el('profileBalance')) el('profileBalance').textContent = '₹' + (d.balance || 0).toFixed(2);
-                        // ── KYC status update (temporarily disabled) ────────
-                        // if (el('profileKycStatus')) {
-                        //     el('profileKycStatus').textContent = d.kycStatus || 'Pending';
-                        //     el('profileKycStatus').className = 'status-badge status-' + (d.kycStatus || 'pending').toLowerCase();
-                        // }
+                        
+                        if (el('profileNameDisplay')) el('profileNameDisplay').textContent = d.name || 'Unknown User';
+                        if (el('profileEmailDisplay')) el('profileEmailDisplay').textContent = d.email || 'No email provided';
+                        if (el('profilePhoneDisplay')) el('profilePhoneDisplay').textContent = d.phoneNo || 'Not provided';
+                        if (el('profileRoleDisplay')) el('profileRoleDisplay').textContent = d.role || 'User';
+                        if (el('profileUserNumberDisplay')) el('profileUserNumberDisplay').textContent = d.userNumber || 'N/A';
+                        
+                        // Format balance
+                        if (el('profileBalanceDisplay')) {
+                            const formatter = new Intl.NumberFormat('en-IN', {
+                                style: 'currency',
+                                currency: 'INR',
+                                maximumFractionDigits: 0
+                            });
+                            el('profileBalanceDisplay').textContent = formatter.format(d.balance || 0);
+                        }
                     }
                 })
                 .catch(function () { /* silent */ });
         })();
     </script>
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @@keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fs-7 { font-size: 0.85rem; }
+        .fs-8 { font-size: 0.75rem; }
+        .tracking-wider { letter-spacing: 1px; }
+        
+        .form-control:focus {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border-color: var(--primary) !important;
+        }
+        
+        .hover-bg-success:hover {
+            background-color: var(--success) !important;
+            color: white !important;
+        }
+    </style>
 }

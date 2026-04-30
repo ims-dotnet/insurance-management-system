@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InsureTrust.Web.Controllers
 {
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class SupportController : Controller
     {
         private readonly ISupportService _supportService;

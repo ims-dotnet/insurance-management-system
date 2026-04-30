@@ -123,5 +123,8 @@ namespace InsureTrust.Web.Models
         public List<AdminUserViewModel> Users { get; set; } = new();
         public List<AdminTransactionViewModel> Transactions { get; set; } = new();
         public List<AdminPolicyTypeViewModel> PolicyTypes { get; set; } = new();
+        public List<AdminPolicyViewModel> PendingPolicies { get; set; } = new();
+        public List<AdminClaimViewModel> PendingClaims { get; set; } = new();
+        public List<AdminSupportViewModel> SupportTickets { get; set; } = new();
     }
 }

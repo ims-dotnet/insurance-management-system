@@ -1,16 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using InsureTrust.Web.Models;
 using InsureTrust.Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace InsureTrust.Web.Controllers;
 
 public class AccountController : Controller
 {
     private readonly IAuthService _authService;
+    private readonly IPolicyService _policyService;
 
-    public AccountController(IAuthService authService)
+    public AccountController(IAuthService authService, IPolicyService policyService)
     {
         _authService = authService;
+        _policyService = policyService;
     }
 
     [HttpGet]
@@ -34,7 +39,7 @@ public class AccountController : Controller
         {
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true,
+                HttpOnly = false, // Must be false so Javascript site.js can see it for client-side navigation guards
                 Secure = true,
                 SameSite = SameSiteMode.Lax
             };
@@ -45,6 +50,26 @@ public class AccountController : Controller
             }
 
             Response.Cookies.Append("authToken", response.Token, cookieOptions);
+
+            // ── NEW: SIGN IN TO COOKIE AUTHENTICATION ──────────────────────
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, response.User?.Id.ToString() ?? "0"),
+                new Claim(ClaimTypes.Name, response.User?.Name ?? "User"),
+                new Claim(ClaimTypes.Email, response.User?.Email ?? model.Email),
+                new Claim(ClaimTypes.Role, response.User?.Role ?? "Customer"),
+                new Claim("Token", response.Token)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
+            {
+                IsPersistent = model.RememberMe,
+                ExpiresUtc = DateTime.UtcNow.AddDays(7)
+            });
+            // ───────────────────────────────────────────────────────────────
 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             {
@@ -74,6 +99,32 @@ public class AccountController : Controller
         var result = await _authService.RegisterAsync(model);
         if (result != null)
         {
+            // ── AUTO-LOGIN AFTER REGISTRATION ──────────────────────────
+            var loginModel = new LoginViewModel { Email = model.Email, Password = model.Password };
+            var response = await _authService.LoginAsync(loginModel);
+            
+            if (response != null && !string.IsNullOrEmpty(response.Token))
+            {
+                var cookieOptions = new CookieOptions { HttpOnly = false, Secure = true, SameSite = SameSiteMode.Lax };
+                Response.Cookies.Append("authToken", response.Token, cookieOptions);
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, response.User?.Id.ToString() ?? "0"),
+                    new Claim(ClaimTypes.Name, response.User?.Name ?? result.Name),
+                    new Claim(ClaimTypes.Email, response.User?.Email ?? result.Email),
+                    new Claim(ClaimTypes.Role, response.User?.Role ?? "Customer"),
+                    new Claim("Token", response.Token)
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                return RedirectToAction("Index", "Home");
+            }
+            // ───────────────────────────────────────────────────────────────
+
             return RedirectToAction(nameof(Login));
         }
 
@@ -88,9 +139,11 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult Profile()
+    public async Task<IActionResult> Profile()
     {
-        return View();
+        var policies = await _policyService.GetAllPolicybyid();
+        ViewBag.UserPolicies = policies ?? new List<PolicyDto>();
+        return View(new UpdateProfileViewModel());
     }
 
     [HttpGet]
@@ -120,9 +173,10 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
         Response.Cookies.Delete("authToken");
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction(nameof(Login));
     }
 }

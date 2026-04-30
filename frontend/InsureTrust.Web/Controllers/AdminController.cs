@@ -67,6 +67,45 @@ namespace InsureTrust.Web.Controllers
                         model.Transactions = JsonSerializer.Deserialize<List<AdminTransactionViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminTransactionViewModel>();
                     }
                 }
+
+                // Fetch Pending Policies
+                var pendingPoliciesResponse = await _httpClient.GetAsync("api/policy/pending");
+                if (pendingPoliciesResponse.IsSuccessStatusCode)
+                {
+                    var content = await pendingPoliciesResponse.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (apiResponse.TryGetProperty("data", out var dataProperty))
+                    {
+                        model.PendingPolicies = JsonSerializer.Deserialize<List<AdminPolicyViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminPolicyViewModel>();
+                    }
+                }
+
+                // Fetch Pending Claims
+                var pendingClaimsResponse = await _httpClient.GetAsync("api/claim/all");
+                if (pendingClaimsResponse.IsSuccessStatusCode)
+                {
+                    var content = await pendingClaimsResponse.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (apiResponse.TryGetProperty("data", out var dataProperty))
+                    {
+                        var allClaims = JsonSerializer.Deserialize<List<AdminClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminClaimViewModel>();
+                        model.PendingClaims = allClaims.Where(c => c.Status?.ToLower() == "pending").ToList();
+                    }
+                }
+
+                // Fetch Support Tickets
+                var supportResponse = await _httpClient.GetAsync("api/queries/all");
+                if (supportResponse.IsSuccessStatusCode)
+                {
+                    var content = await supportResponse.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (apiResponse.TryGetProperty("data", out var dataProperty))
+                    {
+                        var allTickets = JsonSerializer.Deserialize<List<AdminSupportViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminSupportViewModel>();
+                        model.SupportTickets = allTickets.Where(t => t.Status != "Resolved").ToList();
+                        model.Stats.TotalOpenSupportTickets = model.SupportTickets.Count;
+                    }
+                }
             }
             catch
             {
