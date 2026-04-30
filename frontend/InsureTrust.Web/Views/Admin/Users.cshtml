@@ -77,7 +77,7 @@
                                 <td>@user.Role</td>
                                 <td>@user.ActivePolicyCount</td>
                                 <td>$@user.TotalSpent.ToString("N2")</td>
-                                <td>@user.RegisteredAt.ToString("dd MMM yyyy")</td>
+                                <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
                                 <td><span class="@kycChipClass">@kycLabel</span></td>
                                 <td>
                                     <button type="button" class="btn-inst admin-users-verify-btn" @(isKycVerified ? "disabled" : null)>

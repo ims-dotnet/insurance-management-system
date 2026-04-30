@@ -106,6 +106,18 @@ namespace InsureTrust.Web.Controllers
                         model.Stats.TotalOpenSupportTickets = model.SupportTickets.Count;
                     }
                 }
+
+                // Fetch Policy Types
+                var policyTypesResponse = await _httpClient.GetAsync("api/policy/types");
+                if (policyTypesResponse.IsSuccessStatusCode)
+                {
+                    var content = await policyTypesResponse.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (apiResponse.TryGetProperty("data", out var dataProperty))
+                    {
+                        model.PolicyTypes = JsonSerializer.Deserialize<List<AdminPolicyTypeViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminPolicyTypeViewModel>();
+                    }
+                }
             }
             catch
             {
