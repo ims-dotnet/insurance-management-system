@@ -3,7 +3,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ── YARP Reverse Proxy ────────────────────────────────────────────────────────
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .ConfigureHttpClient((context, handler) =>
+    {
+        // Bypass SSL certificate validation for local development
+        // We cast to object to avoid CS8121 type-conflict errors in the compiler
+        var h = (object)handler;
+
+        if (h is SocketsHttpHandler socketsHandler)
+        {
+            socketsHandler.SslOptions.RemoteCertificateValidationCallback = (message, cert, chain, errors) => true;
+        }
+
+        if (h is HttpClientHandler clientHandler)
+        {
+            clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+        }
+    });
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];

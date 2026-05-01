@@ -4,39 +4,38 @@
     ViewData["Title"] = "My Support Queries";
 }
 
-<section class="fade-in-up">
-    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+<section class="brut-container">
+    <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <span class="meta-line"><i class="fa-solid fa-headset me-1"></i> Help Center</span>
-            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Support Queries</h1>
-            <p class="text-muted mt-2 fs-5">Track your submitted tickets and our responses.</p>
+            <span class="badge-brut badge-brut-primary mb-2">HELP CENTER</span>
+            <h1 class="mb-0">Support Queries</h1>
+            <p class="text-muted fw-bold">Track your submitted tickets and our responses.</p>
         </div>
-        <div class="d-none d-md-flex align-items-center gap-3">
-            <a asp-controller="Support" asp-action="CreateQuery" class="btn-inst btn-inst-primary shadow-lg">
-                <i class="fa-solid fa-plus me-2"></i>New Ticket
-            </a>
-        </div>
+        <a asp-controller="Support" asp-action="CreateQuery" class="btn-inst btn-inst-primary">
+            <i class="fa-solid fa-plus me-2"></i> NEW TICKET
+        </a>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
     {
-        <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger rounded-3 p-4 mb-4 d-flex align-items-center">
-            <i class="fa-solid fa-triangle-exclamation fs-4 me-3"></i> 
+        <div class="brut-card border-danger bg-danger bg-opacity-10 mb-4 d-flex align-items-center">
+            <i class="fa-solid fa-triangle-exclamation fs-3 me-3 text-danger"></i> 
             <div>
-                <h5 class="mb-1 fw-bold">Error Loading Data</h5>
-                <p class="mb-0 fs-7">@Model.ErrorMessage</p>
+                <h4 class="mb-1 text-danger">Error Loading Data</h4>
+                <p class="mb-0 fw-bold">@Model.ErrorMessage</p>
+                <p class="small mt-1 text-muted">Please ensure the <strong>QueryService</strong> is running and reachable via the Gateway Hub.</p>
             </div>
         </div>
     }
 
     @if (Model.Queries == null || !Model.Queries.Any())
     {
-        <div class="text-center p-5 border border-secondary border-opacity-25 rounded-4 bg-dark bg-opacity-25 mt-4">
-            <i class="fa-solid fa-ticket fa-4x text-muted mb-3 opacity-50"></i>
-            <h3 class="text-white">No Tickets Found</h3>
-            <p class="text-muted mb-4">You have not submitted any support tickets yet.</p>
-            <a asp-controller="Support" asp-action="CreateQuery" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
-                Create Support Query <i class="fa-solid fa-arrow-right ms-2"></i>
+        <div class="brut-card text-center py-5">
+            <i class="fa-solid fa-ticket fa-4x mb-4 opacity-20"></i>
+            <h3>No Tickets Found</h3>
+            <p class="text-muted mb-4 fw-bold">You have not submitted any support tickets yet.</p>
+            <a asp-controller="Support" asp-action="CreateQuery" class="btn-inst btn-inst-secondary">
+                CREATE SUPPORT QUERY <i class="fa-solid fa-arrow-right ms-2"></i>
             </a>
         </div>
     }
@@ -45,89 +44,52 @@
         <div class="row g-4">
             @foreach (var item in Model.Queries)
             {
-                var statusClass = item.Status?.ToLower() switch
-                {
-                    "pending" => "bg-warning-subtle text-warning border-warning-subtle",
-                    "inprogress" => "bg-info-subtle text-info border-info-subtle",
-                    "resolved" => "bg-success-subtle text-success border-success-subtle",
-                    _ => "bg-secondary-subtle text-secondary border-secondary-subtle"
-                };
-                
-                var statusIcon = item.Status?.ToLower() switch
-                {
-                    "pending" => "fa-clock",
-                    "inprogress" => "fa-spinner fa-spin",
-                    "resolved" => "fa-check-circle",
-                    _ => "fa-circle-dot"
-                };
-
                 <div class="col-12">
-                    <div class="panel-card p-4 border border-secondary border-opacity-25 rounded-4 position-relative group overflow-hidden">
-                        
+                    <div class="brut-card">
                         <div class="d-flex justify-content-between align-items-start mb-4">
                             <div>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge bg-dark border border-secondary border-opacity-25 text-muted font-monospace fs-7 px-3 py-1">
-                                        <i class="fa-solid fa-hashtag me-1 text-primary"></i>@item.TicketNumber
-                                    </span>
-                                </div>
-                                <h3 class="text-white fw-bold mb-0 fs-4">@item.Subject</h3>
+                                <span class="badge-brut mb-2">#@item.TicketNumber</span>
+                                <h3 class="mb-0">@item.Subject</h3>
                             </div>
-                            <span class="badge @statusClass border rounded-pill px-3 py-2 text-uppercase tracking-wider fs-7">
-                                <i class="fa-solid @statusIcon me-1"></i> @item.Status
+                            <span class="badge-brut @(item.Status?.ToLower() == "resolved" ? "badge-brut-primary" : "bg-white")">
+                                @item.Status
                             </span>
                         </div>
 
-                        <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 mb-4">
-                            <p class="text-muted mb-0 fs-6 line-clamp-2">@item.Description</p>
+                        <div class="brut-card bg-light bg-opacity-50 p-3 mb-4 shadow-none border-1">
+                            <p class="mb-0 fw-bold">@item.Description</p>
                         </div>
 
                         <div class="row g-3">
-                            <div class="col-sm-6 col-md-3">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Created At</p>
-                                <p class="text-white fw-medium mb-0 fs-7"><i class="fa-regular fa-calendar text-muted me-1"></i> @item.CreatedAt</p>
+                            <div class="col-md-3">
+                                <label class="small fw-bold text-uppercase opacity-50">Created At</label>
+                                <p class="fw-bold mb-0">@item.CreatedAt</p>
                             </div>
-
-                            <div class="col-sm-6 col-md-3">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Resolved At</p>
-                                <p class="text-white fw-medium mb-0 fs-7">
-                                    @if (item.ResolvedAt != null)
-                                    {
-                                        <span><i class="fa-regular fa-calendar-check text-success me-1"></i> @item.ResolvedAt</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted fst-italic">Pending...</span>
-                                    }
-                                </p>
-                            </div>
-
-                            <div class="col-sm-6 col-md-3">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Attachment</p>
-                                <div class="mb-0 fs-7">
+                            <div class="col-md-3">
+                                <label class="small fw-bold text-uppercase opacity-50">Attachment</label>
+                                <div>
                                     @if (!string.IsNullOrWhiteSpace(item.AttachmentUrl))
                                     {
-                                        <a href="@(item.AttachmentUrl)" target="_blank" class="text-info text-decoration-none hover-accent">
-                                            <i class="fa-solid fa-paperclip me-1"></i> View File
+                                        <a href="@(item.AttachmentUrl)" target="_blank" class="text-secondary fw-bold">
+                                            <i class="fa-solid fa-paperclip me-1"></i> VIEW FILE
                                         </a>
                                     }
                                     else
                                     {
-                                        <span class="text-muted fst-italic">None</span>
+                                        <span class="text-muted">None</span>
                                     }
                                 </div>
                             </div>
-                            
-                            <div class="col-sm-6 col-md-3">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Admin Response</p>
-                                <p class="text-white fw-medium mb-0 fs-7 line-clamp-2">
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-uppercase opacity-50">Admin Response</label>
+                                <p class="fw-bold mb-0">
                                     @if (!string.IsNullOrWhiteSpace(item.AdminResponse))
                                     {
-                                        <i class="fa-solid fa-reply text-primary me-1"></i> @item.AdminResponse
+                                        <span class="text-secondary">@item.AdminResponse</span>
                                     }
                                     else
                                     {
-                                        <span class="text-muted fst-italic">Awaiting response...</span>
+                                        <span class="text-muted italic">Awaiting response...</span>
                                     }
                                 </p>
                             </div>

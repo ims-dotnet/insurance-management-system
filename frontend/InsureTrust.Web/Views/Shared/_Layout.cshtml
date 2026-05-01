@@ -41,7 +41,7 @@
             }
             else
             {
-                <div class="alert alert-info bg-primary bg-opacity-10 border-0 text-primary rounded-4 p-3 mb-4 fs-7 text-center">
+                <div class="alert alert-info bg-primary bg-opacity-10 border-0 text-primary rounded-3 p-2 mb-3 fs-8 text-center">
                     <i class="fa-solid fa-circle-check me-1"></i> Connected as <strong>@User.Identity.Name</strong>
                 </div>
             }
@@ -49,17 +49,17 @@
             <nav class="nav-ledger">
                 @if (User.IsInRole("Admin"))
                 {
-                    <a asp-controller="Admin" asp-action="Dashboard" class="fs-7 py-2"><i class="fa-solid fa-gauge-high me-2"></i> Admin Dashboard</a>
+                    <a asp-controller="Admin" asp-action="Dashboard"><i class="fa-solid fa-gauge-high me-2"></i> Admin Dashboard</a>
                 }
                 else
                 {
-                    <a asp-controller="Home" asp-action="Index" class="fs-7 py-2"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard</a>
+                    <a asp-controller="Home" asp-action="Index"><i class="fa-solid fa-chart-pie me-2"></i> Dashboard</a>
                 }
-                <a asp-controller="Policy" asp-action="GetAllPolicybyid" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-shield-halved me-2"></i> Policy Desk</a>
-                <a asp-controller="Claim" asp-action="Index" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Claim Desk</a>
-                <a asp-controller="Notification" asp-action="Index" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-bell me-2"></i> Notifications</a>
-                <a asp-controller="Account" asp-action="Profile" data-auth-required="true" class="fs-7 py-2"><i class="fa-solid fa-user me-2"></i> Profile</a>
-                <button type="button" id="openCalculatorPanel" class="btn-link-ledger fs-7 py-2"><i class="fa-solid fa-calculator me-2"></i> Calculator</button>
+                <a asp-controller="Policy" asp-action="GetAllPolicybyid" data-auth-required="true"><i class="fa-solid fa-shield-halved me-2"></i> Policy Desk</a>
+                <a asp-controller="Claim" asp-action="Index" data-auth-required="true"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Claim Desk</a>
+                <a asp-controller="Notification" asp-action="Index" data-auth-required="true"><i class="fa-solid fa-bell me-2"></i> Notifications</a>
+                <a asp-controller="Account" asp-action="Profile" data-auth-required="true"><i class="fa-solid fa-user me-2"></i> Profile</a>
+                <button type="button" id="openCalculatorPanel" class="btn-link-ledger"><i class="fa-solid fa-calculator me-2"></i> Calculator</button>
             </nav>
 
             <div class="sidebar-footer">
@@ -99,14 +99,12 @@
             else
             {
                 <header class="main-header">
-                    <div class="header-actions">
-                        @await Html.PartialAsync("_NotificationBell")
-                        <div class="header-user-profile">
-                            <img id="sidebarUserAvatar" class="header-avatar" src="~/images/avatars/avatar-1.svg" alt="User avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';" />
-                            <div class="user-details" style="@(User.Identity?.IsAuthenticated == true ? "display: block;" : "display: none;")">
-                                <p id="sidebarUserName">@(User.Identity?.Name ?? "Guest User")</p>
-                                <p id="sidebarUserEmail">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "guest@insuretrust")</p>
-                            </div>
+                    @await Html.PartialAsync("_NotificationBell")
+                    <div class="header-user-profile">
+                        <img id="sidebarUserAvatar" class="header-avatar" src="~/images/avatars/avatar-1.svg" alt="User avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=FBBC05&color=000';" />
+                        <div class="user-details" style="@(User.Identity?.IsAuthenticated == true ? "display: block;" : "display: none;")">
+                            <p id="sidebarUserName">@(User.Identity?.Name ?? "Guest User")</p>
+                            <p id="sidebarUserEmail">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "guest@insuretrust")</p>
                         </div>
                     </div>
                 </header>
