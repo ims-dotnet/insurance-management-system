@@ -13,7 +13,8 @@ using FluentValidation.AspNetCore;
 using InsureTrust.IdentityService.Mappings;
 using InsureTrust.IdentityService.Validators;
 
-DotNetEnv.Env.TraversePath().Load();
+if (!Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Production") ?? true)
+    DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()

@@ -15,7 +15,8 @@ using System.Security.Claims;
 using System.Text;
 
 
-DotNetEnv.Env.TraversePath().Load();
+if (!Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Production") ?? true)
+    DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<InsureTrustProductServiceContext>(options =>

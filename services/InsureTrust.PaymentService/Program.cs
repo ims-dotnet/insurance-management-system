@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 using Serilog;
 
-DotNetEnv.Env.TraversePath().Load();
+if (!Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.Equals("Production") ?? true)
+    DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
