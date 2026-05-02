@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\services\InsureTrust.CalculatorService\InsureTrust.CalculatorService.csproj" />
+    <ProjectReference Include="../../services/InsureTrust.CalculatorService/InsureTrust.CalculatorService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

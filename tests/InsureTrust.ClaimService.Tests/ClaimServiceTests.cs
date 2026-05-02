@@ -5,6 +5,9 @@ using InsureTrust.ClaimService.DTOs;
 using InsureTrust.ClaimService.Models;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using System.Net;
+using Moq.Protected;
 using Xunit;
 
 namespace InsureTrust.ClaimService.Tests
@@ -14,6 +17,8 @@ namespace InsureTrust.ClaimService.Tests
         private readonly Mock<IClaimRepository> _repoMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<InsureTrust.ClaimService.Services.ClaimService>> _loggerMock;
+        private readonly Mock<IConfiguration> _configMock;
+        private readonly HttpClient _httpClient;
         private readonly InsureTrust.ClaimService.Services.ClaimService _service;
 
         public ClaimServiceTests()
@@ -21,7 +26,30 @@ namespace InsureTrust.ClaimService.Tests
             _repoMock = new Mock<IClaimRepository>();
             _mapperMock = new Mock<IMapper>();
             _loggerMock = new Mock<ILogger<InsureTrust.ClaimService.Services.ClaimService>>();
-            _service = new InsureTrust.ClaimService.Services.ClaimService(_repoMock.Object, _mapperMock.Object, _loggerMock.Object);
+            _configMock = new Mock<IConfiguration>();
+
+            var handlerMock = new Mock<HttpMessageHandler>();
+            handlerMock
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                  "SendAsync",
+                  ItExpr.IsAny<HttpRequestMessage>(),
+                  ItExpr.IsAny<CancellationToken>()
+               )
+               .ReturnsAsync(new HttpResponseMessage()
+               {
+                  StatusCode = HttpStatusCode.OK,
+                  Content = new StringContent("{}"),
+               });
+
+            _httpClient = new HttpClient(handlerMock.Object);
+
+            _service = new InsureTrust.ClaimService.Services.ClaimService(
+                _repoMock.Object, 
+                _mapperMock.Object, 
+                _loggerMock.Object, 
+                _httpClient, 
+                _configMock.Object);
         }
 
         [Fact]

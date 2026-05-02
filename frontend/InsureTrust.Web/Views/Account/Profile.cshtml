@@ -5,13 +5,18 @@
 }
 
 <section class="profile-shell fade-in-up">
-    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+<div class="brut-page-header mb-5">
+    <div class="d-flex justify-content-between align-items-center">
         <div>
-            <span class="meta-line"><i class="fa-solid fa-user-circle me-1"></i> Account Settings</span>
-            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Your Profile</h1>
-            <p class="text-muted mt-2 fs-5">Manage your personal information and preferences.</p>
+            <span class="text-primary fw-900 text-uppercase" style="font-size: 0.65rem; letter-spacing: 2px;">Account Security</span>
+            <h1 class="display-6 fw-900 text-white mb-0 mt-1" style="text-transform: uppercase; letter-spacing: -1px;">Your Profile</h1>
+            <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Manage your personal information and preferences.</p>
+        </div>
+        <div class="d-flex gap-2">
+             <div class="badge-brut">Verified Account</div>
         </div>
     </div>
+</div>
 
     @if (TempData["Success"] != null)
     {
@@ -28,90 +33,90 @@
 
     <div class="row g-4">
         <div class="col-lg-8">
-            <div class="panel-card h-100 p-0 overflow-hidden border border-secondary border-opacity-25 rounded-4">
-                <div class="p-4 bg-dark bg-opacity-50 border-bottom border-secondary border-opacity-25 d-flex align-items-center gap-4">
+            <div class="brut-card h-100">
+                <div class="p-4 bg-dark d-flex align-items-center gap-4 border-bottom border-black">
                     <div class="position-relative">
-                        <img src="~/images/avatars/avatar-1.svg" alt="Profile" class="rounded-circle border border-2 border-primary" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';" />
-                        <button class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0" style="width: 28px; height: 28px; padding: 0;">
-                            <i class="fa-solid fa-camera fs-8"></i>
+                        <img src="~/images/avatars/avatar-1.svg" alt="Profile" class="border border-3 border-primary" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=User&background=FBBC05&color=000';" />
+                        <button class="btn-brut-icon position-absolute bottom-0 end-0">
+                            <i class="fa-solid fa-camera"></i>
                         </button>
                     </div>
                     <div>
-                        <h3 class="text-white fw-bold mb-1" id="profileNameDisplay">Loading...</h3>
-                        <p class="text-muted mb-0 fs-7 d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-envelope"></i> <span id="profileEmailDisplay">--</span>
+                        <h3 class="text-white fw-900 mb-1" id="profileNameDisplay" style="text-transform: uppercase;">Loading...</h3>
+                        <p class="text-white-50 mb-0 fs-7 d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-envelope text-primary"></i> <span id="profileEmailDisplay">--</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="p-4">
-                    <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-address-card text-primary me-2"></i> Personal Details</h4>
+                <div class="p-4 bg-white">
+                    <h4 class="text-black fw-900 mb-4 fs-5 text-uppercase"><i class="fa-solid fa-address-card text-primary me-2"></i> Personal Details</h4>
                     
-                    <div class="row g-4 mb-5">
+                    <div class="row g-3 mb-5">
                         <div class="col-sm-6">
-                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Direct Extension</p>
-                                <p class="text-white fw-medium mb-0 fs-6" id="profilePhoneDisplay">--</p>
+                            <div class="p-3 bg-black text-white border-black">
+                                <p class="text-primary text-uppercase tracking-wider fs-9 fw-900 mb-1">Direct Extension</p>
+                                <p class="fw-bold mb-0 fs-6" id="profilePhoneDisplay">--</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Assigned Role</p>
-                                <p class="text-white fw-medium mb-0 fs-6">
-                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1" id="profileRoleDisplay">--</span>
+                            <div class="p-3 bg-black text-white border-black">
+                                <p class="text-primary text-uppercase tracking-wider fs-9 fw-900 mb-1">Assigned Role</p>
+                                <p class="fw-bold mb-0 fs-6">
+                                    <span class="badge bg-primary text-black border-black rounded-0 px-3 py-1" id="profileRoleDisplay">--</span>
                                 </p>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">User Identifier</p>
-                                <p class="text-white fw-medium mb-0 fs-6 font-monospace" id="profileUserNumberDisplay">--</p>
+                            <div class="p-3 bg-black text-white border-black">
+                                <p class="text-primary text-uppercase tracking-wider fs-9 fw-900 mb-1">User Identifier</p>
+                                <p class="fw-bold mb-0 fs-6 font-monospace" id="profileUserNumberDisplay">--</p>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 h-100">
-                                <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Account Status</p>
-                                <p class="text-white fw-medium mb-0 fs-6">
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1"><i class="fa-solid fa-check-circle me-1"></i> Active</span>
+                            <div class="p-3 bg-black text-white border-black">
+                                <p class="text-primary text-uppercase tracking-wider fs-9 fw-900 mb-1">Account Status</p>
+                                <p class="fw-bold mb-0 fs-6">
+                                    <span class="badge bg-success text-white border-black rounded-0 px-3 py-1"><i class="fa-solid fa-check-circle me-1"></i> Active</span>
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-user-pen text-accent me-2"></i> Update Information</h4>
+                    <h4 class="text-black fw-900 mb-4 fs-5 text-uppercase"><i class="fa-solid fa-user-pen text-primary me-2"></i> Update Information</h4>
                     <form id="profileUpdateForm" asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data" novalidate>
                         <div class="row g-4">
                             <div class="col-md-6 form-group">
-                                <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="Name">Full Name</label>
+                                <label class="form-label text-black fw-900 text-uppercase fs-7 tracking-wider" asp-for="Name">Full Name</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                                    <span class="input-group-text bg-black text-white border-black rounded-0">
                                         <i class="fa-solid fa-user"></i>
                                     </span>
-                                    <input asp-for="Name" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" />
+                                    <input asp-for="Name" class="form-control border-black rounded-0 py-2 shadow-none" style="font-weight: 600;" />
                                 </div>
                             </div>
                             <div class="col-md-6 form-group">
-                                <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="PhoneNo">Phone Number</label>
+                                <label class="form-label text-black fw-900 text-uppercase fs-7 tracking-wider" asp-for="PhoneNo">Phone Number</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                                    <span class="input-group-text bg-black text-white border-black rounded-0">
                                         <i class="fa-solid fa-phone"></i>
                                     </span>
-                                    <input asp-for="PhoneNo" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" />
+                                    <input asp-for="PhoneNo" class="form-control border-black rounded-0 py-2 shadow-none" style="font-weight: 600;" />
                                 </div>
                             </div>
                         </div>
                         <p id="profileMessage" class="meta-note mt-3 d-none"></p>
                         <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-lg" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
-                                Save Changes
+                            <button type="submit" class="btn-inst btn-inst-primary px-5 py-2">
+                                SAVE CHANGES
                             </button>
                         </div>
                     </form>
 
-                    <div class="mt-5 pt-4 border-top border-secondary border-opacity-10">
-                        <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-file-shield text-success me-2"></i> Your Policy Portfolio</h4>
+                    <div class="mt-5 pt-4 border-top border-black border-2">
+                        <h4 class="text-black fw-900 mb-4 fs-5 text-uppercase"><i class="fa-solid fa-file-shield text-primary me-2"></i> Your Policy Portfolio</h4>
                         
-                        <div class="d-flex flex-column gap-3">
+                        <div class="d-flex flex-column gap-2">
                             @{
                                 var policies = ViewBag.UserPolicies as IEnumerable<PolicyDto>;
                             }
@@ -119,26 +124,26 @@
                             {
                                 @foreach (var p in policies)
                                 {
-                                    <div class="p-3 bg-dark bg-opacity-25 rounded-3 border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                    <div class="p-3 bg-white border border-black d-flex justify-content-between align-items-center">
                                         <div>
                                             <div class="d-flex align-items-center gap-2 mb-1">
-                                                <h6 class="text-white mb-0 fw-bold">@p.PolicyNumber</h6>
-                                                <span class="badge @(p.Status?.ToLower() == "active" ? "bg-success" : "bg-warning") bg-opacity-10 text-@(p.Status?.ToLower() == "active" ? "success" : "warning") border @(p.Status?.ToLower() == "active" ? "border-success" : "border-warning") border-opacity-25 fs-9">
+                                                <h6 class="text-black mb-0 fw-900">@p.PolicyNumber</h6>
+                                                <span class="badge bg-black text-white border-black rounded-0 fs-9">
                                                     @p.Status
                                                 </span>
                                             </div>
-                                            <p class="text-muted mb-0 fs-7">@p.PolicyTypeName — Expires @p.ExpiryDate.ToString("dd MMM yyyy")</p>
+                                            <p class="text-muted mb-0 fs-7 fw-bold">@p.PolicyTypeName — Expires @p.ExpiryDate.ToString("dd MMM yyyy")</p>
                                         </div>
-                                        <a href="/Policy/GetAllPolicybyid" class="btn btn-sm btn-outline-primary rounded-pill px-3 fs-8">Details</a>
+                                        <a href="/Policy/GetAllPolicybyid" class="btn-inst py-1 px-3" style="font-size: 0.65rem;">DETAILS</a>
                                     </div>
                                 }
                             }
                             else
                             {
-                                <div class="p-4 text-center bg-dark bg-opacity-10 rounded-3 border border-dashed border-secondary border-opacity-25">
+                                <div class="p-4 text-center border-black border-2 border-dashed">
                                     <i class="fa-solid fa-folder-open text-muted fs-2 mb-2"></i>
-                                    <p class="text-muted mb-0">No active policies found in your portfolio.</p>
-                                    <a href="/Policy" class="btn btn-link text-primary text-decoration-none fs-7 mt-2">Browse Plans <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                                    <p class="text-black fw-bold mb-0">No active policies found in your portfolio.</p>
+                                    <a href="/Policy" class="btn-inst btn-inst-primary py-1 px-3 mt-3">BROWSE PLANS</a>
                                 </div>
                             }
                         </div>
@@ -149,24 +154,24 @@
 
         <div class="col-lg-4">
             <div class="d-flex flex-column gap-4">
-                <div class="panel-card p-0 overflow-hidden border border-primary border-opacity-25 rounded-4" style="background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));">
-                    <div class="p-4">
+                <div class="brut-card p-0 overflow-hidden">
+                    <div class="p-4 bg-black text-white">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4 class="text-white fw-bold mb-0 fs-5"><i class="fa-solid fa-wallet text-success me-2"></i> Wallet</h4>
-                            <i class="fa-brands fa-cc-visa text-muted fs-3 opacity-50"></i>
+                            <h4 class="fw-900 mb-0 fs-5 text-uppercase"><i class="fa-solid fa-wallet text-primary me-2"></i> Wallet</h4>
+                            <i class="fa-brands fa-cc-visa text-primary fs-3"></i>
                         </div>
-                        <p class="text-muted text-uppercase tracking-wider fs-8 fw-bold mb-1">Available Balance</p>
-                        <h2 class="display-5 fw-bolder text-white mb-4" id="profileBalanceDisplay">₹0</h2>
-                        <button type="button" class="btn btn-outline-success w-100 rounded-pill fw-bold bg-success bg-opacity-10 border-success border-opacity-50 hover-bg-success">
-                            <i class="fa-solid fa-money-bill-transfer me-2"></i> Request Disbursement
+                        <p class="text-primary text-uppercase tracking-wider fs-9 fw-900 mb-1">Available Balance</p>
+                        <h2 class="display-5 fw-900 text-white mb-4" id="profileBalanceDisplay" style="letter-spacing: -2px;">₹0</h2>
+                        <button type="button" class="btn-inst btn-inst-primary w-100">
+                            <i class="fa-solid fa-money-bill-transfer me-2"></i> REQUEST PAYOUT
                         </button>
                     </div>
                 </div>
 
-                <div class="panel-card border border-secondary border-opacity-25 rounded-4">
-                    <h4 class="text-white fw-bold mb-4 fs-5"><i class="fa-solid fa-calculator text-primary me-2"></i> Quick Estimate</h4>
-                    <p class="text-muted fs-7 mb-4">Calculate premium rates for different policy configurations instantly.</p>
-                    <div class="bg-dark bg-opacity-25 p-3 rounded-3 border border-secondary border-opacity-25">
+                <div class="brut-card p-4 bg-white">
+                    <h4 class="text-black fw-900 mb-4 fs-5 text-uppercase"><i class="fa-solid fa-calculator text-primary me-2"></i> Quick Estimate</h4>
+                    <p class="text-muted fs-7 mb-4 fw-bold">Calculate premium rates for different policy configurations instantly.</p>
+                    <div class="p-3 bg-black border-black">
                         @await Html.PartialAsync("_Calculator")
                     </div>
                 </div>
@@ -221,15 +226,5 @@
         .fs-7 { font-size: 0.85rem; }
         .fs-8 { font-size: 0.75rem; }
         .tracking-wider { letter-spacing: 1px; }
-        
-        .form-control:focus {
-            background-color: rgba(15, 23, 42, 0.8) !important;
-            border-color: var(--primary) !important;
-        }
-        
-        .hover-bg-success:hover {
-            background-color: var(--success) !important;
-            color: white !important;
-        }
     </style>
 }

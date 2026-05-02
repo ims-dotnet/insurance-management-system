@@ -9,7 +9,7 @@
             <i class="fa-solid fa-user-plus"></i>
         </div>
         <h1 class="auth-title text-center text-white mb-2">Create Account</h1>
-        <p class="auth-subtitle text-center text-muted mb-4 pb-2">Join InsureTrust and secure your future</p>
+        <p class="auth-subtitle text-center text-light mb-4 pb-2">Join InsureTrust and secure your future</p>
 
         <form id="registerForm" asp-controller="Account" asp-action="Register" method="post" enctype="multipart/form-data" novalidate class="auth-form">
             @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
@@ -21,62 +21,62 @@
 
             <div class="row g-3">
                 <div class="col-md-6 form-group mb-3">
-                    <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="Name">Full Legal Name</label>
+                    <label class="form-label text-light fw-bold text-uppercase fs-7 tracking-wider" asp-for="Name">Full Legal Name</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <span class="input-group-text bg-dark border-secondary text-light border-end-0 rounded-0">
                             <i class="fa-solid fa-user"></i>
                         </span>
-                        <input asp-for="Name" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" placeholder="John Doe" required />
+                        <input asp-for="Name" class="form-control bg-dark border-secondary text-light border-start-0 rounded-0 py-2 shadow-none" placeholder="John Doe" required />
                     </div>
                 </div>
 
                 <div class="col-md-6 form-group mb-3">
-                    <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="Email">Email Address</label>
+                    <label class="form-label text-light fw-bold text-uppercase fs-7 tracking-wider" asp-for="Email">Email Address</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <span class="input-group-text bg-dark border-secondary text-light border-end-0 rounded-0">
                             <i class="fa-solid fa-envelope"></i>
                         </span>
-                        <input asp-for="Email" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" type="email" placeholder="name@example.com" required />
+                        <input asp-for="Email" class="form-control bg-dark border-secondary text-light border-start-0 rounded-0 py-2 shadow-none" type="email" placeholder="name@example.com" required />
                     </div>
                 </div>
 
                 <div class="col-md-6 form-group mb-3">
-                    <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="PhoneNo">Phone Number</label>
+                    <label class="form-label text-light fw-bold text-uppercase fs-7 tracking-wider" asp-for="PhoneNo">Phone Number</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <span class="input-group-text bg-dark border-secondary text-light border-end-0 rounded-0">
                             <i class="fa-solid fa-phone"></i>
                         </span>
-                        <input asp-for="PhoneNo" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" placeholder="+1 (555) 000-0000" required />
+                        <input asp-for="PhoneNo" class="form-control bg-dark border-secondary text-light border-start-0 rounded-0 py-2 shadow-none" placeholder="+1 (555) 000-0000" required />
                     </div>
                 </div>
 
                 <div class="col-md-6 form-group mb-3">
-                    <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="PanCard">PAN Number</label>
+                    <label class="form-label text-light fw-bold text-uppercase fs-7 tracking-wider" asp-for="PanCard">PAN Number</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <span class="input-group-text bg-dark border-secondary text-light border-end-0 rounded-0">
                             <i class="fa-solid fa-id-card"></i>
                         </span>
-                        <input asp-for="PanCard" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" placeholder="ABCDE1234F" required />
+                        <input asp-for="PanCard" class="form-control bg-dark border-secondary text-light border-start-0 rounded-0 py-2 shadow-none" placeholder="ABCDE1234F" required />
                     </div>
                 </div>
 
                 <div class="col-md-6 form-group mb-4">
-                    <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="Password">Password</label>
+                    <label class="form-label text-light fw-bold text-uppercase fs-7 tracking-wider" asp-for="Password">Password</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <span class="input-group-text bg-dark border-secondary text-light border-end-0 rounded-0">
                             <i class="fa-solid fa-lock"></i>
                         </span>
-                        <input asp-for="Password" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" type="password" placeholder="••••••••" required />
+                        <input asp-for="Password" class="form-control bg-dark border-secondary text-light border-start-0 rounded-0 py-2 shadow-none" type="password" placeholder="••••••••" required />
                     </div>
                 </div>
 
                 <div class="col-md-6 form-group mb-4">
-                    <label class="form-label text-muted fw-bold text-uppercase fs-7 tracking-wider" asp-for="ConfirmPassword">Confirm Password</label>
+                    <label class="form-label text-light fw-bold text-uppercase fs-7 tracking-wider" asp-for="ConfirmPassword">Confirm Password</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark bg-opacity-50 border-secondary border-opacity-25 text-muted border-end-0 rounded-start-3">
+                        <span class="input-group-text bg-dark border-secondary text-light border-end-0 rounded-0">
                             <i class="fa-solid fa-shield-check"></i>
                         </span>
-                        <input asp-for="ConfirmPassword" class="form-control bg-dark bg-opacity-50 border-secondary border-opacity-25 text-white border-start-0 rounded-end-3 py-2 shadow-none" type="password" placeholder="••••••••" required />
+                        <input asp-for="ConfirmPassword" class="form-control bg-dark border-secondary text-light border-start-0 rounded-0 py-2 shadow-none" type="password" placeholder="••••••••" required />
                     </div>
                 </div>
             </div>
@@ -84,10 +84,10 @@
             <p id="registerMessage" class="meta-note d-none"></p>
 
             <div class="d-flex flex-column gap-3 mt-2">
-                <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-lg">
                     Create Account <i class="fa-solid fa-arrow-right ms-2"></i>
                 </button>
-                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary w-100 py-3 rounded-pill fw-bold text-white border-secondary border-opacity-25 hover-bg-dark">
+                <a asp-controller="Account" asp-action="Login" class="btn btn-dark w-100 py-3 fw-bold text-white border-light hover-bg-dark">
                     Already have an account? Sign In
                 </a>
             </div>

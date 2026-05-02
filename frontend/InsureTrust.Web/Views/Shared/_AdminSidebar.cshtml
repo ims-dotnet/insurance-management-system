@@ -19,16 +19,16 @@
     <a href="/Admin/Claims" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Claims" ? "active" : "")" style="color: var(--text-ink); margin-top: 0.25rem;">
         <i class="fas fa-hand-holding-medical" style="margin-right: 8px;"></i> Claims Management
     </a>
-    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+    <a href="/Renewal/RenewalHistory" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Renewal" ? "active" : "")" style="color: var(--text-ink); margin-top: 0.25rem;">
         <i class="fas fa-sync-alt" style="margin-right: 8px;"></i> Renewals Management
     </a>
-    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+    <a href="/Renewal/MasterPaymentLedger" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "MasterPaymentLedger" ? "active" : "")" style="color: var(--text-ink); margin-top: 0.25rem;">
         <i class="fas fa-receipt" style="margin-right: 8px;"></i> Transaction Logs
     </a>
-    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+    <a href="/Admin/Users" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Users" ? "active" : "")" style="color: var(--text-ink); margin-top: 0.25rem;">
         <i class="fas fa-users" style="margin-right: 8px;"></i> User Management
     </a>
-    <a href="javascript:void(0);" style="color: var(--text-ink); margin-top: 0.25rem;">
+    <a href="/Admin/Support" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Support" ? "active" : "")" style="color: var(--text-ink); margin-top: 0.25rem;">
         <i class="fas fa-headset" style="margin-right: 8px;"></i> Support
     </a>
     <a href="/Account/Logout" style="color: var(--accent-red); margin-top: auto; border-top: 1px solid var(--border-dark); padding-top: 1.5rem; font-size: 0.85rem; font-weight: bold;">

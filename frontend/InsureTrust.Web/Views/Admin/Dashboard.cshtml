@@ -23,6 +23,14 @@
         </div>
     </div>
 
+    @if (TempData["AdminError"] != null)
+    {
+        <div class="alert bg-warning text-dark border-dark border-3 rounded-0 fw-bold p-3 mb-4 d-flex align-items-center" style="border: 3px solid #000 !important; box-shadow: 4px 4px 0px #000;">
+            <i class="fa-solid fa-triangle-exclamation fs-4 me-3"></i>
+            <div>@TempData["AdminError"]</div>
+        </div>
+    }
+
     <!-- Top KPIs - Neo-Brutalism Style -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">

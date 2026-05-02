@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\services\InsureTrust.IdentityService\InsureTrust.IdentityService.csproj" />
+    <ProjectReference Include="../../services/InsureTrust.IdentityService/InsureTrust.IdentityService.csproj" />
   </ItemGroup>
 
 </Project>

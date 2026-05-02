@@ -227,7 +227,7 @@
         <p class="cp-page-sub">Register a new insurance product category with its nomenclature and coverage parameters into the active classification index.</p>
     </div>
     <div class="cp-header-actions">
-        <a asp-action="Index" class="bor-btn bor-btn-outline">
+        <a asp-action="Index" class="btn-inst">
             ← Back to Registry
         </a>
     </div>
@@ -258,7 +258,7 @@
                 <div class="cp-field">
                     <label class="field-label" asp-for="Name">Classification Name</label>
                     <input asp-for="Name"
-                           class="bor-input"
+                           class="brut-input"
                            placeholder="e.g. Comprehensive Term Life" />
                     <span asp-validation-for="Name" class="field-error"></span>
                 </div>
@@ -266,7 +266,7 @@
                 <div class="cp-field">
                     <label class="field-label" asp-for="Category">Division Category</label>
                     <input asp-for="Category"
-                           class="bor-input"
+                           class="brut-input"
                            placeholder="e.g. Life, Auto, Health" />
                     <span asp-validation-for="Category" class="field-error"></span>
                 </div>
@@ -274,7 +274,7 @@
                 <div class="cp-field">
                     <label class="field-label" asp-for="Icon">Identifying Icon</label>
                     <input asp-for="Icon"
-                           class="bor-input"
+                           class="brut-input"
                            placeholder="e.g. 🛡️" />
                     <span asp-validation-for="Icon" class="field-error"></span>
                 </div>
@@ -291,7 +291,7 @@
             <div class="cp-field">
                 <label class="field-label" asp-for="Description">Classification Summary</label>
                 <textarea asp-for="Description"
-                          class="bor-textarea"
+                          class="brut-input"
                           rows="5"
                           placeholder="Detail the coverage scope, limitations, and standard terms..."></textarea>
                 <span asp-validation-for="Description" class="field-error"></span>
@@ -301,10 +301,10 @@
         <div class="cp-actions">
             <span class="cp-footer-note">Form BOR-ADM-100 · Bureau of Risk</span>
             <div style="display:flex; gap:10px; align-items:center;">
-                <a asp-action="Index" asp-controller="Policy" class="bor-btn bor-btn-outline">
+                <a asp-action="Index" asp-controller="Policy" class="btn-inst" style="background: transparent; color: #000;">
                     Abort Filing
                 </a>
-                <button type="submit" class="bor-btn bor-btn-primary">
+                <button type="submit" class="btn-inst">
                     Commit to Registry →
                 </button>
             </div>

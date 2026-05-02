@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 builder.Services.AddHttpClient();
@@ -66,13 +67,12 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Removed for Azure deployment consistency
 app.UseStaticFiles();
 
+app.UseSession();
 app.UseRouting();
 
-
-app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

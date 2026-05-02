@@ -28,6 +28,8 @@ namespace InsureTrust.Web.Controllers
             }
         }
 
+        public IActionResult Index() => RedirectToAction(nameof(Dashboard));
+
         public async Task<IActionResult> Dashboard()
         {
             ViewBag.HideSidebar = true;
@@ -133,9 +135,10 @@ namespace InsureTrust.Web.Controllers
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 // Handle API unreachability
+                TempData["AdminError"] = "Warning: One or more backend services are unreachable. Dashboard data may be incomplete. Details: " + ex.Message;
             }
 
             return View(model);
@@ -190,6 +193,12 @@ namespace InsureTrust.Web.Controllers
                 TempData["PolicyActionError"] = "Policy service is currently unavailable.";
             }
 
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer) && referer.Contains("/Admin/Dashboard", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction(nameof(Dashboard));
+            }
+
             return RedirectToAction(nameof(Policies));
         }
 
@@ -238,6 +247,12 @@ namespace InsureTrust.Web.Controllers
             catch
             {
                 TempData["ClaimActionError"] = "Claim service is unavailable.";
+            }
+
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer) && referer.Contains("/Admin/Dashboard", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction(nameof(Dashboard));
             }
 
             return RedirectToAction(nameof(Claims));
@@ -309,6 +324,12 @@ namespace InsureTrust.Web.Controllers
             catch
             {
                 TempData["SupportActionError"] = "Support service is unavailable.";
+            }
+
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer) && referer.Contains("/Admin/Dashboard", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction(nameof(Dashboard));
             }
 
             return RedirectToAction(nameof(Support));

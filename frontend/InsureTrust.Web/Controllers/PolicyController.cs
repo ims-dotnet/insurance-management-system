@@ -16,23 +16,6 @@ namespace InsureTrust.Web.Controllers
             _service = service;
         }
 
-        [AllowAnonymous]
-        public IActionResult SetToken(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-                return Content("Token missing");
-
-            HttpContext.Session.SetString("JWT", token);
-
-            return Content("Token Saved Successfully");
-        }
-
-        [AllowAnonymous]
-        public IActionResult CheckToken()
-        {
-            var token = HttpContext.Session.GetString("JWT");
-            return Content(token ?? "NO TOKEN");
-        }
 
         public async Task<IActionResult> Index()
         {

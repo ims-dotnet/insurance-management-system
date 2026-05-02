@@ -22,8 +22,20 @@
     const closeBtn = document.getElementById('closeCalculatorPopup');
     const popup    = document.getElementById('calculatorPopup');
 
-    function openCalc()  { if (popup) { popup.classList.add('open');    popup.setAttribute('aria-hidden', 'false'); } }
-    function closeCalc() { if (popup) { popup.classList.remove('open'); popup.setAttribute('aria-hidden', 'true');  } }
+    function openCalc()  {
+        if (popup) {
+            popup.classList.add('open');
+            popup.style.display = 'flex'; // fallback for inline style set in layout
+            popup.setAttribute('aria-hidden', 'false');
+        }
+    }
+    function closeCalc() {
+        if (popup) {
+            popup.classList.remove('open');
+            popup.style.display = 'none';
+            popup.setAttribute('aria-hidden', 'true');
+        }
+    }
 
     if (openBtn)  openBtn.addEventListener('click', openCalc);
     if (closeBtn) closeBtn.addEventListener('click', closeCalc);
@@ -81,6 +93,8 @@
         loadTypes();
 
         runBtn.addEventListener('click', async function () {
+            const resultBox = panel.querySelector('.js-calc-result-box');
+            if (resultBox) resultBox.classList.remove('d-none');
             if (resultEl) resultEl.textContent = 'Calculating…';
 
             const age           = parseInt(ageEl?.value   || '0', 10);

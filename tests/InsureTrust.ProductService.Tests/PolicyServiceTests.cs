@@ -2,6 +2,9 @@ using Moq;
 using InsureTrust.ProductService.Services;
 using InsureTrust.ProductService.Repository;
 using InsureTrust.ProductService.DTOs;
+using Microsoft.Extensions.Configuration;
+using System.Net;
+using Moq.Protected;
 using Xunit;
 
 namespace InsureTrust.ProductService.Tests
@@ -9,12 +12,32 @@ namespace InsureTrust.ProductService.Tests
     public class PolicyServiceTests
     {
         private readonly Mock<IPolicyRepository> _repoMock;
+        private readonly Mock<IConfiguration> _configMock;
+        private readonly HttpClient _httpClient;
         private readonly PolicyService _service;
 
         public PolicyServiceTests()
         {
             _repoMock = new Mock<IPolicyRepository>();
-            _service = new PolicyService(_repoMock.Object);
+            _configMock = new Mock<IConfiguration>();
+
+            var handlerMock = new Mock<HttpMessageHandler>();
+            handlerMock
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                  "SendAsync",
+                  ItExpr.IsAny<HttpRequestMessage>(),
+                  ItExpr.IsAny<CancellationToken>()
+               )
+               .ReturnsAsync(new HttpResponseMessage()
+               {
+                  StatusCode = HttpStatusCode.OK,
+                  Content = new StringContent("{}"),
+               });
+
+            _httpClient = new HttpClient(handlerMock.Object);
+
+            _service = new PolicyService(_repoMock.Object, _httpClient, _configMock.Object);
         }
 
         [Fact]

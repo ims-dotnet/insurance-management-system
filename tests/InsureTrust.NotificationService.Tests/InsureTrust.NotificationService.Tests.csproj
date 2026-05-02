@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\services\InsureTrust.NotificationService\InsureTrust.NotificationService.csproj" />
+    <ProjectReference Include="../../services/InsureTrust.NotificationService/InsureTrust.NotificationService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

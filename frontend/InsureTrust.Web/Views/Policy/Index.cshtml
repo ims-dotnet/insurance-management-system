@@ -5,21 +5,21 @@
 }
 
 <section class="fade-in-up">
-    <div class="page-heading d-flex justify-content-between align-items-center mb-5">
+<div class="brut-page-header mb-5">
+    <div class="d-flex justify-content-between align-items-center">
         <div>
-            <span class="meta-line"><i class="fa-solid fa-shield-halved me-1"></i> Coverage Options</span>
-            <h1 class="display-5 fw-bold text-white mb-0 mt-2">Insurance Policies</h1>
-            <p class="text-muted mt-2 fs-5">Select a coverage plan that fits your needs.</p>
+            <span class="text-primary fw-900 text-uppercase" style="font-size: 0.65rem; letter-spacing: 2px;">Coverage Desk</span>
+            <h1 class="display-6 fw-900 text-white mb-0 mt-1" style="text-transform: uppercase; letter-spacing: -1px;">Insurance Policies</h1>
+            <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Select a coverage plan that fits your needs.</p>
         </div>
         @if (User.IsInRole("Admin"))
         {
-            <div class="d-none d-md-flex align-items-center gap-3">
-                <a asp-action="CreatePolicy" class="btn-inst btn-inst-primary shadow-lg">
-                    <i class="fa-solid fa-plus me-2"></i>New Classification
-                </a>
-            </div>
+            <a asp-action="CreatePolicy" class="btn-inst btn-inst-primary py-2 px-3">
+                <i class="fa-solid fa-plus me-2"></i>NEW POLICY
+            </a>
         }
     </div>
+</div>
 
     @if (!Model.Any())
     {
@@ -35,22 +35,22 @@
             @foreach (var item in Model)
             {
                 <div class="col-lg-4 col-md-6">
-                    <div class="panel-card h-100 d-flex flex-column p-0 border border-secondary border-opacity-25 rounded-4 overflow-hidden position-relative group">
+                    <div class="brut-card h-100 position-relative">
                         
                         @if (User.IsInRole("Admin"))
                         {
-                            <div class="position-absolute top-0 end-0 p-3 z-3 d-flex gap-2">
-                                <a asp-action="update" asp-route-id="@item.Id" class="btn btn-sm btn-dark border-secondary border-opacity-50 text-white rounded-circle" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center;" title="Edit">
-                                    <i class="fa-solid fa-pen fs-7"></i>
+                            <div class="position-absolute top-0 end-0 p-2 z-3 d-flex gap-1">
+                                <a asp-action="update" asp-route-id="@item.Id" class="btn-brut-icon" title="Edit">
+                                    <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger rounded-circle" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center;" title="Delete">
-                                    <i class="fa-solid fa-trash fs-7"></i>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn-brut-icon-danger" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
                                 </a>
                             </div>
                         }
 
-                        <div class="p-4 flex-grow-1">
-                            <div class="mb-4 text-primary fs-1">
+                        <div class="brut-card-body">
+                            <div class="mb-3 text-dark fs-2">
                                 @if (string.IsNullOrEmpty(item.Icon))
                                 {
                                     <i class="fa-solid fa-file-shield"></i>
@@ -61,21 +61,24 @@
                                 }
                             </div>
                             
-                            <div class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill mb-3 fs-7 px-3 py-1 text-uppercase tracking-wider">
+                            <div class="brut-badge">
                                 @item.Category Division
                             </div>
                             
-                            <h3 class="text-white fw-bold mb-3">@item.Name</h3>
-                            <p class="text-muted fs-7 mb-0 line-clamp-3">@item.Description</p>
+                            <h3 class="brut-title">@item.Name</h3>
+                            <p class="brut-text">@item.Description</p>
                         </div>
 
-                        <div class="p-4 bg-dark bg-opacity-50 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center mt-auto">
+                        <div class="brut-footer">
                             <div>
-                                <span class="text-white fw-bold fs-5">From ₹3,000</span>
-                                <span class="text-muted fs-7">/month</span>
+                                <div class="text-uppercase fw-900" style="font-size: 0.6rem; color: var(--primary);">Premium</div>
+                                <div class="d-flex align-items-baseline">
+                                    <span class="fw-900 fs-4 text-white">₹3,000</span>
+                                    <span class="ms-1" style="font-size: 0.65rem; color: #888;">/mo</span>
+                                </div>
                             </div>
-                            <a asp-action="Purchase" asp-route-id="@item.Id" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none;">
-                                Buy Policy <i class="fa-solid fa-arrow-right ms-1"></i>
+                            <a asp-action="Purchase" asp-route-id="@item.Id" class="btn-inst btn-inst-primary py-2 px-3" style="font-size: 0.75rem;">
+                                BUY POLICY <i class="fa-solid fa-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -84,35 +87,3 @@
         </div>
     }
 </section>
-
-@section Scripts {
-    <style>
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s ease-out forwards;
-        }
-        @@keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .fs-7 { font-size: 0.85rem; }
-        .tracking-wider { letter-spacing: 1px; }
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-        }
-        .group:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-            border-color: rgba(59, 130, 246, 0.4) !important;
-        }
-        .group {
-            transition: all 0.3s ease;
-        }
-    </style>
-}

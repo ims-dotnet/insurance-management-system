@@ -6,18 +6,19 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .ConfigureHttpClient((context, handler) =>
     {
-        // Bypass SSL certificate validation for local development
-        // We cast to object to avoid CS8121 type-conflict errors in the compiler
-        var h = (object)handler;
-
-        if (h is SocketsHttpHandler socketsHandler)
+        // Only bypass SSL in Development (local dev with self-signed certs)
+        if (builder.Environment.IsDevelopment())
         {
-            socketsHandler.SslOptions.RemoteCertificateValidationCallback = (message, cert, chain, errors) => true;
-        }
+            var h = (object)handler;
+            if (h is SocketsHttpHandler socketsHandler)
+            {
+                socketsHandler.SslOptions.RemoteCertificateValidationCallback = (message, cert, chain, errors) => true;
+            }
 
-        if (h is HttpClientHandler clientHandler)
-        {
-            clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+            if (h is HttpClientHandler clientHandler)
+            {
+                clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+            }
         }
     });
 
@@ -51,7 +52,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("GatewayCors");
 app.UseAuthorization();
 

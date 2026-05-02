@@ -80,19 +80,20 @@
                         </div>
                     </div>
                     <div class="nav-center">
-                        <a asp-controller="Admin" asp-action="Dashboard" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">DASHBOARD</a>
-                        <a asp-controller="Policy" asp-action="CreatePolicy" class="nav-link-admin">+ NEW POLICY TYPE</a>
+                        <a asp-controller="Admin" asp-action="Dashboard" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" || (ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Admin") ? "active" : "")">DASHBOARD</a>
+                        <a asp-controller="Admin" asp-action="Policies" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Policies" || ViewContext.RouteData.Values["controller"]?.ToString() == "Policy" ? "active" : "")">POLICIES</a>
+                        <a asp-controller="Admin" asp-action="Claims" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Claims" ? "active" : "")">CLAIMS</a>
                         <a asp-controller="Admin" asp-action="Support" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Support" ? "active" : "")">SUPPORT</a>
                     </div>
                     <div class="nav-right">
                         @await Html.PartialAsync("_NotificationBell")
-                        <div class="admin-user-info ms-4">
+                        <div class="admin-user-info ms-2">
                             <div class="initials-circle bg-warning text-dark fw-bold">
                                 @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")@(User.Identity?.Name?.Contains(" ") == true ? User.Identity?.Name?.Split(' ')[1].Substring(0, 1).ToUpper() : "D")
                             </div>
-                            <span class="ms-2 fs-8 fw-bold text-white">@User.Identity?.Name</span>
+                            <span class="admin-name text-white ms-2 fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">@User.Identity?.Name</span>
                         </div>
-                        <a asp-controller="Account" asp-action="Logout" class="btn-signout ms-4">SIGN OUT</a>
+                        <a asp-controller="Account" asp-action="Logout" class="btn-signout ms-1">SIGN OUT</a>
                     </div>
                 </nav>
             }
@@ -130,15 +131,8 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        // Simple script to toggle calculator popup since we hid it by default
-        $(document).ready(function() {
-            $('#openCalculatorPanel').click(function() {
-                $('#calculatorPopup').css('display', 'flex').attr('aria-hidden', 'false');
-            });
-            $('#closeCalculatorPopup').click(function() {
-                $('#calculatorPopup').css('display', 'none').attr('aria-hidden', 'true');
-            });
-        });
+        // Calculator open/close is handled by site.js using the .open class.
+        // This block is intentionally left minimal to avoid double-binding.
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

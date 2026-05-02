@@ -2,7 +2,7 @@
   "dependencies": {
     "mssql1": {
       "type": "mssql",
-      "connectionId": "ConnectionStrings:InsureTrustProductServiceContext"
+      "connectionId": "ConnectionStrings:Default"
     }
   }
 }

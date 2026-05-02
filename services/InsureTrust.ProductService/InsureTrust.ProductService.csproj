@@ -27,7 +27,7 @@
 
 	<ItemGroup>
 
-		<ProjectReference Include="..\InsureTrust.IdentityService\InsureTrust.IdentityService.csproj" />
+		<ProjectReference Include="../InsureTrust.IdentityService/InsureTrust.IdentityService.csproj" />
 	</ItemGroup>
 
 </Project>

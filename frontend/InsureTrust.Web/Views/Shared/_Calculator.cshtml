@@ -3,38 +3,56 @@
     var sectionId = string.IsNullOrWhiteSpace(suffix) ? "calculatorPanel" : $"calculatorPanel{suffix}";
 }
 
-<section id="@sectionId" class="panel-card calculator-panel js-calculator">
-    <div class="panel-title">Estimator Console</div>
-    <div class="calc-grid">
-        <div>
-            <label class="form-label">Age</label>
-            <input class="form-control-inst js-calc-age" type="number" min="18" max="70" placeholder="e.g. 25" autocomplete="off" />
+<section id="@sectionId" class="brut-card bg-white js-calculator overflow-hidden">
+    <div class="p-2 bg-black text-white fw-900 text-uppercase d-flex align-items-center" style="font-size: 0.6rem; border-bottom: 2px solid #000;">
+        <i class="fa-solid fa-microchip me-2 text-primary"></i> Estimator Console
+    </div>
+    <div class="p-3">
+        <div class="d-flex flex-column gap-3">
+            <div class="brut-form-group">
+                <label class="text-black fw-900 text-uppercase mb-1 d-block" style="font-size: 0.6rem; letter-spacing: 1px;">User Age</label>
+                <input class="brut-input js-calc-age" type="number" min="18" max="70" placeholder="e.g. 25" />
+            </div>
+            
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="brut-form-group">
+                        <label class="text-black fw-900 text-uppercase mb-1 d-block" style="font-size: 0.6rem; letter-spacing: 1px;">Coverage Amt</label>
+                        <input class="brut-input js-calc-amount" type="number" min="5000" max="150000" placeholder="e.g. 50000" />
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="brut-form-group">
+                        <label class="text-black fw-900 text-uppercase mb-1 d-block" style="font-size: 0.6rem; letter-spacing: 1px;">Tenure (Mo)</label>
+                        <input class="brut-input js-calc-tenure" type="number" min="12" max="36" placeholder="e.g. 12" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="brut-form-group">
+                <label class="text-black fw-900 text-uppercase mb-1 d-block" style="font-size: 0.6rem; letter-spacing: 1px;">Policy Category</label>
+                <select class="brut-select js-calc-category">
+                    <option value="">-- SELECT --</option>
+                    <option value="Personal">PERSONAL</option>
+                    <option value="Business">BUSINESS</option>
+                </select>
+            </div>
+
+            <div class="brut-form-group">
+                <label class="text-black fw-900 text-uppercase mb-1 d-block" style="font-size: 0.6rem; letter-spacing: 1px;">Policy Type</label>
+                <select class="brut-select js-calc-policy-type" disabled>
+                    <option value="">-- WAITING --</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-inst btn-inst-primary w-100 py-2 mt-2 js-calc-run" style="font-size: 0.75rem;">
+                <i class="fa-solid fa-bolt me-1"></i> RUN ESTIMATE
+            </button>
         </div>
-        <div>
-            <label class="form-label">Package Amount</label>
-            <input class="form-control-inst js-calc-amount" type="number" min="5000" max="15000" placeholder="Min: 5000" autocomplete="off" />
-        </div>
-        <div>
-            <label class="form-label">Tenure (Months)</label>
-            <input class="form-control-inst js-calc-tenure" type="number" min="12" max="36" placeholder="e.g. 12" autocomplete="off" />
-        </div>
-        <div>
-            <label class="form-label">Policy Category</label>
-            <select class="form-control-inst js-calc-category">
-                <option value="">Select category</option>
-                <option value="Personal">Personal</option>
-                <option value="Business">Business</option>
-            </select>
-        </div>
-        <div>
-            <label class="form-label">Policy Type</label>
-            <select class="form-control-inst js-calc-policy-type" disabled>
-                <option value="">Select policy type</option>
-            </select>
+        
+        <div class="mt-3 p-2 bg-black text-primary border-2 border-black d-none js-calc-result-box">
+             <div class="text-uppercase fw-900 mb-1" style="font-size: 0.5rem; color: #666; letter-spacing: 1px;">Projected Premium</div>
+             <div class="fs-5 fw-900 js-calc-result" style="letter-spacing: -1px;">--</div>
         </div>
     </div>
-    <div class="panel-actions">
-        <button type="button" class="btn-inst btn-inst-success js-calc-run">Run Estimate</button>
-    </div>
-    <p class="meta-note js-calc-result"></p>
 </section>

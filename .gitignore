@@ -483,3 +483,11 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 .env
+
+# Custom project ignores
+*.bak
+*.csproj.user
+wwwroot/uploads/
+.DS_Store
+InsureTrust.slnLaunch.user
+
