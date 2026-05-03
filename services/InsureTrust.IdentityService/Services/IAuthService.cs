@@ -10,5 +10,6 @@ public interface IAuthService
     Task<UserDto> GetProfileAsync(int userId);
     Task<UserDto> UpdateProfileAsync(int userId, UpdateProfileDto dto, string uploadPath);
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
+    Task<bool> UpdateUserBalanceAsync(int userId, decimal amountToAdd);
 }
 

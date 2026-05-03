@@ -44,15 +44,15 @@ namespace InsureTrust.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Purchase(CreatePolicyDto dto)
         {
-            if (!ModelState.IsValid)
-                return View(dto);
-
-            var result = await _service.PurchaseAsync(dto);
-
-            if (result)
+            if (ModelState.IsValid)
             {
-                TempData["Success"] = "Policy purchased successfully";
-                return RedirectToAction("GetAllPolicybyid");
+                TempData["Info"] = "Please complete the payment to finalize your policy purchase.";
+                return RedirectToAction("Checkout", "Renewal", new 
+                { 
+                    policyId = dto.PolicyTypeId, 
+                    amount = dto.PackageAmount, 
+                    tenure = dto.Tenure 
+                });
             }
 
             TempData["Error"] = "Policy purchase failed";

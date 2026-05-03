@@ -16,7 +16,6 @@ namespace InsureTrust.Web.Models
         [Range(0.01, double.MaxValue)]
         public decimal MaturityAmount { get; set; }
         
-        public List<IFormFile> Documents { get; set; } = new();
     }
 
     public class ClaimViewModel
@@ -30,5 +29,11 @@ namespace InsureTrust.Web.Models
         public string? AdminRemarks { get; set; }
         public DateTime SubmittedAt { get; set; }
         public List<string> DocumentUrls { get; set; } = new();
+    }
+
+    public class ClaimIndexViewModel
+    {
+        public IEnumerable<ClaimViewModel> Claims { get; set; } = new List<ClaimViewModel>();
+        public IEnumerable<PolicyDto> ActivePolicies { get; set; } = new List<PolicyDto>();
     }
 }

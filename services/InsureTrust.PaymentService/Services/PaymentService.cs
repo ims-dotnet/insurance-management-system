@@ -32,12 +32,13 @@ namespace InsureTrust.PaymentService.Services
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            // Fetch real amount from Product Service
+            // Fetch policy type details to confirm existence
             var initialPolicy = await _productClient.GetPolicyByPolicyIdAsync(dto.PolicyId);
             if (initialPolicy == null)
                 throw new NotFoundException("Policy product not found.");
 
-            decimal amount = initialPolicy.PackageAmount;
+            // Use provided amount if available, else fall back to default
+            decimal amount = dto.PackageAmount > 0 ? dto.PackageAmount : initialPolicy.PackageAmount;
 
             var gatewayResult = await _gateway.ProcessAsync(amount, dto.PaymentMethod);
 
@@ -45,7 +46,7 @@ namespace InsureTrust.PaymentService.Services
             if (gatewayResult.Success)
             {
                 // Register the policy in ProductService and get real ID/Number
-                var productResponse = await _productClient.RegisterNewPolicyAsync(userId, dto.PolicyId, amount);
+                var productResponse = await _productClient.RegisterNewPolicyAsync(userId, dto.PolicyId, amount, dto.Tenure);
                 generatedUserPolicyId = productResponse?.UserPolicyId;
             }
 

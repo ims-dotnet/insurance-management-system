@@ -176,5 +176,16 @@ namespace InsureTrust.ProductService.Repository
 
             return _mapper.Map<PolicyDto>(entity);
         }
+
+        public async Task<bool> UpdatePolicyStatusAsync(int policyId, string newStatus)
+        {
+            var entity = await _context.UserPolicies.FindAsync(policyId);
+            if (entity == null) return false;
+
+            entity.Status = newStatus;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -246,5 +246,22 @@ namespace InsureTrust.ProductService.Controllers
 
             return Ok(ApiResponse<PolicyDto>.Ok(result));
         }
+
+        [AllowAnonymous]
+        [HttpPut("status/{policyId}")]
+        public async Task<IActionResult> UpdatePolicyStatus(int policyId, [FromBody] UpdatePolicyStatusDto dto)
+        {
+            _logger.LogInformation("Updating policy {PolicyId} status to {Status}", policyId, dto.Status);
+
+            if (policyId <= 0)
+                throw new ArgumentException("Invalid Policy Id");
+
+            if (string.IsNullOrWhiteSpace(dto.Status))
+                return BadRequest("Status cannot be empty");
+
+            var result = await _service.UpdatePolicyStatusAsync(policyId, dto.Status);
+
+            return Ok(ApiResponse<bool>.Ok(result, "Policy status updated successfully"));
+        }
     }
 }

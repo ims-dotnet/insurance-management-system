@@ -20,7 +20,7 @@ public class UserPolicy
 
     [Required]
     [MaxLength(20)]
-    public string Status { get; set; } = "Pending";  // Pending, Active, Rejected, Expired
+    public string Status { get; set; } = "Pending";  // Pending, Active, Rejected, Expired, Claimed
 
     public DateTime PurchaseDate { get; set; } = DateTime.UtcNow;
 

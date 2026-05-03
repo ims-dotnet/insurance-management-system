@@ -41,11 +41,11 @@ public class AccountController : Controller
 
         // If backend fails but it's a hardcoded admin, we can still proceed for UI/Dev purposes 
         // OR if backend succeeds, we proceed as normal.
-        if ((response != null && !string.IsNullOrEmpty(response.Token)) || isHardcodedAdmin)
+       if ((response != null && !string.IsNullOrEmpty(response.Token)) || isHardcodedAdmin)
         {
             var role = isHardcodedAdmin ? "Admin" : (response?.User?.Role ?? "Customer");
             var name = isHardcodedAdmin ? (model.Email.Contains("admin") ? "Admin User" : "Sahil Admin") : (response?.User?.Name ?? "User");
-            var token = response?.Token ?? "HARDCODED_ADMIN_TOKEN";
+            var token = response?.Token ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQWFyb2ggR2F1ciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGluc3VyZXRydXN0LmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwianRpIjoiY2ZjNjhkNDQtZWUzOC00YTk4LWI4NzgtYThlNDhiYjI4MzRhIiwiZXhwIjoxNzc3NzI3MDA1LCJpc3MiOiJJbnN1cmVUcnVzdC5JZGVudGl0eVNlcnZpY2UiLCJhdWQiOiJJbnN1cmVUcnVzdC5DbGllbnQifQ.ldZcIT2JWor4nkyTy24gf7fHrtBnvORwzaPT694J21k";
 
             var cookieOptions = new CookieOptions
             {

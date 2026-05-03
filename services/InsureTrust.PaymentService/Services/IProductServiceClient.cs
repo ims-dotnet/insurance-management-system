@@ -7,6 +7,6 @@ namespace InsureTrust.PaymentService.Services
         Task<ProductPolicyDto?> GetPolicyByPolicyIdAsync(int policyId);
         Task<ProductPolicyDto?> GetPolicyByNumberAsync(string policyNumber);
         Task<bool> RenewPolicyByNumberAsync(string policyNumber);
-        Task<ProductPolicyDto?> RegisterNewPolicyAsync(int userId, int policyId, decimal amount);
+        Task<ProductPolicyDto?> RegisterNewPolicyAsync(int userId, int policyId, decimal amount, int tenure);
     }
 }

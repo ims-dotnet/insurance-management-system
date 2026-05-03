@@ -104,12 +104,12 @@ namespace InsureTrust.PaymentService.Services
             return false;
         }
 
-        public async Task<ProductPolicyDto?> RegisterNewPolicyAsync(int userId, int policyId, decimal amount)
+        public async Task<ProductPolicyDto?> RegisterNewPolicyAsync(int userId, int policyId, decimal amount, int tenure)
         {
             try
             {
                 AddAuthorizationHeader();
-                var payload = new { PolicyTypeId = policyId, PackageAmount = amount }; // Match CreatePolicyDto in ProductService
+                var payload = new { PolicyTypeId = policyId, PackageAmount = amount, Tenure = tenure }; // Match CreatePolicyDto in ProductService
                 var response = await _httpClient.PostAsJsonAsync("api/policy/purchase", payload);
                 if (response.IsSuccessStatusCode)
                 {

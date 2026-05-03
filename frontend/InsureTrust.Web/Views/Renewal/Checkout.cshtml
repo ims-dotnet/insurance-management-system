@@ -20,6 +20,7 @@
             <input type="hidden" asp-for="IsRenewal" value="false" />
             <input type="hidden" asp-for="PolicyId" />
             <input type="hidden" asp-for="Amount" />
+            <input type="hidden" asp-for="Tenure" />
             <input type="hidden" asp-for="UserPolicyId" />
             
             <div style="flex: 1;">
@@ -76,6 +77,10 @@
                         <tr>
                             <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-transform: uppercase;">POLICY ID</td>
                             <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right; font-weight: bold;">@Model.PolicyId</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-transform: uppercase;">TENURE</td>
+                            <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-align: right; font-weight: bold;">@Model.Tenure Months</td>
                         </tr>
                         <tr>
                             <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-light); text-transform: uppercase;">APPROVAL STATUS</td>

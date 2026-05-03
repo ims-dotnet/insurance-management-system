@@ -14,7 +14,7 @@ namespace InsureTrust.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Checkout(int? policyId)
+        public async Task<IActionResult> Checkout(int? policyId, decimal? amount, int? tenure)
         {
             // Default to policy 1 if none provided (e.g. from navbar link)
             policyId ??= 1;
@@ -37,7 +37,8 @@ namespace InsureTrust.Web.Controllers
                 PaymentCategory = "UPI",
                 PaymentMethod = "GPay",
                 IsRenewal = false,
-                Amount = response.Data.PackageAmount
+                Amount = amount ?? response.Data.PackageAmount,
+                Tenure = tenure ?? 12
             };
 
             return View(model);
@@ -60,7 +61,8 @@ namespace InsureTrust.Web.Controllers
                 paymentCategory = model.PaymentCategory,
                 paymentMethod = model.PaymentMethod,
                 isRenewal = false,
-                amount = model.Amount
+                amount = model.Amount,
+                tenure = model.Tenure
             });
         }
 
@@ -122,7 +124,8 @@ namespace InsureTrust.Web.Controllers
             string paymentCategory,
             string paymentMethod,
             bool isRenewal,
-            decimal amount = 5000)
+            decimal amount = 5000,
+            int tenure = 12)
         {
             var model = new PolicyPaymentViewModel
             {
@@ -131,7 +134,8 @@ namespace InsureTrust.Web.Controllers
                 PaymentCategory = paymentCategory,
                 PaymentMethod = paymentMethod,
                 IsRenewal = isRenewal,
-                Amount = amount
+                Amount = amount,
+                Tenure = tenure
             };
 
             return View(model);
@@ -166,7 +170,9 @@ namespace InsureTrust.Web.Controllers
                     var request = new
                     {
                         policyId = model.PolicyId,
-                        paymentMethod = model.PaymentMethod
+                        paymentMethod = model.PaymentMethod,
+                        tenure = model.Tenure,
+                        packageAmount = model.Amount
                     };
 
                     apiResponse = await _renewalService.InitiateFirstPaymentAsync(request);

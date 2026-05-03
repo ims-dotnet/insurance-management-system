@@ -3,35 +3,48 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using InsureTrust.Web.Services;
 
 namespace InsureTrust.Web.Controllers
 {
     public class AdminController : Controller
     {
         private readonly HttpClient _httpClient;
+        private readonly IClaimService _claimService;
         private readonly string _gatewayUrl;
 
-        public AdminController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public AdminController(IHttpClientFactory httpClientFactory, IConfiguration configuration, IClaimService claimService)
         {
             _gatewayUrl = configuration["ApiBaseUrls:Gateway"] ?? throw new InvalidOperationException("Gateway URL not configured.");
             _httpClient = httpClientFactory.CreateClient();
             _httpClient.BaseAddress = new Uri(_gatewayUrl);
+            _claimService = claimService;
         }
 
         private void AddToken()
         {
             var token = Request.Cookies["authToken"];
-            _httpClient.DefaultRequestHeaders.Authorization = null;
-            if (!string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(token))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                // Note: We can't easily redirect from here, but we can clear headers
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+                return;
             }
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        private bool CheckToken()
+        {
+            var token = Request.Cookies["authToken"];
+            return !string.IsNullOrEmpty(token);
         }
 
         public IActionResult Index() => RedirectToAction(nameof(Dashboard));
 
         public async Task<IActionResult> Dashboard()
         {
+            if (!CheckToken()) return RedirectToAction("Login", "Account");
+            
             ViewBag.HideSidebar = true;
             AddToken();
             var model = new AdminDashboardViewModel();
@@ -42,11 +55,10 @@ namespace InsureTrust.Web.Controllers
                 var usersTask = _httpClient.GetAsync("api/admin/users");
                 var transTask = _httpClient.GetAsync("api/admin/transactions");
                 var pendingPoliciesTask = _httpClient.GetAsync("api/policy/pending");
-                var allClaimsTask = _httpClient.GetAsync("api/claim/all");
                 var supportTask = _httpClient.GetAsync("api/queries/all");
                 var policyTypesTask = _httpClient.GetAsync("api/policy/types");
 
-                await Task.WhenAll(statsTask, usersTask, transTask, pendingPoliciesTask, allClaimsTask, supportTask, policyTypesTask);
+                await Task.WhenAll(statsTask, usersTask, transTask, pendingPoliciesTask, supportTask, policyTypesTask);
 
                 // Process Stats
                 var statsResponse = await statsTask;
@@ -97,17 +109,14 @@ namespace InsureTrust.Web.Controllers
                 }
 
                 // Process Claims
-                var allClaimsResponse = await allClaimsTask;
-                if (allClaimsResponse.IsSuccessStatusCode)
-                {
-                    var content = await allClaimsResponse.Content.ReadAsStringAsync();
-                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (apiResponse.TryGetProperty("data", out var dataProperty))
+                try {
+                    var allClaims = await _claimService.GetAllClaimsAsync();
+                    model.PendingClaims = allClaims.Where(c =>
                     {
-                        var allClaims = JsonSerializer.Deserialize<List<AdminClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminClaimViewModel>();
-                        model.PendingClaims = allClaims.Where(c => c.Status?.ToLower() == "pending").ToList();
-                    }
-                }
+                        var status = !string.IsNullOrWhiteSpace(c.ClaimStatus) ? c.ClaimStatus : c.Status;
+                        return (status?.ToLower() == "pending");
+                    }).ToList();
+                } catch { }
 
                 // Process Support Tickets
                 var supportResponse = await supportTask;
@@ -204,22 +213,9 @@ namespace InsureTrust.Web.Controllers
 
         public async Task<IActionResult> Claims()
         {
-            AddToken();
-            var claims = new List<AdminClaimViewModel>();
-            try
-            {
-                var response = await _httpClient.GetAsync("api/claim/all");
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (apiResponse.TryGetProperty("data", out var dataProperty))
-                    {
-                        claims = JsonSerializer.Deserialize<List<AdminClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminClaimViewModel>();
-                    }
-                }
-            }
-            catch { }
+            if (!CheckToken()) return RedirectToAction("Login", "Account");
+
+            var claims = await _claimService.GetAllClaimsAsync();
             return View(claims);
         }
 
@@ -236,13 +232,12 @@ namespace InsureTrust.Web.Controllers
             AddToken();
             try
             {
-                var payload = new { Action = model.Action, AdminRemarks = model.Remarks ?? string.Empty };
-                var response = await _httpClient.PutAsJsonAsync($"api/claim/{model.Id}", payload);
+                var success = await _claimService.UpdateClaimStatusAsync(model.Id, model.Action, model.Remarks);
 
-                if (response.IsSuccessStatusCode)
+                if (success)
                     TempData["ClaimActionSuccess"] = $"Claim {model.Action} action completed.";
                 else
-                    TempData["ClaimActionError"] = "Could not update claim status.";
+                    TempData["ClaimActionError"] = "Failed to update claim status.";
             }
             catch
             {

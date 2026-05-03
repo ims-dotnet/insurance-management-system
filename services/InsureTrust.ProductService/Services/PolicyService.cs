@@ -152,5 +152,13 @@ namespace InsureTrust.ProductService.Services
 
             return await _repo.RenewPolicyAsync(policyId, userId) ?? new PolicyDto();
         }
+
+        public async Task<bool> UpdatePolicyStatusAsync(int policyId, string newStatus)
+        {
+            if (policyId <= 0 || string.IsNullOrWhiteSpace(newStatus))
+                return false;
+
+            return await _repo.UpdatePolicyStatusAsync(policyId, newStatus);
+        }
     }
 }

@@ -1,6 +1,7 @@
 using InsureTrust.Web.Models;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Net.Http.Json;
 
 namespace InsureTrust.Web.Services
 {
@@ -33,10 +34,12 @@ namespace InsureTrust.Web.Services
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (apiResponse.TryGetProperty("data", out var dataProperty))
-                {
-                    return JsonSerializer.Deserialize<List<ClaimViewModel>>(dataProperty.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<ClaimViewModel>();
-                }
+                
+                JsonElement dataProperty = default;
+                bool hasData = apiResponse.ValueKind == JsonValueKind.Object && apiResponse.TryGetProperty("data", out dataProperty);
+                var rawJson = hasData ? dataProperty.GetRawText() : apiResponse.GetRawText();
+                
+                return JsonSerializer.Deserialize<List<ClaimViewModel>>(rawJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<ClaimViewModel>();
             }
             return new List<ClaimViewModel>();
         }
@@ -48,17 +51,33 @@ namespace InsureTrust.Web.Services
             content.Add(new StringContent(model.Description), "Description");
             content.Add(new StringContent(model.MaturityAmount.ToString()), "MaturityAmount");
 
-            if (model.Documents != null)
-            {
-                foreach (var file in model.Documents)
-                {
-                    var fileContent = new StreamContent(file.OpenReadStream());
-                    fileContent.Headers.Add("Content-Type", file.ContentType);
-                    content.Add(fileContent, "Documents", file.FileName);
-                }
-            }
-
             var response = await _httpClient.PostAsync($"api/claim/submit/{policyId}", content);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<IEnumerable<AdminClaimViewModel>> GetAllClaimsAsync()
+        {
+            AddToken();
+            var response = await _httpClient.GetAsync("api/claim/all");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                
+                JsonElement dataProperty = default;
+                bool hasData = apiResponse.ValueKind == JsonValueKind.Object && apiResponse.TryGetProperty("data", out dataProperty);
+                var rawJson = hasData ? dataProperty.GetRawText() : apiResponse.GetRawText();
+                
+                return JsonSerializer.Deserialize<List<AdminClaimViewModel>>(rawJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AdminClaimViewModel>();
+            }
+            return new List<AdminClaimViewModel>();
+        }
+
+        public async Task<bool> UpdateClaimStatusAsync(int claimId, string action, string remarks)
+        {
+            AddToken();
+            var payload = new { Action = action, AdminRemarks = remarks ?? string.Empty };
+            var response = await _httpClient.PutAsJsonAsync($"api/claim/{claimId}", payload);
             return response.IsSuccessStatusCode;
         }
     }

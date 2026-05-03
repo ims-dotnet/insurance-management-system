@@ -67,7 +67,7 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 
-// app.UseHttpsRedirection(); // Removed for Azure deployment consistency
+app.UseHttpsRedirection(); // Removed for Azure deployment consistency
 app.UseStaticFiles();
 
 app.UseSession();

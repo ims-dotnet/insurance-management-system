@@ -14,6 +14,8 @@ namespace InsureTrust.ClaimService.Services
         private readonly ILogger<ClaimService> _logger;
         private readonly HttpClient _httpClient;
         private readonly string _notificationUrl;
+        private readonly string _identityServiceUrl;
+        private readonly string _productServiceUrl;
 
         public ClaimService(IClaimRepository repo, IMapper mapper, ILogger<ClaimService> logger, HttpClient httpClient, IConfiguration configuration)
         {
@@ -22,6 +24,8 @@ namespace InsureTrust.ClaimService.Services
             _logger = logger;
             _httpClient = httpClient;
             _notificationUrl = configuration["ServiceUrls:NotificationUrl"] ?? "https://localhost:7016/api/notifications/send";
+            _identityServiceUrl = configuration["ServiceUrls:IdentityUrl"] ?? "https://localhost:7001/api/auth";
+            _productServiceUrl = configuration["ServiceUrls:ProductUrl"] ?? "https://localhost:7296/api/policy";
         }
 
         private async Task SendNotification(int userId, string title, string message, string color, string feature)
@@ -39,6 +43,36 @@ namespace InsureTrust.ClaimService.Services
                 await _httpClient.PostAsJsonAsync(_notificationUrl, payload);
             }
             catch { /* Log failure but don't break flow */ }
+        }
+
+        private async Task<bool> UpdateUserBalanceAsync(int userId, decimal amountToDeduct)
+        {
+            try
+            {
+                var payload = new { UserId = userId, AmountToDeduct = amountToDeduct };
+                var response = await _httpClient.PutAsJsonAsync($"{_identityServiceUrl}/update-balance", payload);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to update user balance: {Error}", ex.Message);
+                return false;
+            }
+        }
+
+        private async Task<bool> UpdatePolicyStatusAsync(int policyId, string status)
+        {
+            try
+            {
+                var payload = new { Status = status };
+                var response = await _httpClient.PutAsJsonAsync($"{_productServiceUrl}/status/{policyId}", payload);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to update policy status: {Error}", ex.Message);
+                return false;
+            }
         }
 
         public async Task<IEnumerable<ClaimDto>> GetMyClaimsAsync(int userId)
@@ -109,10 +143,17 @@ namespace InsureTrust.ClaimService.Services
 
             await _repo.SaveChangesAsync();
 
+            // Update user balance and policy status if claim is approved
+            if (claim.ClaimStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+            {
+                await UpdateUserBalanceAsync(claim.UserId, claim.MaturityAmount);
+                await UpdatePolicyStatusAsync(claim.UserPolicyId, "Claimed");
+            }
+
             string status = claim.ClaimStatus; // "Approved" or "Denied"
             string color = status.ToLower() == "approved" ? "Green" : "Red";
             string message = status.ToLower() == "approved"
-                ? $"Your claim {claim.ClaimNumber} has been approved."
+                ? $"Your claim {claim.ClaimNumber} has been approved for ₹{claim.MaturityAmount:F2}."
                 : $"Your claim {claim.ClaimNumber} was rejected. Remarks: {dto.AdminRemarks}";
 
             await SendNotification(claim.UserId, $"Claim {status}", message, color, "Claim");

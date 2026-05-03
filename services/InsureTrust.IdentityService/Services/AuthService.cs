@@ -152,6 +152,20 @@ namespace InsureTrust.IdentityService.Services
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
+        public async Task<bool> UpdateUserBalanceAsync(int userId, decimal amountToDeduct)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new KeyNotFoundException("User not found.");
+
+            user.Balance += amountToDeduct; // Add balance for claim payout
+
+            await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
+
+            return true;
+        }
+
         private async Task<string> GenerateUserNumberAsync()
         {
             var users = await _userRepository.GetAllAsync();

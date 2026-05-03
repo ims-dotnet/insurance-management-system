@@ -17,5 +17,6 @@ public interface IPolicyService
     Task<PolicyDto> EditPolicyAsync(int policyId, EditPolicyDto dto, int userId);
     Task DeletePolicyAsync(int policyId, int userId, string role);
     Task<PolicyDto> RenewPolicyAsync(int policyId, int userId);
+    Task<bool> UpdatePolicyStatusAsync(int policyId, string newStatus);
 }
 

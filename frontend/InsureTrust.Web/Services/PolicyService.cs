@@ -55,11 +55,16 @@ namespace InsureTrust.Web.Services
             return await GetFromApiAsync<PolicyTypeDto>($"api/policy/types/{id}");
         }
 
-        public async Task<bool> PurchaseAsync(CreatePolicyDto dto)
+        public async Task<PolicyDto?> PurchaseAsync(CreatePolicyDto dto)
         {
             AddToken();
             var response = await _http.PostAsJsonAsync("api/policy/purchase", dto);
-            return response.IsSuccessStatusCode;
+            if (response.IsSuccessStatusCode)
+            {
+                var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<PolicyDto>>();
+                return apiResponse?.Data;
+            }
+            return null;
         }
 
         public async Task<bool> EditPolicy(CreatePolicyDto dto, int policyId)

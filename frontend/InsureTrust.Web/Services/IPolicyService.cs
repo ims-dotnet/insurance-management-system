@@ -9,7 +9,7 @@ namespace InsureTrust.Web.Services
 
         Task<PolicyTypeDto?> GetPolicyTypeByIdAsync(int id);
 
-        Task<bool> PurchaseAsync(CreatePolicyDto dto);
+        Task<PolicyDto?> PurchaseAsync(CreatePolicyDto dto);
 
         Task<IEnumerable<PolicyDto>> GetAllPolicy();
 

@@ -43,5 +43,23 @@ namespace InsureTrust.IdentityService.Controllers
             var result = await _authService.UpdateProfileAsync(userId, dto, uploadPath);
             return Ok(new ApiResponse<UserDto>(result, "Profile updated successfully."));
         }
+
+        [AllowAnonymous]
+        [HttpPut("update-balance")]
+        public async Task<ActionResult<ApiResponse<bool>>> UpdateBalanceAsync([FromBody] UpdateBalanceDto dto)
+        {
+            if (dto == null || dto.UserId <= 0 || dto.AmountToDeduct <= 0)
+                return BadRequest(new ApiResponse<bool>("Invalid user ID or amount."));
+
+            try
+            {
+                var result = await _authService.UpdateUserBalanceAsync(dto.UserId, dto.AmountToDeduct);
+                return Ok(new ApiResponse<bool>(result, "Balance updated successfully."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<bool>(ex.Message));
+            }
+        }
     }
 }

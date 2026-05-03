@@ -60,7 +60,9 @@ namespace InsureTrust.Web.Models
         public string PolicyTypeName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal MaturityAmount { get; set; }
+        public string ClaimStatus { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
+
         public DateTime SubmittedAt { get; set; }
         public DateTime? ProcessedAt { get; set; }
         public List<string> DocumentUrls { get; set; } = new();
